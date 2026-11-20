@@ -1,3 +1,7 @@
+import { formatNumber } from '@/lib/locale';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { Upload, Download, Trash2, FileText, File, Image, Video, Loader2, Eye } from 'lucide-react';
 import { getGroupAssets, deleteGroupAsset } from '@/services/group';
@@ -12,6 +16,7 @@ interface GroupAssetsProps {
 }
 
 export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
+    useTranslation();
     const [assets, setAssets] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showUploadModal, setShowUploadModal] = useState(false);
@@ -26,7 +31,7 @@ export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
             if (preview) setPreviewFile({ url: resolved, name });
             else window.open(resolved, '_blank', 'noopener,noreferrer');
         } catch {
-            window.alert('This file is unavailable or you no longer have access.');
+            window.alert(t("groups:thisFileIsUnavailableOrYouNoLongerHave"));
         }
     };
 
@@ -48,7 +53,7 @@ export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
     }, [loadAssets]);
 
     const handleDelete = async (assetId: string) => {
-        if (!confirm('Are you sure you want to delete this asset?')) return;
+        if (!confirm(t("groups:areYouSureYouWantToDeleteThisAsset"))) return;
 
         try {
             setDeletingId(assetId);
@@ -56,7 +61,7 @@ export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
             setAssets((prev) => prev.filter((a) => a.id !== assetId));
         } catch (error) {
             console.error('Error deleting asset:', error);
-            alert('Failed to delete asset');
+            alert(t("groups:failedToDeleteAsset"));
         } finally {
             setDeletingId(null);
         }
@@ -78,12 +83,12 @@ export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
     const formatFileSize = (bytes: number | null) => {
         if (!bytes) return 'N/A';
         if (bytes < 1024) return `${bytes} B`;
-        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        if (bytes < 1024 * 1024) return t("groups:kB", { value1: formatNumber((bytes / 1024), { minimumFractionDigits: 1, maximumFractionDigits: 1 }) });
+        return t("groups:mB", { value1: formatNumber((bytes / (1024 * 1024)), { minimumFractionDigits: 1, maximumFractionDigits: 1 }) });
     };
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+        return new Date(dateString).toLocaleDateString(activeLanguage(), {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
@@ -111,10 +116,8 @@ export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-surface-900 dark:text-surface-50">Course Materials</h2>
-                    <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                        {assets.length} {assets.length === 1 ? 'file' : 'files'} uploaded
-                    </p>
+                    <h2 className="text-2xl font-bold text-surface-900 dark:text-surface-50">{t("groups:courseMaterials")}</h2>
+                    <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">{t("groups:uploaded", { count: assets.length })}</p>
                 </div>
                 {canUpload && (
                     <button
@@ -122,8 +125,7 @@ export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
                         className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
                     >
                         <Upload className="w-4 h-4" />
-                        Upload Files
-                    </button>
+                        {t("groups:uploadFiles")}</button>
                 )}
             </div>
 
@@ -131,11 +133,11 @@ export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
             {assets.length === 0 ? (
                 <div className="text-center py-12 bg-surface-50 dark:bg-surface-900 rounded-lg border-2 border-dashed border-surface-200 dark:border-surface-700">
                     <FileText className="w-12 h-12 mx-auto text-surface-400 dark:text-surface-500 mb-3" />
-                    <h3 className="text-lg font-medium text-surface-900 dark:text-surface-50 mb-1">No materials yet</h3>
+                    <h3 className="text-lg font-medium text-surface-900 dark:text-surface-50 mb-1">{t("groups:noMaterialsYet")}</h3>
                     <p className="text-sm text-surface-500 dark:text-surface-400 mb-4">
                         {canUpload
-                            ? 'Upload course materials, PDFs, documents, and resources for students.'
-                            : 'Course materials will appear here when uploaded by instructors.'}
+                            ? t("groups:uploadCourseMaterialsPDFsDocumentsAndResourcesForStudents")
+                            : t("groups:courseMaterialsWillAppearHereWhenUploadedByInstructors")}
                     </p>
                     {canUpload && (
                         <button
@@ -143,8 +145,7 @@ export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
                             className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg text-surface-700 dark:text-surface-300 font-medium hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors"
                         >
                             <Upload className="w-4 h-4" />
-                            Upload Your First File
-                        </button>
+                            {t("groups:uploadYourFirstFile")}</button>
                     )}
                 </div>
             ) : (
@@ -154,20 +155,15 @@ export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
                             <thead className="bg-surface-50 dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700">
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">
-                                        Name
-                                    </th>
+                                        {t("groups:name")}</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">
-                                        Type
-                                    </th>
+                                        {t("groups:type")}</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">
-                                        Size
-                                    </th>
+                                        {t("groups:size")}</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">
-                                        Date
-                                    </th>
+                                        {t("groups:date")}</th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">
-                                        Actions
-                                    </th>
+                                        {t("groups:actions")}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-surface-200 dark:divide-surface-700">
@@ -198,7 +194,7 @@ export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
                                                     <button
                                                         onClick={() => openAsset(item.asset.file_url, item.asset.filename, true)}
                                                         className="p-2 text-surface-500 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
-                                                        title="Preview"
+                                                        title={t("groups:preview")}
                                                     >
                                                         <Eye className="w-4 h-4" />
                                                     </button>
@@ -206,7 +202,7 @@ export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
                                                 <button
                                                     onClick={() => openAsset(item.asset.file_url, item.asset.filename, false)}
                                                     className="p-2 text-surface-500 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
-                                                    title="Download"
+                                                    title={t("groups:download")}
                                                 >
                                                     <Download className="w-4 h-4" />
                                                 </button>
@@ -215,7 +211,7 @@ export default function GroupAssets({ groupId, userRole }: GroupAssetsProps) {
                                                         onClick={() => handleDelete(item.id)}
                                                         disabled={deletingId === item.id}
                                                         className="p-2 text-surface-500 dark:text-surface-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
-                                                        title="Delete"
+                                                        title={t("groups:delete")}
                                                     >
                                                         {deletingId === item.id ? (
                                                             <Loader2 className="w-4 h-4 animate-spin" />

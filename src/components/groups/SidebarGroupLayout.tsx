@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { Lock } from 'lucide-react';
 import { GroupHeader, GroupMembers, GroupTabs, GroupAssets, GroupRecordings } from '@/components/groups';
 import type { TabValue } from '@/components/groups/GroupTabs';
@@ -27,6 +29,7 @@ export default function SidebarGroupLayout({
     isLeaving,
     onMemberChange,
 }: SidebarGroupLayoutProps) {
+    useTranslation();
     if (!canViewContent) {
         return (
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -35,12 +38,9 @@ export default function SidebarGroupLayout({
                         <Lock className="w-8 h-8 text-surface-400 dark:text-surface-500" />
                     </div>
                     <h3 className="text-lg font-medium text-surface-900 dark:text-surface-50 mb-2">
-                        This is a private classroom
-                    </h3>
+                        {t("groups:thisIsAPrivateClassroom")}</h3>
                     <p className="text-surface-500 dark:text-surface-400 max-w-md mx-auto">
-                        You need to be a member to see the content of this classroom.
-                        Request to join or contact the classroom admin.
-                    </p>
+                        {t("groups:youNeedToBeAMemberToSeeThe")}</p>
                 </div>
             </div>
         );

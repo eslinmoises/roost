@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { searchUsers, SearchResultUser } from '@/services/search';
@@ -9,6 +11,7 @@ interface MentionDropdownProps {
 }
 
 export default function MentionDropdown({ query, onSelect, onClose }: MentionDropdownProps) {
+    useTranslation();
     const [results, setResults] = useState<SearchResultUser[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -70,8 +73,7 @@ export default function MentionDropdown({ query, onSelect, onClose }: MentionDro
                 </div>
             ) : results.length === 0 ? (
                 <div className="p-3 text-sm text-surface-500 dark:text-surface-400 text-center">
-                    No users found
-                </div>
+                    {t("posts:noUsersFound")}</div>
             ) : (
                 <div className="py-1 max-h-48 overflow-y-auto">
                     {results.map((user, index) => (

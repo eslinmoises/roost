@@ -1,3 +1,7 @@
+import { formatNumber } from '@/lib/locale';
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Crown, Shield, ChevronRight, MoreVertical, UserMinus, ShieldPlus, ShieldMinus, Loader2 } from 'lucide-react';
@@ -23,6 +27,7 @@ export default function GroupMembers({
     limit = 5,
     onMemberChange,
 }: GroupMembersProps) {
+    useTranslation();
     const { user } = useAuth();
     const [members, setMembers] = useState<GroupMemberWithProfile[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -114,12 +119,12 @@ export default function GroupMembers({
             onMemberChange?.();
         } catch (error) {
             console.error('Error updating role:', error);
-            alert(error instanceof Error ? error.message : 'Failed to update role');
+            alert(error instanceof Error ? localizeError(error.message) : t("groups:failedToUpdateRole"));
         }
     };
 
     const handleRemoveMember = async (memberId: string) => {
-        if (!confirm('Are you sure you want to remove this member?')) return;
+        if (!confirm(t("groups:areYouSureYouWantToRemoveThisMember"))) return;
 
         try {
             await removeMember(groupId, memberId);
@@ -129,7 +134,7 @@ export default function GroupMembers({
             onMemberChange?.();
         } catch (error) {
             console.error('Error removing member:', error);
-            alert(error instanceof Error ? error.message : 'Failed to remove member');
+            alert(error instanceof Error ? localizeError(error.message) : t("groups:failedToRemoveMember"));
         }
     };
 
@@ -149,8 +154,7 @@ export default function GroupMembers({
             <div className="card p-6">
                 <h3 className="font-semibold text-surface-900 dark:text-surface-50 mb-4 flex items-center gap-2">
                     <Users className="w-5 h-5" />
-                    Members
-                </h3>
+                    {t("groups:members2")}</h3>
                 <div className="space-y-3">
                     {[...Array(3)].map((_, i) => (
                         <div key={i} className="flex items-center gap-3 animate-pulse">
@@ -170,8 +174,7 @@ export default function GroupMembers({
             <div className="card p-6">
                 <h3 className="font-semibold text-surface-900 dark:text-surface-50 mb-4 flex items-center gap-2">
                     <Users className="w-5 h-5" />
-                    Members
-                </h3>
+                    {t("groups:members2")}</h3>
                 <div className="space-y-3">
                     {members.map((member) => (
                         <Link
@@ -206,8 +209,7 @@ export default function GroupMembers({
                         to="/members"
                         className="flex items-center justify-center gap-1 mt-4 pt-4 border-t border-surface-100 dark:border-surface-700 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
                     >
-                        View all members
-                        <ChevronRight className="w-4 h-4" />
+                        {t("groups:viewAllMembers")}<ChevronRight className="w-4 h-4" />
                     </Link>
                 )}
             </div>
@@ -220,7 +222,7 @@ export default function GroupMembers({
             <div className="p-6 border-b border-surface-100 dark:border-surface-700">
                 <h3 className="font-semibold text-surface-900 dark:text-surface-50 flex items-center gap-2">
                     <Users className="w-5 h-5" />
-                    Members ({members.length}{hasMore ? '+' : ''})
+                    {t("groups:members3")}{formatNumber(members.length)}{hasMore ? '+' : ''})
                 </h3>
             </div>
             <div className="divide-y divide-surface-100 dark:divide-surface-700">
@@ -264,7 +266,7 @@ export default function GroupMembers({
                                 member.role === 'moderator' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' :
                                     'bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400'}
                         `}>
-                            {member.role && (member.role.charAt(0).toUpperCase() + member.role.slice(1))}
+                            {member.role && (t(`common:role_${member.role}`))}
                         </span>
 
                         {/* Actions menu */}
@@ -285,8 +287,7 @@ export default function GroupMembers({
                                                 className="w-full flex items-center gap-2 px-4 py-2 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-700"
                                             >
                                                 <ShieldPlus className="w-4 h-4" />
-                                                Make Moderator
-                                            </button>
+                                                {t("groups:makeModerator")}</button>
                                         )}
                                         {canPromote && member.role === 'moderator' && (
                                             <>
@@ -295,15 +296,13 @@ export default function GroupMembers({
                                                     className="w-full flex items-center gap-2 px-4 py-2 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-700"
                                                 >
                                                     <Crown className="w-4 h-4" />
-                                                    Make Admin
-                                                </button>
+                                                    {t("groups:makeAdmin")}</button>
                                                 <button
                                                     onClick={() => handleRoleChange(member.user_id, 'member')}
                                                     className="w-full flex items-center gap-2 px-4 py-2 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-700"
                                                 >
                                                     <ShieldMinus className="w-4 h-4" />
-                                                    Remove Moderator
-                                                </button>
+                                                    {t("groups:removeModerator")}</button>
                                             </>
                                         )}
                                         <button
@@ -311,8 +310,7 @@ export default function GroupMembers({
                                             className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                                         >
                                             <UserMinus className="w-4 h-4" />
-                                            Remove from Classroom
-                                        </button>
+                                            {t("groups:removeFromClassroom")}</button>
                                     </div>
                                 )}
                             </div>
@@ -326,12 +324,11 @@ export default function GroupMembers({
                         {loadingMore ? (
                             <div className="flex items-center justify-center gap-2 text-surface-500 dark:text-surface-400">
                                 <Loader2 className="w-5 h-5 animate-spin" />
-                                <span className="text-sm">Loading more members...</span>
+                                <span className="text-sm">{t("groups:loadingMoreMembers")}</span>
                             </div>
                         ) : (
                             <span className="text-sm text-surface-400 dark:text-surface-500">
-                                Scroll for more
-                            </span>
+                                {t("groups:scrollForMore")}</span>
                         )}
                     </div>
                 )}

@@ -1,4 +1,7 @@
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
+
 import { ChevronDown, Shield, SlidersHorizontal } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Category } from '@/types';
@@ -30,6 +33,7 @@ export default function CategoryFilter({
     sortBy = 'newest',
     onSortChange,
 }: CategoryFilterProps) {
+    useTranslation();
     const [topicOpen, setTopicOpen] = useState(false);
     const [sortOpen, setSortOpen] = useState(false);
     const topicRef = useRef<HTMLDivElement>(null);
@@ -50,7 +54,7 @@ export default function CategoryFilter({
     }, []);
 
     const selectedCategory = categories.find(c => c.id === selectedCategoryId);
-    const topicLabel = selectedCategory ? selectedCategory.name : 'All Topics';
+    const topicLabel = selectedCategory ? selectedCategory.name : t("posts:allTopics");
 
     return (
         <div className="flex items-center gap-2 flex-wrap">
@@ -82,8 +86,7 @@ export default function CategoryFilter({
                                     : 'text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-700'
                             }`}
                         >
-                            All Topics
-                        </button>
+                            {t("posts:allTopics")}</button>
                         {categories.map(category => (
                             <button
                                 key={category.id}
@@ -141,9 +144,9 @@ export default function CategoryFilter({
                                 >
                                     {SORT_LABELS[option]}
                                     <span className="block text-xs text-surface-400 dark:text-surface-500 mt-0.5">
-                                        {option === 'newest' && 'Most recent posts'}
-                                        {option === 'popular' && 'Most reactions'}
-                                        {option === 'trending' && 'Most commented'}
+                                        {option === 'newest' && t("posts:mostRecentPosts")}
+                                        {option === 'popular' && t("posts:mostReactions")}
+                                        {option === 'trending' && t("posts:mostCommented")}
                                     </span>
                                 </button>
                             ))}
@@ -166,8 +169,7 @@ export default function CategoryFilter({
                     `}
                 >
                     <Shield className="w-3.5 h-3.5" />
-                    Admin Posts
-                </button>
+                    {t("posts:adminPosts")}</button>
             )}
         </div>
     );

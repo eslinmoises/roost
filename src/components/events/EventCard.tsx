@@ -1,5 +1,8 @@
+import { format } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { MapPin, Video, Users, Clock } from 'lucide-react';
-import { format } from 'date-fns';
+
 import type { EventWithDetails } from '../../types';
 import RSVPButton from './RSVPButton';
 import type { RSVPStatus } from '../../types/database';
@@ -12,6 +15,7 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event, onRSVP, onClick, showGroup = true }: EventCardProps) {
+    useTranslation();
     const startDate = new Date(event.start_time);
     const endDate = new Date(event.end_time);
     const isPast = endDate < new Date();
@@ -46,7 +50,7 @@ export default function EventCard({ event, onRSVP, onClick, showGroup = true }: 
                             : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                         }
                     `}>
-                        {event.is_virtual ? 'Virtual' : 'In Person'}
+                        {event.is_virtual ? t("common:uiVirtual") : t("events:inPerson")}
                     </div>
                 </div>
 
@@ -78,7 +82,7 @@ export default function EventCard({ event, onRSVP, onClick, showGroup = true }: 
                     event.meeting_url && (
                         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                             <Video size={16} className="text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                            <span className="truncate">Online Meeting</span>
+                            <span className="truncate">{t("events:onlineMeeting")}</span>
                         </div>
                     )
                 ) : (
@@ -94,10 +98,7 @@ export default function EventCard({ event, onRSVP, onClick, showGroup = true }: 
                 {event.attendeeCount && (
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                         <Users size={16} className="text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                        <span>
-                            {event.attendeeCount.going} going
-                            {event.attendeeCount.maybe > 0 && `, ${event.attendeeCount.maybe} maybe`}
-                        </span>
+                        <span>{t("events:going", { value1: event.attendeeCount.going, value2: event.attendeeCount.maybe > 0 ? t('events:maybeCount', { count: event.attendeeCount.maybe }) : '' })}</span>
                     </div>
                 )}
 
@@ -123,7 +124,7 @@ export default function EventCard({ event, onRSVP, onClick, showGroup = true }: 
                 {/* Past event indicator */}
                 {isPast && (
                     <div className="pt-3 border-t border-gray-100 dark:border-surface-700">
-                        <span className="text-sm text-gray-500 dark:text-gray-400 italic">This event has ended</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 italic">{t("events:thisEventHasEnded")}</span>
                     </div>
                 )}
             </div>

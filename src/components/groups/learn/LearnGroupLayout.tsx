@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Lock, Loader2 } from 'lucide-react';
@@ -37,6 +39,7 @@ export default function LearnGroupLayout({
     group,
     canViewContent,
 }: LearnGroupLayoutProps) {
+    useTranslation();
     const { user } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -171,7 +174,7 @@ export default function LearnGroupLayout({
 
     const handleDeleteModule = async () => {
         if (!activeModule) return;
-        if (!confirm(`Are you sure you want to delete the module "${activeModule.title}"? This will unassign all recordings and assets.`)) return;
+        if (!confirm(t("classroom:areYouSureYouWantToDeleteTheModule", { value1: activeModule.title }))) return;
 
         try {
             await deleteModule(activeModule.id);
@@ -179,7 +182,7 @@ export default function LearnGroupLayout({
             loadModules();
         } catch (error) {
             console.error('Error deleting module:', error);
-            alert('Failed to delete module');
+            alert(t("classroom:failedToDeleteModule"));
         }
     };
 
@@ -202,11 +205,9 @@ export default function LearnGroupLayout({
                         <Lock className="w-8 h-8 text-surface-400 dark:text-surface-500" />
                     </div>
                     <h3 className="text-lg font-medium text-surface-900 dark:text-surface-50 mb-2">
-                        This is a private classroom
-                    </h3>
+                        {t("classroom:thisIsAPrivateClassroom")}</h3>
                     <p className="text-surface-500 dark:text-surface-400 max-w-md mx-auto">
-                        You need to be a member to see the content of this classroom.
-                    </p>
+                        {t("classroom:youNeedToBeAMemberToSeeThe")}</p>
                 </div>
             </div>
         );

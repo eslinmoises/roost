@@ -1,7 +1,11 @@
+import { formatNumber } from '@/lib/locale';
+import { formatDistanceToNow } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { Link } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
+
 import {
     MoreHorizontal,
     Edit2,
@@ -42,12 +46,12 @@ interface CommentItemProps {
 }
 
 const reactionIcons: Record<ReactionType, { icon: typeof Heart; label: string; color: string; bgColor: string }> = {
-    like: { icon: ThumbsUp, label: 'Like', color: 'text-blue-500', bgColor: 'hover:bg-blue-50 dark:hover:bg-blue-900/30' },
-    love: { icon: Heart, label: 'Love', color: 'text-red-500', bgColor: 'hover:bg-red-50 dark:hover:bg-red-900/30' },
-    fire: { icon: Flame, label: 'Fire', color: 'text-orange-500', bgColor: 'hover:bg-orange-50 dark:hover:bg-orange-900/30' },
-    clap: { icon: Hand, label: 'Clap', color: 'text-yellow-500', bgColor: 'hover:bg-yellow-50 dark:hover:bg-yellow-900/30' },
-    think: { icon: Brain, label: 'Think', color: 'text-purple-500', bgColor: 'hover:bg-purple-50 dark:hover:bg-purple-900/30' },
-    haha: { icon: Laugh, label: 'Haha', color: 'text-green-500', bgColor: 'hover:bg-green-50 dark:hover:bg-green-900/30' },
+    like: { icon: ThumbsUp, get label() { return t("posts:like"); }, color: 'text-blue-500', bgColor: 'hover:bg-blue-50 dark:hover:bg-blue-900/30' },
+    love: { icon: Heart, get label() { return t("posts:love"); }, color: 'text-red-500', bgColor: 'hover:bg-red-50 dark:hover:bg-red-900/30' },
+    fire: { icon: Flame, get label() { return t("posts:fire"); }, color: 'text-orange-500', bgColor: 'hover:bg-orange-50 dark:hover:bg-orange-900/30' },
+    clap: { icon: Hand, get label() { return t("posts:clap"); }, color: 'text-yellow-500', bgColor: 'hover:bg-yellow-50 dark:hover:bg-yellow-900/30' },
+    think: { icon: Brain, get label() { return t("posts:think"); }, color: 'text-purple-500', bgColor: 'hover:bg-purple-50 dark:hover:bg-purple-900/30' },
+    haha: { icon: Laugh, get label() { return t("posts:haha"); }, color: 'text-green-500', bgColor: 'hover:bg-green-50 dark:hover:bg-green-900/30' },
 };
 
 const DEFAULT_REACTION_COUNTS: ReactionCounts = { like: 0, love: 0, fire: 0, clap: 0, think: 0, haha: 0, total: 0 };
@@ -66,6 +70,7 @@ function CommentItem({
     userReactionsMap,
     userVotesMap,
 }: CommentItemProps) {
+    useTranslation();
     const { user } = useAuth();
     const [showMenu, setShowMenu] = useState(false);
     const [showReplies, setShowReplies] = useState(true);
@@ -225,7 +230,7 @@ function CommentItem({
     };
 
     const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete this comment?')) {
+        if (window.confirm(t("posts:areYouSureYouWantToDeleteThisComment"))) {
             await onDelete(comment.id);
         }
     };
@@ -286,7 +291,7 @@ function CommentItem({
                             }
                             <span className="text-xs text-surface-400 dark:text-surface-500 ml-2">
                                 {formatDistanceToNow(new Date(comment.created_at || Date.now()), { addSuffix: true })}
-                                {comment.is_edited && <span className="ml-1">(edited)</span>}
+                                {comment.is_edited && <span className="ml-1">{t("posts:edited")}</span>}
                             </span>
                         </div>
                     </Link>
@@ -311,8 +316,7 @@ function CommentItem({
                                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-surface-700 dark:text-surface-200 hover:bg-surface-50 dark:hover:bg-surface-700"
                                     >
                                         <Edit2 className="w-3.5 h-3.5" />
-                                        Edit
-                                    </button>
+                                        {t("posts:edit")}</button>
                                     <button
                                         onClick={() => {
                                             handleDelete();
@@ -321,8 +325,7 @@ function CommentItem({
                                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
-                                        Delete
-                                    </button>
+                                        {t("posts:delete")}</button>
                                 </div>
                             )}
                         </div>
@@ -368,7 +371,7 @@ function CommentItem({
                             })}
                         </div>
                         <span className="text-xs text-surface-400 group-hover:text-surface-600 dark:group-hover:text-surface-300 transition-colors">
-                            {reactionCounts.total}
+                            {formatNumber(reactionCounts.total)}
                         </span>
                     </button>
                 )}
@@ -395,7 +398,7 @@ function CommentItem({
                                     }`}
                             >
                                 <ReactionIcon className="w-4 h-4" />
-                                <span>{currentReaction ? reactionIcons[currentReaction].label : 'React'}</span>
+                                <span>{currentReaction ? reactionIcons[currentReaction].label : t("common:uiReact")}</span>
                             </button>
 
                             {/* Reaction picker popup */}
@@ -438,7 +441,7 @@ function CommentItem({
                                         ? 'text-green-500'
                                         : 'text-surface-400 hover:text-surface-600 dark:hover:text-surface-300'
                                 }`}
-                                title="Upvote"
+                                title={t("posts:upvote")}
                             >
                                 <ChevronUp className="w-4 h-4" />
                             </button>
@@ -448,7 +451,7 @@ function CommentItem({
                                     voteCounts.score < 0 ? 'text-red-500 dark:text-red-400' :
                                     'text-surface-400'
                                 }`}>
-                                    {voteCounts.score}
+                                    {formatNumber(voteCounts.score)}
                                 </span>
                             )}
                             <button
@@ -459,7 +462,7 @@ function CommentItem({
                                         ? 'text-red-500'
                                         : 'text-surface-400 hover:text-surface-600 dark:hover:text-surface-300'
                                 }`}
-                                title="Downvote"
+                                title={t("posts:downvote")}
                             >
                                 <ChevronDown className="w-4 h-4" />
                             </button>
@@ -472,8 +475,7 @@ function CommentItem({
                                 className="flex items-center gap-1 text-xs text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 transition-colors"
                             >
                                 <MessageCircle className="w-4 h-4" />
-                                Reply
-                            </button>
+                                {t("posts:reply")}</button>
                         )}
 
                         {hasReplies && (
@@ -484,12 +486,12 @@ function CommentItem({
                                 {showReplies ? (
                                     <>
                                         <ChevronUp className="w-4 h-4" />
-                                        Hide {comment.replies!.length} {comment.replies!.length === 1 ? 'reply' : 'replies'}
+                                        {t('posts:hideReplies', { count: comment.replies!.length })}
                                     </>
                                 ) : (
                                     <>
                                         <ChevronDown className="w-4 h-4" />
-                                        Show {comment.replies!.length} {comment.replies!.length === 1 ? 'reply' : 'replies'}
+                                        {t('posts:showReplies', { count: comment.replies!.length })}
                                     </>
                                 )}
                             </button>
@@ -502,7 +504,7 @@ function CommentItem({
                     <div className="mt-3">
                         <CommentForm
                             onSubmit={handleReplySubmit}
-                            placeholder={`Reply to ${comment.author.display_name}...`}
+                            placeholder={t("posts:replyTo", { value1: comment.author.display_name })}
                             onCancel={() => setIsReplying(false)}
                             autoFocus
                             isReply

@@ -1,5 +1,8 @@
+import { format } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+
 import { X } from 'lucide-react';
 import type { Event } from '../../types/database';
 import { useAuth } from '../../contexts/AuthContext';
@@ -25,6 +28,7 @@ export interface EventFormData {
 }
 
 export default function EventForm({ isOpen, onClose, onSubmit, initialData, groupId }: EventFormProps) {
+    useTranslation();
     const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [userGroups, setUserGroups] = useState<GroupWithDetails[]>([]);
@@ -114,7 +118,7 @@ export default function EventForm({ isOpen, onClose, onSubmit, initialData, grou
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-surface-700">
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        {initialData ? 'Edit Event' : 'Create New Event'}
+                        {initialData ? t("events:editEvent") : t("events:createNewEvent")}
                     </h2>
                     <button
                         onClick={onClose}
@@ -129,14 +133,13 @@ export default function EventForm({ isOpen, onClose, onSubmit, initialData, grou
                     {/* Group Selection */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Group (Optional)
-                        </label>
+                            {t("events:groupOptional")}</label>
                         <select
                             value={formData.group_id || ''}
                             onChange={(e) => handleChange('group_id', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         >
-                            <option value="">General (Community Event)</option>
+                            <option value="">{t("events:generalCommunityEvent")}</option>
                             {userGroups.map((group) => (
                                 <option key={group.id} value={group.id}>
                                     {group.name}
@@ -144,14 +147,13 @@ export default function EventForm({ isOpen, onClose, onSubmit, initialData, grou
                             ))}
                         </select>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            Select "General" for community-wide events, or choose a specific group.
-                        </p>
+                            {t("events:selectGeneralForCommunityWideEventsOrChooseA")}</p>
                     </div>
 
                     {/* Title */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Event Title <span className="text-red-500">*</span>
+                            {t("events:eventTitle")} <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
@@ -159,21 +161,20 @@ export default function EventForm({ isOpen, onClose, onSubmit, initialData, grou
                             value={formData.title}
                             onChange={(e) => handleChange('title', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="Monthly Team Meetup"
+                            placeholder={t("events:monthlyTeamMeetup")}
                         />
                     </div>
 
                     {/* Description */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Description
-                        </label>
+                            {t("events:description")}</label>
                         <textarea
                             value={formData.description}
                             onChange={(e) => handleChange('description', e.target.value)}
                             rows={4}
                             className="w-full px-3 py-2 border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="Tell attendees what to expect..."
+                            placeholder={t("events:tellAttendeesWhatToExpect")}
                         />
                     </div>
 
@@ -181,7 +182,7 @@ export default function EventForm({ isOpen, onClose, onSubmit, initialData, grou
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Start Date & Time <span className="text-red-500">*</span>
+                                {t("events:startDateTime")} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="datetime-local"
@@ -193,7 +194,7 @@ export default function EventForm({ isOpen, onClose, onSubmit, initialData, grou
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                End Date & Time <span className="text-red-500">*</span>
+                                {t("events:endDateTime")} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="datetime-local"
@@ -215,16 +216,14 @@ export default function EventForm({ isOpen, onClose, onSubmit, initialData, grou
                             className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
                         />
                         <label htmlFor="is_virtual" className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
-                            This is a virtual event
-                        </label>
+                            {t("events:thisIsAVirtualEvent")}</label>
                     </div>
 
                     {/* Location OR Meeting URL */}
                     {formData.is_virtual ? (
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Meeting URL
-                            </label>
+                                {t("events:meetingURL")}</label>
                             <input
                                 type="url"
                                 value={formData.meeting_url}
@@ -233,20 +232,18 @@ export default function EventForm({ isOpen, onClose, onSubmit, initialData, grou
                                 placeholder="https://zoom.us/j/123456789"
                             />
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                Optional: Add after event creation or closer to event date
-                            </p>
+                                {t("events:optionalAddAfterEventCreationOrCloserToEvent")}</p>
                         </div>
                     ) : (
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Location
-                            </label>
+                                {t("events:location")}</label>
                             <input
                                 type="text"
                                 value={formData.location}
                                 onChange={(e) => handleChange('location', e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                placeholder="123 Main St, City, State"
+                                placeholder={t("events:123MainStCityState")}
                             />
                         </div>
                     )}
@@ -259,14 +256,13 @@ export default function EventForm({ isOpen, onClose, onSubmit, initialData, grou
                         onClick={onClose}
                         className="px-4 py-2 border border-gray-300 dark:border-surface-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-surface-800 transition-colors"
                     >
-                        Cancel
-                    </button>
+                        {t("events:cancel")}</button>
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
                         className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
                     >
-                        {loading ? 'Saving...' : initialData ? 'Update Event' : 'Create Event'}
+                        {loading ? t("common:uiSaving") : initialData ? t("events:updateEvent") : t("events:createEvent")}
                     </button>
                 </div>
             </div>

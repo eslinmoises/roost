@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { Video } from 'lucide-react';
 import type { ModuleWithProgress } from '@/types';
 import ProgressBar from './ProgressBar';
@@ -8,6 +11,7 @@ interface ModuleCardProps {
 }
 
 export default function ModuleCard({ module, onClick }: ModuleCardProps) {
+    useTranslation();
     return (
         <button
             onClick={() => onClick(module.id)}
@@ -46,11 +50,9 @@ export default function ModuleCard({ module, onClick }: ModuleCardProps) {
                 <div className="space-y-1.5">
                     <ProgressBar value={module.progress_percentage} size="md" />
                     <p className="text-xs text-surface-500 dark:text-surface-400">
-                        {module.progress_percentage}%
+                        {formatNumber(module.progress_percentage)}%
                         {module.recording_count > 0 && (
-                            <span className="ml-1">
-                                · {module.completed_count}/{module.recording_count} lessons
-                            </span>
+                            <span className="ml-1">{t("classroom:lessons", { value1: module.completed_count, value2: module.recording_count })}</span>
                         )}
                     </p>
                 </div>

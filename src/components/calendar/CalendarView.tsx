@@ -1,8 +1,11 @@
+import { format } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
 import { APP_CONFIG } from '@/config/app';
 import { Calendar as BigCalendar, dateFnsLocalizer } from 'react-big-calendar';
 import type { View } from 'react-big-calendar';
-import { format, parse, startOfWeek, getDay } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import { parse, startOfWeek, getDay } from 'date-fns';
+import { enUS, es } from 'date-fns/locale';
+import { activeLanguage, t } from '@/i18n';
 import { useState } from 'react';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import type { CalendarEvent, EventWithDetails } from '../../types';
@@ -17,7 +20,7 @@ const localizer = dateFnsLocalizer({
     parse,
     startOfWeek,
     getDay,
-    locales: { 'en-US': enUS },
+    locales: { en: enUS, es },
 });
 
 interface CalendarViewProps {
@@ -28,6 +31,7 @@ interface CalendarViewProps {
 }
 
 export default function CalendarView({ events, onCreateEvent, onRefresh, onRangeChange }: CalendarViewProps) {
+    useTranslation();
     const { user } = useAuth();
     const [selectedEvent, setSelectedEvent] = useState<EventWithDetails | null>(null);
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -288,6 +292,14 @@ export default function CalendarView({ events, onCreateEvent, onRefresh, onRange
             `}</style>
             <BigCalendar
                 localizer={localizer}
+                culture={activeLanguage()}
+                messages={{
+                    today: t('events:calendarToday'), previous: t('events:calendarPrevious'), next: t('events:calendarNext'),
+                    month: t('events:calendarMonth'), week: t('events:calendarWeek'), day: t('events:calendarDay'),
+                    agenda: t('events:calendarAgenda'), date: t('events:calendarDate'), time: t('events:calendarTime'),
+                    event: t('events:calendarEvent'), allDay: t('events:calendarAllDay'),
+                    noEventsInRange: t('events:calendarNoEvents'), showMore: count => t('events:calendarShowMore', { count }),
+                }}
                 events={calendarEvents}
                 startAccessor="start"
                 endAccessor="end"

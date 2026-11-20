@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { MessageCircle, Loader2 } from 'lucide-react';
 import {
@@ -31,6 +33,7 @@ export default function CommentSection({
     isExpanded = false,
     onCommentCountChange,
 }: CommentSectionProps) {
+    useTranslation();
     const targetId = postId || recordingId || '';
     const targetType = recordingId ? 'recording' : 'post';
     const { user, profile } = useAuth();
@@ -240,8 +243,8 @@ export default function CommentSection({
                 <MessageCircle className="w-5 h-5" />
                 <span>
                     {commentCount > 0
-                        ? `${commentCount} ${commentCount === 1 ? 'Comment' : 'Comments'}`
-                        : 'Add a comment'}
+                        ? t('common:countComments', { count: commentCount })
+                        : t("posts:addAComment")}
                 </span>
             </button>
 
@@ -264,7 +267,7 @@ export default function CommentSection({
                             <div className="flex-1">
                                 <CommentForm
                                     onSubmit={(content) => handleCreateComment(content)}
-                                    placeholder="Write a comment..."
+                                    placeholder={t("posts:writeAComment")}
                                 />
                             </div>
                         </div>
@@ -281,7 +284,7 @@ export default function CommentSection({
                     {!isLoading && comments.length === 0 && (
                         <div className="text-center py-8 text-surface-400 dark:text-surface-500">
                             <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                            <p className="text-sm">No comments yet. Be the first to comment!</p>
+                            <p className="text-sm">{t("posts:noCommentsYetBeTheFirstToComment")}</p>
                         </div>
                     )}
 
@@ -306,8 +309,7 @@ export default function CommentSection({
                                     onClick={() => loadComments(false, 0)}
                                     className="w-full py-2 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors"
                                 >
-                                    Load all comments
-                                </button>
+                                    {t("posts:loadAllComments")}</button>
                             )}
                         </div>
                     )}

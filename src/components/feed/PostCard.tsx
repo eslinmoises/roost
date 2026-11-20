@@ -1,3 +1,6 @@
+import { formatDistanceToNow } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { Link } from 'react-router-dom';
@@ -15,7 +18,7 @@ import {
     Laugh,
     Expand,
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+
 import DOMPurify from 'dompurify';
 import { PostWithDetails, getPostAssets } from '@/services';
 import { ReactionType } from '@/types';
@@ -52,12 +55,12 @@ interface PostCardProps {
 }
 
 const reactionIcons: Record<ReactionType, { icon: typeof Heart; label: string; color: string; bgColor: string }> = {
-    like: { icon: ThumbsUp, label: 'Like', color: 'text-blue-500', bgColor: 'hover:bg-blue-50 dark:hover:bg-blue-900/30' },
-    love: { icon: Heart, label: 'Love', color: 'text-red-500', bgColor: 'hover:bg-red-50 dark:hover:bg-red-900/30' },
-    fire: { icon: Flame, label: 'Fire', color: 'text-orange-500', bgColor: 'hover:bg-orange-50 dark:hover:bg-orange-900/30' },
-    clap: { icon: Hand, label: 'Clap', color: 'text-yellow-500', bgColor: 'hover:bg-yellow-50 dark:hover:bg-yellow-900/30' },
-    think: { icon: Brain, label: 'Think', color: 'text-purple-500', bgColor: 'hover:bg-purple-50 dark:hover:bg-purple-900/30' },
-    haha: { icon: Laugh, label: 'Haha', color: 'text-green-500', bgColor: 'hover:bg-green-50 dark:hover:bg-green-900/30' },
+    like: { icon: ThumbsUp, get label() { return t("posts:like"); }, color: 'text-blue-500', bgColor: 'hover:bg-blue-50 dark:hover:bg-blue-900/30' },
+    love: { icon: Heart, get label() { return t("posts:love"); }, color: 'text-red-500', bgColor: 'hover:bg-red-50 dark:hover:bg-red-900/30' },
+    fire: { icon: Flame, get label() { return t("posts:fire"); }, color: 'text-orange-500', bgColor: 'hover:bg-orange-50 dark:hover:bg-orange-900/30' },
+    clap: { icon: Hand, get label() { return t("posts:clap"); }, color: 'text-yellow-500', bgColor: 'hover:bg-yellow-50 dark:hover:bg-yellow-900/30' },
+    think: { icon: Brain, get label() { return t("posts:think"); }, color: 'text-purple-500', bgColor: 'hover:bg-purple-50 dark:hover:bg-purple-900/30' },
+    haha: { icon: Laugh, get label() { return t("posts:haha"); }, color: 'text-green-500', bgColor: 'hover:bg-green-50 dark:hover:bg-green-900/30' },
 };
 
 function PostCard({
@@ -71,6 +74,7 @@ function PostCard({
     isFollowingAuthor,
     onFollowToggle,
 }: PostCardProps) {
+    useTranslation();
     const { user, profile } = useAuth();
     const [showMenu, setShowMenu] = useState(false);
     const [showReactions, setShowReactions] = useState(false);
@@ -236,7 +240,7 @@ function PostCard({
             {post.is_pinned && (
                 <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 mb-3">
                     <Pin className="w-3 h-3" />
-                    <span className="font-medium">Pinned</span>
+                    <span className="font-medium">{t("posts:pinned")}</span>
                 </div>
             )}
 
@@ -287,7 +291,7 @@ function PostCard({
                                             : 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 hover:bg-primary-100 dark:hover:bg-primary-800/40'
                                     }`}
                                 >
-                                    {isFollowingAuthor ? 'Following' : 'Follow'}
+                                    {isFollowingAuthor ? t("common:uiFollowing") : t("common:uiFollow")}
                                 </button>
                             )}
                         </div>
@@ -296,7 +300,7 @@ function PostCard({
                             <span className="hidden sm:inline">•</span>
                             <span className="whitespace-nowrap">
                                 {formatDistanceToNow(new Date(post.created_at || Date.now()), { addSuffix: true })}
-                                {post.is_edited && <span className="text-surface-400 dark:text-surface-500"> (edited)</span>}
+                                {post.is_edited && <span className="text-surface-400 dark:text-surface-500"> {t("posts:edited")}</span>}
                             </span>
                         </div>
                     </div>
@@ -309,7 +313,7 @@ function PostCard({
                         <button
                             onClick={onClick}
                             className="p-2 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-full transition-colors"
-                            title="View post"
+                            title={t("posts:viewPost")}
                         >
                             <Expand className="w-5 h-5 text-surface-400" />
                         </button>
@@ -336,7 +340,7 @@ function PostCard({
                                             className="w-full flex items-center gap-2 px-4 py-2 text-sm text-surface-700 dark:text-surface-200 hover:bg-surface-50 dark:hover:bg-surface-700"
                                         >
                                             <Pin className="w-4 h-4" />
-                                            {post.is_pinned ? 'Unpin' : 'Pin'}
+                                            {post.is_pinned ? t("common:uiUnpin") : t("common:uiPin")}
                                         </button>
                                     )}
                                     {isAuthor && (
@@ -349,8 +353,7 @@ function PostCard({
                                                 className="w-full flex items-center gap-2 px-4 py-2 text-sm text-surface-700 dark:text-surface-200 hover:bg-surface-50 dark:hover:bg-surface-700"
                                             >
                                                 <Edit2 className="w-4 h-4" />
-                                                Edit
-                                            </button>
+                                                {t("posts:edit")}</button>
                                             <button
                                                 onClick={() => {
                                                     onDelete?.(post.id);
@@ -359,8 +362,7 @@ function PostCard({
                                                 className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                                             >
                                                 <Trash2 className="w-4 h-4" />
-                                                Delete
-                                            </button>
+                                                {t("posts:delete")}</button>
                                         </>
                                     )}
                                 </div>
@@ -403,7 +405,7 @@ function PostCard({
                         onClick={() => setIsContentExpanded(!isContentExpanded)}
                         className="mt-1 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
                     >
-                        {isContentExpanded ? 'See less' : 'See more'}
+                        {isContentExpanded ? t("posts:seeLess") : t("posts:seeMore")}
                     </button>
                 )}
             </div>
@@ -430,7 +432,7 @@ function PostCard({
                                 <div
                                     key={type}
                                     className="w-6 h-6 rounded-full bg-white dark:bg-surface-800 border-2 border-white dark:border-surface-900 flex items-center justify-center"
-                                    title={`${reactionIcons[type as ReactionType].label}: ${count}`}
+                                    title={t('common:labelCount', { label: reactionIcons[type as ReactionType].label, count })}
                                 >
                                     <Icon className={`w-4 h-4 ${color}`} />
                                 </div>
@@ -438,7 +440,7 @@ function PostCard({
                         })}
                     </div>
                     <span className="text-sm text-surface-500 dark:text-surface-400 group-hover:text-surface-700 dark:group-hover:text-surface-200 transition-colors">
-                        {reactionCounts.total} {reactionCounts.total === 1 ? 'reaction' : 'reactions'}
+                        {t('common:countReactions', { count: reactionCounts.total })}
                     </span>
                 </button>
             )}
@@ -467,7 +469,7 @@ function PostCard({
                         disabled={isReacting || APP_CONFIG.demo.enabled}
                     >
                         <ReactionIcon className="w-5 h-5" />
-                        <span>{reactionCounts.total > 0 ? reactionCounts.total : 'React'}</span>
+                        <span>{reactionCounts.total > 0 ? reactionCounts.total : t("common:uiReact")}</span>
                     </button>
 
                     {/* Reaction picker popup */}
@@ -510,7 +512,7 @@ function PostCard({
                         }`}
                 >
                     <MessageCircle className="w-5 h-5" />
-                    <span>{commentCount > 0 ? commentCount : 'Comment'}</span>
+                    <span>{commentCount > 0 ? commentCount : t("common:uiComment")}</span>
                 </button>
             </div>
 

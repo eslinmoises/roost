@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { groupTabs } from './groupTabsConfig';
 
 export type TabValue = 'feed' | 'assets' | 'recordings';
@@ -9,6 +10,7 @@ interface GroupTabsProps {
 }
 
 export default function GroupTabs({ activeTab, onTabChange, variant = 'full-width' }: GroupTabsProps) {
+    useTranslation();
     const tabButtons = groupTabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.value;

@@ -1,3 +1,5 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
 interface ProgressBarProps {
     value: number; // 0-100
     size?: 'sm' | 'md';
@@ -5,6 +7,7 @@ interface ProgressBarProps {
 }
 
 export default function ProgressBar({ value, size = 'sm', showLabel = false }: ProgressBarProps) {
+    useTranslation();
     const clampedValue = Math.min(100, Math.max(0, value));
     const height = size === 'sm' ? 'h-1.5' : 'h-2.5';
 
@@ -22,7 +25,7 @@ export default function ProgressBar({ value, size = 'sm', showLabel = false }: P
             </div>
             {showLabel && (
                 <span className="text-xs font-medium text-surface-500 dark:text-surface-400 tabular-nums">
-                    {clampedValue}%
+                    {formatNumber(clampedValue)}%
                 </span>
             )}
         </div>

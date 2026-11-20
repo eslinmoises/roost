@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Plus, Video, Loader2, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getGroupRecordings } from '@/services/group';
@@ -15,6 +18,7 @@ interface GroupRecordingsProps {
 }
 
 export default function GroupRecordings({ groupId, userRole }: GroupRecordingsProps) {
+    useTranslation();
     const [recordings, setRecordings] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
@@ -107,10 +111,8 @@ export default function GroupRecordings({ groupId, userRole }: GroupRecordingsPr
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-surface-900 dark:text-surface-50">Recordings</h2>
-                    <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                        {recordings.length} {recordings.length === 1 ? 'recording' : 'recordings'} available
-                    </p>
+                    <h2 className="text-2xl font-bold text-surface-900 dark:text-surface-50">{t("groups:recordings")}</h2>
+                    <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">{t("groups:available", { count: recordings.length })}</p>
                 </div>
                 <div className="flex items-center gap-3">
                     {/* Sort dropdown */}
@@ -121,10 +123,10 @@ export default function GroupRecordings({ groupId, userRole }: GroupRecordingsPr
                                 onChange={(e) => setSortBy(e.target.value as SortOption)}
                                 className="appearance-none pl-3 pr-8 py-2 text-sm border border-surface-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-surface-700 dark:text-surface-300 focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer"
                             >
-                                <option value="newest">Newest first</option>
-                                <option value="oldest">Oldest first</option>
-                                <option value="title_asc">Title A-Z</option>
-                                <option value="title_desc">Title Z-A</option>
+                                <option value="newest">{t("groups:newestFirst")}</option>
+                                <option value="oldest">{t("groups:oldestFirst")}</option>
+                                <option value="title_asc">{t("groups:titleAZ")}</option>
+                                <option value="title_desc">{t("groups:titleZA")}</option>
                             </select>
                             <ArrowUpDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400 pointer-events-none" />
                         </div>
@@ -135,8 +137,7 @@ export default function GroupRecordings({ groupId, userRole }: GroupRecordingsPr
                             className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
                         >
                             <Plus className="w-4 h-4" />
-                            Add Recording
-                        </button>
+                            {t("groups:addRecording")}</button>
                     )}
                 </div>
             </div>
@@ -145,11 +146,11 @@ export default function GroupRecordings({ groupId, userRole }: GroupRecordingsPr
             {recordings.length === 0 ? (
                 <div className="text-center py-12 bg-surface-50 dark:bg-surface-900 rounded-lg border-2 border-dashed border-surface-200 dark:border-surface-700">
                     <Video className="w-12 h-12 mx-auto text-surface-400 dark:text-surface-500 mb-3" />
-                    <h3 className="text-lg font-medium text-surface-900 dark:text-surface-50 mb-1">No recordings yet</h3>
+                    <h3 className="text-lg font-medium text-surface-900 dark:text-surface-50 mb-1">{t("groups:noRecordingsYet")}</h3>
                     <p className="text-sm text-surface-500 dark:text-surface-400 mb-4">
                         {canPublish
-                            ? 'Share YouTube or Vimeo videos with your students.'
-                            : 'Course recordings will appear here when published by instructors.'}
+                            ? t("groups:shareYouTubeOrVimeoVideosWithYourStudents")
+                            : t("groups:courseRecordingsWillAppearHereWhenPublishedByInstructors")}
                     </p>
                     {canPublish && (
                         <button
@@ -157,8 +158,7 @@ export default function GroupRecordings({ groupId, userRole }: GroupRecordingsPr
                             className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg text-surface-700 dark:text-surface-300 font-medium hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors"
                         >
                             <Plus className="w-4 h-4" />
-                            Add Your First Recording
-                        </button>
+                            {t("groups:addYourFirstRecording")}</button>
                     )}
                 </div>
             ) : (
@@ -178,9 +178,7 @@ export default function GroupRecordings({ groupId, userRole }: GroupRecordingsPr
                     {/* Pagination Controls */}
                     {totalPages > 1 && (
                         <div className="flex items-center justify-between pt-4">
-                            <p className="text-sm text-surface-500 dark:text-surface-400">
-                                Showing {startIndex + 1}-{Math.min(endIndex, sortedRecordings.length)} of {sortedRecordings.length} recordings
-                            </p>
+                            <p className="text-sm text-surface-500 dark:text-surface-400">{t("groups:showingOfRecordings", { value1: startIndex + 1, value2: Math.min(endIndex, sortedRecordings.length), value3: sortedRecordings.length })}</p>
                             <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
@@ -200,7 +198,7 @@ export default function GroupRecordings({ groupId, userRole }: GroupRecordingsPr
                                                     : 'text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800'
                                             }`}
                                         >
-                                            {page}
+                                            {formatNumber(page)}
                                         </button>
                                     ))}
                                 </div>

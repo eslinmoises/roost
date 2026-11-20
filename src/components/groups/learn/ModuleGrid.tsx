@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { Plus, BookOpen, Loader2 } from 'lucide-react';
 import type { ModuleWithProgress } from '@/types';
 import type { GroupRole } from '@/types';
@@ -18,6 +20,7 @@ export default function ModuleGrid({
     onModuleClick,
     onAddModule,
 }: ModuleGridProps) {
+    useTranslation();
     const canManage = userRole && (userRole === 'admin' || userRole === 'moderator');
 
     if (isLoading) {
@@ -33,10 +36,8 @@ export default function ModuleGrid({
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-bold text-surface-900 dark:text-surface-50">Modules</h2>
-                    <p className="text-sm text-surface-500 dark:text-surface-400 mt-0.5">
-                        {modules.length} {modules.length === 1 ? 'module' : 'modules'} available
-                    </p>
+                    <h2 className="text-xl font-bold text-surface-900 dark:text-surface-50">{t("classroom:modules")}</h2>
+                    <p className="text-sm text-surface-500 dark:text-surface-400 mt-0.5">{t("classroom:available", { count: modules.length })}</p>
                 </div>
                 {canManage && (
                     <button
@@ -44,8 +45,7 @@ export default function ModuleGrid({
                         className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
                     >
                         <Plus className="w-4 h-4" />
-                        Add Module
-                    </button>
+                        {t("classroom:addModule")}</button>
                 )}
             </div>
 
@@ -54,12 +54,11 @@ export default function ModuleGrid({
                 <div className="text-center py-12 bg-surface-50 dark:bg-surface-900 rounded-lg border-2 border-dashed border-surface-200 dark:border-surface-700">
                     <BookOpen className="w-12 h-12 mx-auto text-surface-400 dark:text-surface-500 mb-3" />
                     <h3 className="text-lg font-medium text-surface-900 dark:text-surface-50 mb-1">
-                        No modules yet
-                    </h3>
+                        {t("classroom:noModulesYet")}</h3>
                     <p className="text-sm text-surface-500 dark:text-surface-400 mb-4">
                         {canManage
-                            ? 'Create modules to organize your course content.'
-                            : 'Course modules will appear here when published by instructors.'}
+                            ? t("classroom:createModulesToOrganizeYourCourseContent")
+                            : t("classroom:courseModulesWillAppearHereWhenPublishedByInstructors")}
                     </p>
                     {canManage && (
                         <button
@@ -67,8 +66,7 @@ export default function ModuleGrid({
                             className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg text-surface-700 dark:text-surface-300 font-medium hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors"
                         >
                             <Plus className="w-4 h-4" />
-                            Create Your First Module
-                        </button>
+                            {t("classroom:createYourFirstModule")}</button>
                     )}
                 </div>
             ) : (

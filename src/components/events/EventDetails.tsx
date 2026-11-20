@@ -1,5 +1,8 @@
+import { format } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { X, Calendar, MapPin, Video, User, Edit, Trash2 } from 'lucide-react';
-import { format } from 'date-fns';
+
 import { useState, useEffect } from 'react';
 import type { EventWithDetails } from '../../types';
 import type { RSVPStatus } from '../../types/database';
@@ -24,6 +27,7 @@ export default function EventDetails({
     onEdit,
     onDelete,
 }: EventDetailsProps) {
+    useTranslation();
     const { user } = useAuth();
     const [deleting, setDeleting] = useState(false);
     const [showAttendees, setShowAttendees] = useState(false);
@@ -45,7 +49,7 @@ export default function EventDetails({
     const isCreator = user?.id === event.created_by;
 
     const handleDelete = async () => {
-        if (!onDelete || !confirm('Are you sure you want to delete this event?')) return;
+        if (!onDelete || !confirm(t("events:areYouSureYouWantToDeleteThisEvent"))) return;
 
         try {
             setDeleting(true);
@@ -81,7 +85,7 @@ export default function EventDetails({
                         )}
                     </div>
                     <button
-                        aria-label="Close event details"
+                        aria-label={t("events:closeEventDetails")}
                         onClick={onClose}
                         className="p-2 hover:bg-gray-100 dark:hover:bg-surface-800 rounded-lg transition-colors text-gray-600 dark:text-gray-400"
                     >
@@ -95,7 +99,7 @@ export default function EventDetails({
                     <div>
                         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
                             <Calendar size={20} />
-                            <span className="font-semibold">Date & Time</span>
+                            <span className="font-semibold">{t("events:dateTime")}</span>
                         </div>
                         <p className="text-gray-900 dark:text-gray-100 ml-7">
                             {format(startDate, 'EEEE, MMMM d, yyyy')}
@@ -109,7 +113,7 @@ export default function EventDetails({
                         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
                             {event.is_virtual ? <Video size={20} /> : <MapPin size={20} />}
                             <span className="font-semibold">
-                                {event.is_virtual ? 'Virtual Meeting' : 'Location'}
+                                {event.is_virtual ? t("events:virtualMeeting") : t("common:uiLocation")}
                             </span>
                         </div>
                         {event.is_virtual ? (
@@ -120,13 +124,12 @@ export default function EventDetails({
                                     rel="noopener noreferrer"
                                     className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 underline ml-7"
                                 >
-                                    Join Meeting
-                                </a>
+                                    {t("events:joinMeeting")}</a>
                             ) : (
-                                <p className="text-gray-500 dark:text-gray-400 ml-7 italic">Meeting link will be shared closer to the event</p>
+                                <p className="text-gray-500 dark:text-gray-400 ml-7 italic">{t("events:meetingLinkWillBeSharedCloserToTheEvent")}</p>
                             )
                         ) : (
-                            <p className="text-gray-900 dark:text-gray-100 ml-7">{event.location || 'TBA'}</p>
+                            <p className="text-gray-900 dark:text-gray-100 ml-7">{event.location || t("common:uiTBA")}</p>
                         )}
                     </div>
 
@@ -135,7 +138,7 @@ export default function EventDetails({
                         <div>
                             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
                                 <User size={20} />
-                                <span className="font-semibold">Hosted by</span>
+                                <span className="font-semibold">{t("events:hostedBy")}</span>
                             </div>
                             <div className="flex items-center gap-2 ml-7">
                                 {event.creator.avatar_url && (
@@ -156,7 +159,7 @@ export default function EventDetails({
                     {/* Description */}
                     {event.description && (
                         <div>
-                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">About</h3>
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{t("events:about")}</h3>
                             <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{event.description}</p>
                         </div>
                     )}
@@ -164,7 +167,7 @@ export default function EventDetails({
                     {/* RSVP Section */}
                     {onRSVP && !isPast && (
                         <div>
-                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Your Response</h3>
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">{t("events:yourResponse")}</h3>
                             <RSVPButton
                                 eventId={event.id}
                                 currentStatus={event.userRSVP || null}
@@ -179,10 +182,7 @@ export default function EventDetails({
                         <button
                             onClick={() => setShowAttendees(!showAttendees)}
                             className="font-semibold text-gray-900 dark:text-gray-100 mb-3 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-                        >
-                            {showAttendees ? '▼' : '▶'} Attendees
-                            {event.attendeeCount && ` (${event.attendeeCount.going + event.attendeeCount.maybe})`}
-                        </button>
+                        >{t("events:attendees", { value1: showAttendees ? '▼' : '▶', value2: event.attendeeCount && ` (${event.attendeeCount.going + event.attendeeCount.maybe})` })}</button>
                         {showAttendees && <AttendeeList eventId={event.id} />}
                     </div>
                 </div>
@@ -196,8 +196,7 @@ export default function EventDetails({
                                 className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                             >
                                 <Edit size={18} />
-                                Edit Event
-                            </button>
+                                {t("events:editEvent")}</button>
                         )}
                         {onDelete && (
                             <button
@@ -206,7 +205,7 @@ export default function EventDetails({
                                 className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
                             >
                                 <Trash2 size={18} />
-                                {deleting ? 'Deleting...' : 'Delete Event'}
+                                {deleting ? t("common:uiDeleting") : t("events:deleteEvent")}
                             </button>
                         )}
                     </div>

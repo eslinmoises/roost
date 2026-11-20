@@ -1,3 +1,6 @@
+import { emojiPickerLabels } from '@/i18n/emoji';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useState, useRef, useCallback, lazy, Suspense } from 'react';
 import { Send, Loader2, Smile } from 'lucide-react';
@@ -20,13 +23,14 @@ interface CommentFormProps {
 
 export default function CommentForm({
     onSubmit,
-    placeholder = 'Write a comment...',
+    placeholder = t("posts:writeAComment"),
     autoFocus = false,
     initialValue = '',
     submitLabel = 'Post',
     onCancel,
     isReply = false,
 }: CommentFormProps) {
+    useTranslation();
     const [content, setContent] = useState(initialValue);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [mentionQuery, setMentionQuery] = useState<string | null>(null);
@@ -131,7 +135,7 @@ export default function CommentForm({
         }
     };
 
-    if (APP_CONFIG.demo.enabled) return <p className="py-3 text-sm text-surface-500 dark:text-surface-400">Comments are read-only in this demo.</p>;
+    if (APP_CONFIG.demo.enabled) return <p className="py-3 text-sm text-surface-500 dark:text-surface-400">{t("posts:commentsAreReadOnlyInThisDemo")}</p>;
 
     return (
         <form onSubmit={handleSubmit} className={`${isReply ? 'pl-12' : ''}`}>
@@ -156,7 +160,7 @@ export default function CommentForm({
                             type="button"
                             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                             className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors"
-                            title="Add emoji"
+                            title={t("posts:addEmoji")}
                         >
                             <Smile className="w-5 h-5 text-surface-500 dark:text-surface-400" />
                         </button>
@@ -170,7 +174,7 @@ export default function CommentForm({
                                 />
                                 <div className="absolute bottom-full mb-2 right-0 z-30">
                                     <Suspense fallback={<div className="w-[350px] h-[400px] animate-pulse bg-surface-100 dark:bg-surface-800 rounded-lg" />}>
-                                        <EmojiPicker
+                                        <EmojiPicker {...emojiPickerLabels()}
                                             onEmojiClick={handleEmojiClick}
                                             autoFocusSearch={false}
                                             theme={document.documentElement.classList.contains('dark') ? Theme.DARK : Theme.LIGHT}
@@ -190,8 +194,7 @@ export default function CommentForm({
                     </div>
                     <div className="flex items-center justify-between mt-2">
                         <span className="text-xs text-surface-400 dark:text-surface-500">
-                            Press Ctrl+Enter to submit | Type @ to mention
-                        </span>
+                            {t("posts:pressCtrlEnterToSubmitTypeToMention")}</span>
                         <div className="flex gap-2">
                             {onCancel && (
                                 <button
@@ -200,8 +203,7 @@ export default function CommentForm({
                                     className="px-4 py-2 text-sm font-medium text-surface-600 dark:text-surface-400
                                                hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
                                 >
-                                    Cancel
-                                </button>
+                                    {t("posts:cancel")}</button>
                             )}
                             <button
                                 type="submit"

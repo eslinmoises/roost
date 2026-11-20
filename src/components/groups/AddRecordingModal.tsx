@@ -1,3 +1,7 @@
+import { formatNumber } from '@/lib/locale';
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Loader2 } from 'lucide-react';
@@ -31,6 +35,7 @@ export default function AddRecordingModal({
     onSuccess,
     editingRecording,
 }: AddRecordingModalProps) {
+    useTranslation();
     const { user } = useAuth();
     const [videoUrl, setVideoUrl] = useState('');
     const [title, setTitle] = useState('');
@@ -82,7 +87,7 @@ export default function AddRecordingModal({
         // Validate video URL
         const videoInfo = extractVideoInfo(videoUrl);
         if (!videoInfo) {
-            setError('Invalid video URL. Please enter a valid YouTube or Vimeo URL.');
+            setError(t("groups:invalidVideoURLPleaseEnterAValidYouTubeOr"));
             return;
         }
 
@@ -116,7 +121,7 @@ export default function AddRecordingModal({
             resetForm();
         } catch (err) {
             console.error('Error saving recording:', err);
-            setError(err instanceof Error ? err.message : 'Failed to save recording');
+            setError(err instanceof Error ? localizeError(err.message) : t("groups:failedToSaveRecording"));
         } finally {
             setIsSubmitting(false);
         }
@@ -147,7 +152,7 @@ export default function AddRecordingModal({
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-surface-100">
                     <h2 className="text-xl font-semibold text-surface-900">
-                        {isEditing ? 'Edit Recording' : 'Add Recording'}
+                        {isEditing ? t("groups:editRecording") : t("groups:addRecording")}
                     </h2>
                     <button
                         onClick={handleClose}
@@ -162,33 +167,31 @@ export default function AddRecordingModal({
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     {error && (
                         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                            {error}
+                            {localizeError(error)}
                         </div>
                     )}
 
                     {/* Video URL */}
                     <div>
                         <label htmlFor="videoUrl" className="block text-sm font-medium text-surface-700 mb-2">
-                            Video URL *
-                        </label>
+                            {t("groups:videoURL")}</label>
                         <input
                             type="url"
                             id="videoUrl"
                             value={videoUrl}
                             onChange={(e) => setVideoUrl(e.target.value)}
-                            placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."
+                            placeholder={t("groups:httpsYoutubeComWatchVOrHttpsVimeoCom")}
                             className="w-full px-4 py-2.5 border border-surface-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             required
                         />
                         <p className="mt-1 text-xs text-surface-500">
-                            Supported: YouTube and Vimeo
-                        </p>
+                            {t("groups:supportedYouTubeAndVimeo")}</p>
                     </div>
 
                     {/* Video Preview */}
                     {videoUrl && isValidUrl && (
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-surface-700">Preview</label>
+                            <label className="block text-sm font-medium text-surface-700">{t("groups:preview")}</label>
                             <VideoEmbed url={videoUrl} />
                         </div>
                     )}
@@ -196,14 +199,13 @@ export default function AddRecordingModal({
                     {/* Title */}
                     <div>
                         <label htmlFor="title" className="block text-sm font-medium text-surface-700 mb-2">
-                            Title *
-                        </label>
+                            {t("groups:title")}</label>
                         <input
                             type="text"
                             id="title"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="e.g., Introduction to React Hooks"
+                            placeholder={t("groups:eGIntroductionToReactHooks")}
                             className="w-full px-4 py-2.5 border border-surface-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             required
                             minLength={3}
@@ -214,19 +216,18 @@ export default function AddRecordingModal({
                     {/* Description */}
                     <div>
                         <label htmlFor="description" className="block text-sm font-medium text-surface-700 mb-2">
-                            Description (optional)
-                        </label>
+                            {t("groups:descriptionOptional")}</label>
                         <textarea
                             id="description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Describe what this video covers..."
+                            placeholder={t("groups:describeWhatThisVideoCovers")}
                             rows={4}
                             className="w-full px-4 py-2.5 border border-surface-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                             maxLength={1000}
                         />
                         <p className="mt-1 text-xs text-surface-500 text-right">
-                            {description.length}/1000
+                            {formatNumber(description.length)}/1000
                         </p>
                     </div>
 
@@ -238,15 +239,14 @@ export default function AddRecordingModal({
                             disabled={isSubmitting}
                             className="flex-1 px-4 py-2.5 border border-surface-200 rounded-lg text-surface-700 font-medium hover:bg-surface-50 transition-colors disabled:opacity-50"
                         >
-                            Cancel
-                        </button>
+                            {t("groups:cancel")}</button>
                         <button
                             type="submit"
                             disabled={isSubmitting || !title.trim() || !videoUrl.trim() || !isValidUrl}
                             className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                            {isSubmitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Add Recording'}
+                            {isSubmitting ? t("common:uiSaving") : isEditing ? t("groups:saveChanges") : t("groups:addRecording")}
                         </button>
                     </div>
                 </form>

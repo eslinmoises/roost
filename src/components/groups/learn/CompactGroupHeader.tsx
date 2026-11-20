@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { Link } from 'react-router-dom';
 import { Settings, Users } from 'lucide-react';
 import type { GroupWithDetails } from '@/services/group';
@@ -8,6 +11,7 @@ interface CompactGroupHeaderProps {
 }
 
 export default function CompactGroupHeader({ group }: CompactGroupHeaderProps) {
+    useTranslation();
     const canEditSettings = hasPermission(group.user_role, 'edit_settings');
 
     return (
@@ -41,14 +45,14 @@ export default function CompactGroupHeader({ group }: CompactGroupHeaderProps) {
             <div className="flex items-center gap-3 flex-shrink-0">
                 <div className="flex items-center gap-1.5 text-sm text-surface-500 dark:text-surface-400">
                     <Users className="w-4 h-4" />
-                    <span>{group.member_count}</span>
+                    <span>{formatNumber(group.member_count)}</span>
                 </div>
 
                 {canEditSettings && (
                     <Link
                         to={`/classrooms/${group.slug}/settings`}
                         className="p-2 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
-                        title="Classroom settings"
+                        title={t("classroom:classroomSettings")}
                     >
                         <Settings className="w-5 h-5" />
                     </Link>

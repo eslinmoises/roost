@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Image as ImageIcon, Link as LinkIcon, Loader2, Trash2, Upload } from 'lucide-react';
@@ -25,6 +28,7 @@ export default function CreatePostModal({
     onSuccess,
     editingPost = null,
 }: CreatePostModalProps) {
+    useTranslation();
     const { user, profile } = useAuth();
 
     const [content, setContent] = useState('');
@@ -104,7 +108,7 @@ export default function CreatePostModal({
 
                 // Validate file size (max 10MB)
                 if (file.size > 10 * 1024 * 1024) {
-                    setError(`File ${file.name} is too large. Maximum size is 10MB.`);
+                    setError(t("posts:fileIsTooLargeMaximumSizeIs10MB", { value1: file.name }));
                     continue;
                 }
 
@@ -129,7 +133,7 @@ export default function CreatePostModal({
             }
         } catch (err) {
             console.error('Upload failed:', err);
-            setError(err instanceof Error ? err.message : 'Failed to upload images');
+            setError(err instanceof Error ? localizeError(err.message) : t("posts:failedToUploadImages"));
         } finally {
             setIsUploading(false);
             setUploadProgress(0);
@@ -196,7 +200,7 @@ export default function CreatePostModal({
             onSuccess();
             onClose();
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to save post');
+            setError(err instanceof Error ? localizeError(err.message) : t("posts:failedToSavePost"));
         } finally {
             setIsSubmitting(false);
         }
@@ -214,7 +218,7 @@ export default function CreatePostModal({
             <div className="relative bg-white dark:bg-surface-900 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-fade-in flex flex-col">
                 <div className="flex items-center justify-between p-4 border-b border-surface-200 dark:border-surface-700">
                     <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">
-                        {editingPost ? 'Edit Post' : 'Create Post'}
+                        {editingPost ? t("posts:editPost") : t("posts:createPost")}
                     </h2>
                     <button
                         onClick={onClose}
@@ -229,7 +233,7 @@ export default function CreatePostModal({
 
                     {error && (
                         <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm">
-                            {error}
+                            {localizeError(error)}
                         </div>
                     )}
 
@@ -260,7 +264,7 @@ export default function CreatePostModal({
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Add a title (optional)"
+                            placeholder={t("posts:addATitleOptional")}
                             className="w-full px-4 py-3 text-lg font-medium text-surface-900 dark:text-surface-100 placeholder-surface-400 dark:placeholder-surface-500 bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                         />
                     </div>
@@ -271,7 +275,7 @@ export default function CreatePostModal({
                                 key={editorKey}
                                 value={content}
                                 onChange={setContent}
-                                placeholder="What would you like to share with the community?"
+                                placeholder={t("posts:whatWouldYouLikeToShareWithTheCommunity")}
                                 initialValue={editingPost?.content || ''}
                             />
                         </Suspense>
@@ -293,20 +297,17 @@ export default function CreatePostModal({
                             {isUploading ? (
                                 <>
                                     <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-                                    <p className="text-sm text-surface-600 dark:text-surface-400">
-                                        Uploading... {uploadProgress}%
-                                    </p>
+                                    <p className="text-sm text-surface-600 dark:text-surface-400">{t("posts:uploading", { value1: uploadProgress })}</p>
                                 </>
                             ) : (
                                 <>
                                     <Upload className={`w-8 h-8 ${isDragActive ? 'text-primary-500' : 'text-surface-400 dark:text-surface-500'}`} />
                                     <div>
                                         <p className="text-sm font-medium text-surface-700 dark:text-surface-300">
-                                            {isDragActive ? 'Drop images here' : 'Drag & drop images, or click to select'}
+                                            {isDragActive ? t("posts:dropImagesHere") : t("posts:dragDropImagesOrClickToSelect")}
                                         </p>
                                         <p className="text-xs text-surface-400 dark:text-surface-500 mt-1">
-                                            PNG, JPG, GIF, WebP up to 10MB each
-                                        </p>
+                                            {t("posts:pNGJPGGIFWebPUpTo10MBEach")}</p>
                                     </div>
                                 </>
                             )}
@@ -339,7 +340,7 @@ export default function CreatePostModal({
 
                     {categories.length > 0 && (
                         <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm text-surface-500 dark:text-surface-400">Category:</span>
+                            <span className="text-sm text-surface-500 dark:text-surface-400">{t("posts:category")}</span>
                             {categories.map((cat) => (
                                 <button
                                     key={cat.id}
@@ -369,7 +370,7 @@ export default function CreatePostModal({
                             onClick={open}
                             disabled={isUploading}
                             className="p-2 hover:bg-surface-200 dark:hover:bg-surface-700 rounded-full transition-colors text-surface-500 dark:text-surface-400 disabled:opacity-50"
-                            title="Add images"
+                            title={t("posts:addImages")}
                         >
                             {isUploading ? (
                                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -379,14 +380,12 @@ export default function CreatePostModal({
                         </button>
                         <button
                             className="p-2 hover:bg-surface-200 dark:hover:bg-surface-700 rounded-full transition-colors text-surface-500 dark:text-surface-400"
-                            title="Add link"
+                            title={t("posts:addLink")}
                         >
                             <LinkIcon className="w-5 h-5" />
                         </button>
                         {assets.length > 0 && (
-                            <span className="text-xs text-surface-500 dark:text-surface-400 ml-2">
-                                {assets.length} image{assets.length !== 1 ? 's' : ''} attached
-                            </span>
+                            <span className="text-xs text-surface-500 dark:text-surface-400 ml-2">{t("posts:imageAttached", { count: assets.length })}</span>
                         )}
                     </div>
 
@@ -399,7 +398,7 @@ export default function CreatePostModal({
                             {isSubmitting ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
-                                editingPost ? 'Save Changes' : 'Post'
+                                editingPost ? t("posts:saveChanges") : t("common:uiPost")
                             )}
                         </button>
                     </div>

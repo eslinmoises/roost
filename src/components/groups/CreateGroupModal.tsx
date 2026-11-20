@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Lock, Globe, Upload, Loader2, Crown, Users } from 'lucide-react';
@@ -19,6 +22,7 @@ export default function CreateGroupModal({
     onSuccess,
     editingGroup = null,
 }: CreateGroupModalProps) {
+    useTranslation();
     const { user } = useAuth();
     const [name, setName] = useState('');
     const [slug, setSlug] = useState('');
@@ -81,7 +85,7 @@ export default function CreateGroupModal({
             try {
                 const available = await isSlugAvailable(slug, editingGroup?.id);
                 if (!available) {
-                    setSlugError('This URL is already taken');
+                    setSlugError(t("groups:thisURLIsAlreadyTaken"));
                 } else {
                     setSlugError(null);
                 }
@@ -164,7 +168,7 @@ export default function CreateGroupModal({
             onClose();
         } catch (err) {
             console.error('Error saving group:', err);
-            setError(err instanceof Error ? err.message : 'Failed to save group');
+            setError(err instanceof Error ? localizeError(err.message) : t("groups:failedToSaveGroup"));
         } finally {
             setIsSubmitting(false);
         }
@@ -178,7 +182,7 @@ export default function CreateGroupModal({
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-surface-100 dark:border-surface-700">
                     <h2 className="text-xl font-semibold text-surface-900 dark:text-surface-50">
-                        {isEditing ? 'Edit Classroom' : 'Create New Classroom'}
+                        {isEditing ? t("groups:editClassroom") : t("groups:createNewClassroom")}
                     </h2>
                     <button
                         onClick={onClose}
@@ -192,20 +196,19 @@ export default function CreateGroupModal({
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     {error && (
                         <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
-                            {error}
+                            {localizeError(error)}
                         </div>
                     )}
 
                     {/* Cover image upload */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Cover Image
-                        </label>
+                            {t("groups:coverImage")}</label>
                         <div className="relative h-32 bg-surface-100 dark:bg-surface-800 rounded-lg overflow-hidden">
                             {coverPreview ? (
                                 <img
                                     src={coverPreview}
-                                    alt="Cover preview"
+                                    alt={t("groups:coverPreview")}
                                     className="w-full h-full object-cover"
                                 />
                             ) : (
@@ -225,14 +228,13 @@ export default function CreateGroupModal({
                     {/* Avatar upload */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Classroom Avatar
-                        </label>
+                            {t("groups:classroomAvatar")}</label>
                         <div className="flex items-center gap-4">
                             <div className="relative w-20 h-20 bg-surface-100 dark:bg-surface-800 rounded-xl overflow-hidden">
                                 {avatarPreview ? (
                                     <img
                                         src={avatarPreview}
-                                        alt="Avatar preview"
+                                        alt={t("groups:avatarPreview")}
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
@@ -248,22 +250,20 @@ export default function CreateGroupModal({
                                 />
                             </div>
                             <p className="text-sm text-surface-500 dark:text-surface-400">
-                                Click to upload a classroom avatar
-                            </p>
+                                {t("groups:clickToUploadAClassroomAvatar")}</p>
                         </div>
                     </div>
 
                     {/* Classroom name */}
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Classroom Name *
-                        </label>
+                            {t("groups:classroomName")}</label>
                         <input
                             type="text"
                             id="name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="e.g., JavaScript Developers"
+                            placeholder={t("groups:eGJavaScriptDevelopers")}
                             className="w-full px-4 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             required
                             minLength={2}
@@ -274,8 +274,7 @@ export default function CreateGroupModal({
                     {/* Slug */}
                     <div>
                         <label htmlFor="slug" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            URL
-                        </label>
+                            {t("groups:uRL")}</label>
                         <div className="flex items-center">
                             <span className="text-surface-500 dark:text-surface-400 text-sm mr-1">/classrooms/</span>
                             <input
@@ -290,20 +289,19 @@ export default function CreateGroupModal({
                             />
                         </div>
                         {slugError && (
-                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{slugError}</p>
+                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{localizeError(slugError)}</p>
                         )}
                     </div>
 
                     {/* Description */}
                     <div>
                         <label htmlFor="description" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Description
-                        </label>
+                            {t("groups:description")}</label>
                         <textarea
                             id="description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder="What is this classroom about?"
+                            placeholder={t("groups:whatIsThisClassroomAbout")}
                             rows={3}
                             className="w-full px-4 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                         />
@@ -312,8 +310,7 @@ export default function CreateGroupModal({
                     {/* Privacy toggle */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
-                            Privacy
-                        </label>
+                            {t("groups:privacy")}</label>
                         <div className="flex gap-3">
                             <button
                                 type="button"
@@ -326,9 +323,8 @@ export default function CreateGroupModal({
                                 <Globe className={`w-5 h-5 ${!isPrivate ? 'text-primary-600 dark:text-primary-400' : 'text-surface-400 dark:text-surface-500'}`} />
                                 <div className="text-left">
                                     <p className={`font-medium ${!isPrivate ? 'text-primary-900 dark:text-primary-100' : 'text-surface-700 dark:text-surface-300'}`}>
-                                        Public
-                                    </p>
-                                    <p className="text-xs text-surface-500 dark:text-surface-400">Anyone can find and join</p>
+                                        {t("groups:public")}</p>
+                                    <p className="text-xs text-surface-500 dark:text-surface-400">{t("groups:anyoneCanFindAndJoin")}</p>
                                 </div>
                             </button>
                             <button
@@ -342,9 +338,8 @@ export default function CreateGroupModal({
                                 <Lock className={`w-5 h-5 ${isPrivate ? 'text-primary-600 dark:text-primary-400' : 'text-surface-400 dark:text-surface-500'}`} />
                                 <div className="text-left">
                                     <p className={`font-medium ${isPrivate ? 'text-primary-900 dark:text-primary-100' : 'text-surface-700 dark:text-surface-300'}`}>
-                                        Private
-                                    </p>
-                                    <p className="text-xs text-surface-500 dark:text-surface-400">Invite only</p>
+                                        {t("groups:private")}</p>
+                                    <p className="text-xs text-surface-500 dark:text-surface-400">{t("groups:inviteOnly")}</p>
                                 </div>
                             </button>
                         </div>
@@ -353,8 +348,7 @@ export default function CreateGroupModal({
                     {/* Access Type toggle (Free/Premium) */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
-                            Access Type
-                        </label>
+                            {t("groups:accessType")}</label>
                         <div className="flex gap-3">
                             <button
                                 type="button"
@@ -367,9 +361,8 @@ export default function CreateGroupModal({
                                 <Users className={`w-5 h-5 ${!isPremiumGroup ? 'text-primary-600 dark:text-primary-400' : 'text-surface-400 dark:text-surface-500'}`} />
                                 <div className="text-left">
                                     <p className={`font-medium ${!isPremiumGroup ? 'text-primary-900 dark:text-primary-100' : 'text-surface-700 dark:text-surface-300'}`}>
-                                        Free Access
-                                    </p>
-                                    <p className="text-xs text-surface-500 dark:text-surface-400">All members can join</p>
+                                        {t("groups:freeAccess")}</p>
+                                    <p className="text-xs text-surface-500 dark:text-surface-400">{t("groups:allMembersCanJoin")}</p>
                                 </div>
                             </button>
                             <button
@@ -383,9 +376,8 @@ export default function CreateGroupModal({
                                 <Crown className={`w-5 h-5 ${isPremiumGroup ? 'text-amber-600 dark:text-amber-400' : 'text-surface-400 dark:text-surface-500'}`} />
                                 <div className="text-left">
                                     <p className={`font-medium ${isPremiumGroup ? 'text-amber-900 dark:text-amber-100' : 'text-surface-700 dark:text-surface-300'}`}>
-                                        Premium Only
-                                    </p>
-                                    <p className="text-xs text-surface-500 dark:text-surface-400">Premium members only</p>
+                                        {t("groups:premiumOnly")}</p>
+                                    <p className="text-xs text-surface-500 dark:text-surface-400">{t("groups:premiumMembersOnly")}</p>
                                 </div>
                             </button>
                         </div>
@@ -398,15 +390,14 @@ export default function CreateGroupModal({
                             onClick={onClose}
                             className="flex-1 px-4 py-2.5 border border-surface-200 dark:border-surface-700 rounded-lg text-surface-700 dark:text-surface-300 font-medium hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
                         >
-                            Cancel
-                        </button>
+                            {t("groups:cancel")}</button>
                         <button
                             type="submit"
                             disabled={isSubmitting || !name || !slug || !!slugError}
                             className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                            {isEditing ? 'Save Changes' : 'Create Classroom'}
+                            {isEditing ? t("groups:saveChanges") : t("groups:createClassroom")}
                         </button>
                     </div>
                 </form>

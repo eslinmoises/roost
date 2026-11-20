@@ -1,3 +1,6 @@
+import { emojiPickerLabels } from '@/i18n/emoji';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import DOMPurify, { type Config } from 'dompurify';
 import type { EmojiClickData } from 'emoji-picker-react';
@@ -22,6 +25,7 @@ const SANITIZE_OPTIONS: Config = {
 };
 
 export default function RichTextEditor({ value, onChange, placeholder, className = '', initialValue }: RichTextEditorProps) {
+    useTranslation();
     const editorRef = useRef<HTMLDivElement>(null);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -45,14 +49,14 @@ export default function RichTextEditor({ value, onChange, placeholder, className
     };
 
     const addLink = () => {
-        const url = window.prompt('Enter an HTTPS URL');
+        const url = window.prompt(t("posts:enterAnHTTPSURL"));
         if (!url) return;
         try {
             const parsed = new URL(url);
             if (!['https:', 'http:'].includes(parsed.protocol)) throw new Error();
             runCommand('createLink', parsed.toString());
         } catch {
-            window.alert('Please enter a valid HTTP or HTTPS URL.');
+            window.alert(t("posts:pleaseEnterAValidHTTPOrHTTPSURL"));
         }
     };
 
@@ -64,12 +68,12 @@ export default function RichTextEditor({ value, onChange, placeholder, className
     };
 
     const tools = [
-        { label: 'Bold', icon: Bold, action: () => runCommand('bold') },
-        { label: 'Italic', icon: Italic, action: () => runCommand('italic') },
-        { label: 'Underline', icon: Underline, action: () => runCommand('underline') },
-        { label: 'Bulleted list', icon: List, action: () => runCommand('insertUnorderedList') },
-        { label: 'Numbered list', icon: ListOrdered, action: () => runCommand('insertOrderedList') },
-        { label: 'Link', icon: Link, action: addLink },
+        { label: t("posts:bold"), icon: Bold, action: () => runCommand('bold') },
+        { label: t("posts:italic"), icon: Italic, action: () => runCommand('italic') },
+        { label: t("posts:underline"), icon: Underline, action: () => runCommand('underline') },
+        { label: t("posts:bulletedList"), icon: List, action: () => runCommand('insertUnorderedList') },
+        { label: t("posts:numberedList"), icon: ListOrdered, action: () => runCommand('insertOrderedList') },
+        { label: t("posts:link"), icon: Link, action: addLink },
     ];
 
     return (
@@ -81,20 +85,20 @@ export default function RichTextEditor({ value, onChange, placeholder, className
                     </button>
                 ))}
             </div>
-            <button type="button" onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="absolute top-2 right-2 z-10 p-2 rounded hover:bg-surface-200 dark:hover:bg-surface-700" title="Add emoji" aria-label="Add emoji">
+            <button type="button" onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="absolute top-2 right-2 z-10 p-2 rounded hover:bg-surface-200 dark:hover:bg-surface-700" title={t("posts:addEmoji")} aria-label={t("posts:addEmoji")}>
                 <Smile className="w-5 h-5 text-surface-500 dark:text-surface-400" />
             </button>
             {showEmojiPicker && (
                 <>
-                    <button type="button" aria-label="Close emoji picker" className="fixed inset-0 z-20 cursor-default" onClick={() => setShowEmojiPicker(false)} />
+                    <button type="button" aria-label={t("posts:closeEmojiPicker")} className="fixed inset-0 z-20 cursor-default" onClick={() => setShowEmojiPicker(false)} />
                     <div className="absolute top-12 right-2 z-30">
                         <Suspense fallback={<div className="w-[350px] h-[400px] animate-pulse bg-surface-100 dark:bg-surface-800 rounded-lg" />}>
-                            <EmojiPicker onEmojiClick={handleEmojiClick} autoFocusSearch={false} theme={document.documentElement.classList.contains('dark') ? Theme.DARK : Theme.LIGHT} />
+                            <EmojiPicker {...emojiPickerLabels()} onEmojiClick={handleEmojiClick} autoFocusSearch={false} theme={document.documentElement.classList.contains('dark') ? Theme.DARK : Theme.LIGHT} />
                         </Suspense>
                     </div>
                 </>
             )}
-            <div ref={editorRef} contentEditable role="textbox" aria-multiline="true" aria-label={placeholder || 'Post content'} data-placeholder={placeholder}
+            <div ref={editorRef} contentEditable role="textbox" aria-multiline="true" aria-label={placeholder || t("posts:postContent")} data-placeholder={placeholder}
                 onInput={emitChange} onBlur={emitChange}
                 className="min-h-[200px] p-4 bg-white dark:bg-surface-900 text-surface-900 dark:text-surface-100 outline-none empty:before:content-[attr(data-placeholder)] empty:before:text-surface-400"
                 suppressContentEditableWarning />

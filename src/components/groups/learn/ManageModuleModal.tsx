@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Loader2, Image as ImageIcon } from 'lucide-react';
@@ -23,6 +26,7 @@ export default function ManageModuleModal({
     editingModule,
     nextOrder = 0,
 }: ManageModuleModalProps) {
+    useTranslation();
     const { user } = useAuth();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -68,7 +72,7 @@ export default function ManageModuleModal({
             const result = await uploadImage(file);
             setThumbnailUrl(result.url);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to upload image');
+            setError(err instanceof Error ? localizeError(err.message) : t("classroom:failedToUploadImage"));
         } finally {
             setIsUploading(false);
         }
@@ -102,7 +106,7 @@ export default function ManageModuleModal({
             onSuccess();
         } catch (err) {
             console.error('Error saving module:', err);
-            setError(err instanceof Error ? err.message : 'Failed to save module');
+            setError(err instanceof Error ? localizeError(err.message) : t("classroom:failedToSaveModule"));
         } finally {
             setIsSubmitting(false);
         }
@@ -122,7 +126,7 @@ export default function ManageModuleModal({
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-surface-200 dark:border-surface-700">
                     <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">
-                        {isEditing ? 'Edit Module' : 'Create Module'}
+                        {isEditing ? t("classroom:editModule") : t("classroom:createModule")}
                     </h2>
                     <button
                         onClick={onClose}
@@ -137,13 +141,12 @@ export default function ManageModuleModal({
                     {/* Thumbnail */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Thumbnail
-                        </label>
+                            {t("classroom:thumbnail")}</label>
                         {thumbnailUrl ? (
                             <div className="relative w-full h-40 rounded-lg overflow-hidden border border-surface-200 dark:border-surface-700">
                                 <img
                                     src={thumbnailUrl}
-                                    alt="Module thumbnail"
+                                    alt={t("classroom:moduleThumbnail")}
                                     className="w-full h-full object-cover"
                                 />
                                 <button
@@ -167,8 +170,7 @@ export default function ManageModuleModal({
                                     <>
                                         <ImageIcon className="w-8 h-8 text-surface-400" />
                                         <span className="text-sm text-surface-500 dark:text-surface-400">
-                                            Click to upload thumbnail
-                                        </span>
+                                            {t("classroom:clickToUploadThumbnail")}</span>
                                     </>
                                 )}
                             </button>
@@ -185,13 +187,13 @@ export default function ManageModuleModal({
                     {/* Title */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
-                            Title <span className="text-red-500">*</span>
+                            {t("classroom:title")} <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="e.g. Getting Started"
+                            placeholder={t("classroom:eGGettingStarted")}
                             className="w-full px-3 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             required
                         />
@@ -200,12 +202,11 @@ export default function ManageModuleModal({
                     {/* Description */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
-                            Description
-                        </label>
+                            {t("classroom:description")}</label>
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder="What will students learn in this module?"
+                            placeholder={t("classroom:whatWillStudentsLearnInThisModule")}
                             rows={3}
                             className="w-full px-3 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                         />
@@ -213,7 +214,7 @@ export default function ManageModuleModal({
 
                     {/* Error */}
                     {error && (
-                        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                        <p className="text-sm text-red-600 dark:text-red-400">{localizeError(error)}</p>
                     )}
 
                     {/* Actions */}
@@ -223,15 +224,14 @@ export default function ManageModuleModal({
                             onClick={onClose}
                             className="px-4 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
                         >
-                            Cancel
-                        </button>
+                            {t("classroom:cancel")}</button>
                         <button
                             type="submit"
                             disabled={isSubmitting || !title.trim()}
                             className="px-4 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                         >
                             {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                            {isEditing ? 'Save Changes' : 'Create Module'}
+                            {isEditing ? t("classroom:saveChanges") : t("classroom:createModule")}
                         </button>
                     </div>
                 </form>

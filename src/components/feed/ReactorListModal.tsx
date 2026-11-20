@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
@@ -14,12 +17,12 @@ interface ReactorListModalProps {
 }
 
 const reactionConfig: Record<ReactionType, { icon: typeof ThumbsUp; label: string; color: string; activeColor: string }> = {
-    like: { icon: ThumbsUp, label: 'Like', color: 'text-blue-500', activeColor: 'border-blue-500 text-blue-600 bg-blue-50 dark:bg-blue-900/30' },
-    love: { icon: Heart, label: 'Love', color: 'text-red-500', activeColor: 'border-red-500 text-red-600 bg-red-50 dark:bg-red-900/30' },
-    fire: { icon: Flame, label: 'Fire', color: 'text-orange-500', activeColor: 'border-orange-500 text-orange-600 bg-orange-50 dark:bg-orange-900/30' },
-    clap: { icon: Hand, label: 'Clap', color: 'text-yellow-500', activeColor: 'border-yellow-500 text-yellow-600 bg-yellow-50 dark:bg-yellow-900/30' },
-    think: { icon: Brain, label: 'Think', color: 'text-purple-500', activeColor: 'border-purple-500 text-purple-600 bg-purple-50 dark:bg-purple-900/30' },
-    haha: { icon: Laugh, label: 'Haha', color: 'text-green-500', activeColor: 'border-green-500 text-green-600 bg-green-50 dark:bg-green-900/30' },
+    like: { icon: ThumbsUp, get label() { return t("posts:like"); }, color: 'text-blue-500', activeColor: 'border-blue-500 text-blue-600 bg-blue-50 dark:bg-blue-900/30' },
+    love: { icon: Heart, get label() { return t("posts:love"); }, color: 'text-red-500', activeColor: 'border-red-500 text-red-600 bg-red-50 dark:bg-red-900/30' },
+    fire: { icon: Flame, get label() { return t("posts:fire"); }, color: 'text-orange-500', activeColor: 'border-orange-500 text-orange-600 bg-orange-50 dark:bg-orange-900/30' },
+    clap: { icon: Hand, get label() { return t("posts:clap"); }, color: 'text-yellow-500', activeColor: 'border-yellow-500 text-yellow-600 bg-yellow-50 dark:bg-yellow-900/30' },
+    think: { icon: Brain, get label() { return t("posts:think"); }, color: 'text-purple-500', activeColor: 'border-purple-500 text-purple-600 bg-purple-50 dark:bg-purple-900/30' },
+    haha: { icon: Laugh, get label() { return t("posts:haha"); }, color: 'text-green-500', activeColor: 'border-green-500 text-green-600 bg-green-50 dark:bg-green-900/30' },
 };
 
 type TabType = 'all' | ReactionType;
@@ -30,6 +33,7 @@ export default function ReactorListModal({
     reactableId,
     reactionCounts,
 }: ReactorListModalProps) {
+    useTranslation();
     const [reactors, setReactors] = useState<ReactorInfo[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<TabType>('all');
@@ -71,7 +75,7 @@ export default function ReactorListModal({
 
     // Build tabs: "All" + each reaction type with count > 0
     const tabs: { key: TabType; label: string; count: number }[] = [
-        { key: 'all', label: 'All', count: reactionCounts.total },
+        { key: 'all', label: t("posts:all"), count: reactionCounts.total },
     ];
     (Object.keys(reactionConfig) as ReactionType[]).forEach((type) => {
         if (reactionCounts[type] > 0) {
@@ -92,8 +96,7 @@ export default function ReactorListModal({
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 pt-5 pb-3">
                     <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-50">
-                        Reactions
-                    </h3>
+                        {t("posts:reactions")}</h3>
                     <button
                         onClick={onClose}
                         className="p-1.5 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-full transition-colors"
@@ -125,8 +128,8 @@ export default function ReactorListModal({
                                 `}
                             >
                                 {Icon && <Icon className={`w-4 h-4 ${config?.color}`} />}
-                                {tab.key === 'all' && <span>All</span>}
-                                <span className="text-xs">{tab.count}</span>
+                                {tab.key === 'all' && <span>{t("posts:all")}</span>}
+                                <span className="text-xs">{formatNumber(tab.count)}</span>
                             </button>
                         );
                     })}
@@ -142,7 +145,7 @@ export default function ReactorListModal({
                             <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
                         </div>
                     ) : filteredReactors.length === 0 ? (
-                        <p className="text-center py-8 text-sm text-surface-400">No reactions yet</p>
+                        <p className="text-center py-8 text-sm text-surface-400">{t("posts:noReactionsYet")}</p>
                     ) : (
                         <div className="space-y-1">
                             {filteredReactors.map((reactor) => {

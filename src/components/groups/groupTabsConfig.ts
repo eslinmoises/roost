@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { BookOpen, FileText, Video } from 'lucide-react';
 import type { TabValue } from './GroupTabs';
 
@@ -8,7 +9,7 @@ export interface Tab {
 }
 
 export const groupTabs: Tab[] = [
-    { value: 'feed', label: 'Feed', icon: BookOpen },
-    { value: 'assets', label: 'Assets', icon: FileText },
-    { value: 'recordings', label: 'Recordings', icon: Video },
+    { value: 'feed', get label() { return t("groups:feed"); }, icon: BookOpen },
+    { value: 'assets', get label() { return t("groups:assets"); }, icon: FileText },
+    { value: 'recordings', get label() { return t("groups:recordings"); }, icon: Video },
 ];

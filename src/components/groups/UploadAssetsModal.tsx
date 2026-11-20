@@ -1,3 +1,7 @@
+import { formatNumber } from '@/lib/locale';
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useDropzone } from 'react-dropzone';
@@ -30,6 +34,7 @@ export default function UploadAssetsModal({
     onClose,
     onSuccess,
 }: UploadAssetsModalProps) {
+    useTranslation();
     const { user } = useAuth();
     const [files, setFiles] = useState<FileWithPreview[]>([]);
     const [isUploading, setIsUploading] = useState(false);
@@ -71,8 +76,8 @@ export default function UploadAssetsModal({
 
     const formatFileSize = (bytes: number) => {
         if (bytes < 1024) return `${bytes} B`;
-        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        if (bytes < 1024 * 1024) return t("groups:kB", { value1: formatNumber((bytes / 1024), { minimumFractionDigits: 1, maximumFractionDigits: 1 }) });
+        return t("groups:mB", { value1: formatNumber((bytes / (1024 * 1024)), { minimumFractionDigits: 1, maximumFractionDigits: 1 }) });
     };
 
     const handleUpload = async () => {
@@ -111,7 +116,7 @@ export default function UploadAssetsModal({
             onSuccess();
         } catch (err) {
             console.error('Error uploading files:', err);
-            setError(err instanceof Error ? err.message : 'Failed to upload files');
+            setError(err instanceof Error ? localizeError(err.message) : t("groups:failedToUploadFiles"));
         } finally {
             setIsUploading(false);
             setUploadProgress(0);
@@ -125,7 +130,7 @@ export default function UploadAssetsModal({
             <div className="bg-white dark:bg-surface-900 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-surface-100 dark:border-surface-700">
-                    <h2 className="text-xl font-semibold text-surface-900 dark:text-surface-50">Upload Course Materials</h2>
+                    <h2 className="text-xl font-semibold text-surface-900 dark:text-surface-50">{t("groups:uploadCourseMaterials")}</h2>
                     <button
                         onClick={onClose}
                         disabled={isUploading}
@@ -139,7 +144,7 @@ export default function UploadAssetsModal({
                 <div className="p-6 space-y-6">
                     {error && (
                         <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
-                            {error}
+                            {localizeError(error)}
                         </div>
                     )}
 
@@ -157,22 +162,18 @@ export default function UploadAssetsModal({
                         <input {...getInputProps()} disabled={isUploading} />
                         <Upload className="w-12 h-12 mx-auto text-surface-400 dark:text-surface-500 mb-3" />
                         <p className="text-base font-medium text-surface-900 dark:text-surface-50 mb-1">
-                            {isDragActive ? 'Drop files here' : 'Drag & drop files here'}
+                            {isDragActive ? t("groups:dropFilesHere") : t("groups:dragDropFilesHere")}
                         </p>
                         <p className="text-sm text-surface-500 dark:text-surface-400 mb-4">
-                            or click to browse your computer
-                        </p>
+                            {t("groups:orClickToBrowseYourComputer")}</p>
                         <p className="text-xs text-surface-400 dark:text-surface-500">
-                            Supported: PDF, DOC, DOCX, MD, ZIP, RAR, Images (up to 100MB)
-                        </p>
+                            {t("groups:supportedPDFDOCDOCXMDZIPRARImagesUp")}</p>
                     </div>
 
                     {/* File List */}
                     {files.length > 0 && (
                         <div className="space-y-2">
-                            <h3 className="text-sm font-medium text-surface-700 dark:text-surface-300">
-                                Files to upload ({files.length})
-                            </h3>
+                            <h3 className="text-sm font-medium text-surface-700 dark:text-surface-300">{t("groups:filesToUpload", { value1: files.length })}</h3>
                             <div className="space-y-2 max-h-64 overflow-y-auto">
                                 {files.map((fileItem, index) => (
                                     <div
@@ -208,8 +209,8 @@ export default function UploadAssetsModal({
                     {isUploading && (
                         <div className="space-y-2">
                             <div className="flex items-center justify-between text-sm">
-                                <span className="text-surface-700 dark:text-surface-300">Uploading files...</span>
-                                <span className="font-medium text-primary-600 dark:text-primary-400">{uploadProgress}%</span>
+                                <span className="text-surface-700 dark:text-surface-300">{t("groups:uploadingFiles")}</span>
+                                <span className="font-medium text-primary-600 dark:text-primary-400">{formatNumber(uploadProgress)}%</span>
                             </div>
                             <div className="w-full bg-surface-200 dark:bg-surface-700 rounded-full h-2">
                                 <div
@@ -229,15 +230,14 @@ export default function UploadAssetsModal({
                         disabled={isUploading}
                         className="flex-1 px-4 py-2.5 border border-surface-200 dark:border-surface-600 rounded-lg text-surface-700 dark:text-surface-300 font-medium hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors disabled:opacity-50"
                     >
-                        Cancel
-                    </button>
+                        {t("groups:cancel")}</button>
                     <button
                         onClick={handleUpload}
                         disabled={isUploading || files.length === 0}
                         className="flex-1 px-4 py-2.5 bg-primary-600 dark:bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 dark:hover:bg-primary-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {isUploading && <Loader2 className="w-4 h-4 animate-spin" />}
-                        {isUploading ? 'Uploading...' : `Upload ${files.length} ${files.length === 1 ? 'File' : 'Files'}`}
+                        {isUploading ? t("common:uiUploading") : t("groups:upload", { count: files.length })}
                     </button>
                 </div>
             </div>

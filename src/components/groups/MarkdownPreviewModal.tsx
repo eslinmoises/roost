@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Download, Loader2, FileText } from 'lucide-react';
@@ -16,6 +19,7 @@ export default function MarkdownPreviewModal({
     fileName,
     onClose,
 }: MarkdownPreviewModalProps) {
+    useTranslation();
     const [content, setContent] = useState<string>('');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -26,13 +30,13 @@ export default function MarkdownPreviewModal({
         try {
             const response = await fetch(fileUrl);
             if (!response.ok) {
-                throw new Error('Failed to fetch file');
+                throw new Error(t("groups:failedToFetchFile"));
             }
             const text = await response.text();
             setContent(text);
         } catch (err) {
             console.error('Error fetching markdown:', err);
-            setError('Failed to load file content');
+            setError(t("groups:failedToLoadFileContent"));
         } finally {
             setIsLoading(false);
         }
@@ -261,14 +265,14 @@ export default function MarkdownPreviewModal({
                             href={fileUrl}
                             download={fileName}
                             className="p-2 text-surface-500 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
-                            title="Download"
+                            title={t("groups:download")}
                         >
                             <Download className="w-5 h-5" />
                         </a>
                         <button
                             onClick={onClose}
                             className="p-2 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
-                            title="Close"
+                            title={t("groups:close")}
                         >
                             <X className="w-5 h-5 text-surface-500 dark:text-surface-400" />
                         </button>
@@ -283,7 +287,7 @@ export default function MarkdownPreviewModal({
                         </div>
                     ) : error ? (
                         <div className="text-center py-12">
-                            <p className="text-red-600 dark:text-red-400">{error}</p>
+                            <p className="text-red-600 dark:text-red-400">{localizeError(error)}</p>
                         </div>
                     ) : (
                         <article

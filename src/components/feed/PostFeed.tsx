@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
@@ -33,6 +36,7 @@ function getFeedCacheKey(userId: string | undefined, feedMode: string, groupId?:
 
 // Lightweight offscreen wrapper: unmounts PostCard when far off-screen to reduce DOM size
 function OffscreenPostCard(props: React.ComponentProps<typeof PostCard>) {
+    useTranslation();
     const { ref, inView } = useInView({
         rootMargin: '400px',
         triggerOnce: false,
@@ -56,6 +60,7 @@ export default function PostFeed({
     groupId,
     feedMode = 'group',
 }: PostFeedProps) {
+    useTranslation();
     const navigate = useNavigate();
     const { user, profile } = useAuth();
 
@@ -325,14 +330,14 @@ export default function PostFeed({
     }, []);
 
     const handleDeletePost = useCallback(async (postId: string) => {
-        if (!window.confirm('Are you sure you want to delete this post?')) return;
+        if (!window.confirm(t("posts:areYouSureYouWantToDeleteThisPost"))) return;
 
         try {
             await deletePostService(postId);
             setPosts((prev) => prev.filter((p) => p.id !== postId));
         } catch (error) {
             console.error('Error deleting post:', error);
-            alert('Failed to delete post. Please try again.');
+            alert(t("posts:failedToDeletePostPleaseTryAgain"));
         }
     }, []);
 
@@ -345,7 +350,7 @@ export default function PostFeed({
             loadPosts(true);
         } catch (error) {
             console.error('Error toggling pin:', error);
-            alert('Failed to pin/unpin post. Please try again.');
+            alert(t("posts:failedToPinUnpinPostPleaseTryAgain"));
         }
     }, [loadPosts]);
 
@@ -473,8 +478,7 @@ export default function PostFeed({
                         onClick={() => setIsModalOpen(true)}
                         className="flex-1 text-left px-4 py-2.5 bg-surface-100 dark:bg-surface-800 rounded-lg text-surface-400 dark:text-surface-500 hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors"
                     >
-                        Write something...
-                    </button>
+                        {t("posts:writeSomething")}</button>
                 </div>
             </div>}
 
@@ -500,7 +504,7 @@ export default function PostFeed({
                         transition-colors flex items-center justify-center gap-2 border border-primary-200 dark:border-primary-800"
                 >
                     <ChevronUp className="w-4 h-4" />
-                    Show {pendingPosts.length} new {pendingPosts.length === 1 ? 'post' : 'posts'}
+                    {t('posts:showNewPosts', { count: pendingPosts.length })}
                 </button>
             )}
 
@@ -527,7 +531,7 @@ export default function PostFeed({
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2 text-sm font-medium text-surface-500 dark:text-surface-400">
                                         <Pin className="w-4 h-4" />
-                                        <span>Pinned Posts</span>
+                                        <span>{t("posts:pinnedPosts")}</span>
                                     </div>
                                     {totalSlides > 1 && (
                                         <div className="flex items-center gap-2">
@@ -539,7 +543,7 @@ export default function PostFeed({
                                                 <ChevronLeft className="w-4 h-4" />
                                             </button>
                                             <span className="text-xs text-surface-400 dark:text-surface-500 tabular-nums">
-                                                {currentSlide + 1} / {totalSlides}
+                                                {formatNumber(currentSlide + 1)} / {formatNumber(totalSlides)}
                                             </span>
                                             <button
                                                 onClick={() => setPinnedSlide(Math.min(totalSlides - 1, currentSlide + 1))}
@@ -588,17 +592,15 @@ export default function PostFeed({
                                     <div className="w-16 h-16 bg-primary-50 dark:bg-primary-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <UserPlus className="w-8 h-8 text-primary-500" />
                                     </div>
-                                    <h3 className="text-lg font-medium text-surface-900 dark:text-surface-100 mb-2">Your feed is empty</h3>
+                                    <h3 className="text-lg font-medium text-surface-900 dark:text-surface-100 mb-2">{t("posts:yourFeedIsEmpty")}</h3>
                                     <p className="text-surface-500 dark:text-surface-400 mb-4">
-                                        Follow community members to see their posts here. Admin and moderator posts will always appear.
-                                    </p>
+                                        {t("posts:followCommunityMembersToSeeTheirPostsHereAdmin")}</p>
                                     <Link
                                         to="/explore"
                                         className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                                     >
                                         <Compass className="w-4 h-4" />
-                                        Explore Posts
-                                    </Link>
+                                        {t("posts:explorePosts")}</Link>
                                 </div>
                             ) : (
                                 <div className="card p-12 text-center shadow-none">
@@ -617,10 +619,9 @@ export default function PostFeed({
                                             />
                                         </svg>
                                     </div>
-                                    <h3 className="text-lg font-medium text-surface-900 mb-2">No posts yet</h3>
+                                    <h3 className="text-lg font-medium text-surface-900 mb-2">{t("posts:noPostsYet")}</h3>
                                     <p className="text-surface-500 mb-4">
-                                        Be the first to share something with the community!
-                                    </p>
+                                        {t("posts:beTheFirstToShareSomethingWithTheCommunity")}</p>
                                 </div>
                             )
                         ) : regularPosts.length > 0 ? (

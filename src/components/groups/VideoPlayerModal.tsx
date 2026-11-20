@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
@@ -17,6 +19,7 @@ export default function VideoPlayerModal({
     videoPlatform,
     videoId,
 }: VideoPlayerModalProps) {
+    useTranslation();
     // Handle escape key
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -60,7 +63,7 @@ export default function VideoPlayerModal({
             <button
                 onClick={onClose}
                 className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
-                aria-label="Close video"
+                aria-label={t("groups:closeVideo")}
             >
                 <X className="w-6 h-6 text-white" />
             </button>

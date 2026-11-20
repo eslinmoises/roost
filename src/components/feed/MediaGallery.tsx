@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { Asset } from '@/services/asset';
@@ -8,6 +10,7 @@ interface MediaGalleryProps {
 }
 
 export default function MediaGallery({ assets }: MediaGalleryProps) {
+    useTranslation();
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const [urls, setUrls] = useState<string[]>(() => assets.map((asset) => asset.file_url.startsWith('private:') ? '' : asset.file_url));
 
@@ -123,9 +126,7 @@ export default function MediaGallery({ assets }: MediaGalleryProps) {
                         {/* Show "+N more" overlay on last visible item if there are more */}
                         {index === 5 && assets.length > 6 && (
                             <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                <span className="text-white text-xl font-semibold">
-                                    +{assets.length - 6} more
-                                </span>
+                                <span className="text-white text-xl font-semibold">{t("posts:more", { value1: assets.length - 6 })}</span>
                             </div>
                         )}
                     </div>
@@ -142,7 +143,7 @@ export default function MediaGallery({ assets }: MediaGalleryProps) {
                     <button
                         onClick={closeLightbox}
                         className="absolute top-4 right-4 z-10 p-3 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
-                        aria-label="Close"
+                        aria-label={t("posts:close")}
                     >
                         <X className="w-8 h-8" />
                     </button>
@@ -153,14 +154,14 @@ export default function MediaGallery({ assets }: MediaGalleryProps) {
                             <button
                                 onClick={goToPrevious}
                                 className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all hover:scale-110"
-                                aria-label="Previous image"
+                                aria-label={t("posts:previousImage")}
                             >
                                 <ChevronLeft className="w-8 h-8" />
                             </button>
                             <button
                                 onClick={goToNext}
                                 className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all hover:scale-110"
-                                aria-label="Next image"
+                                aria-label={t("posts:nextImage")}
                             >
                                 <ChevronRight className="w-8 h-8" />
                             </button>
@@ -190,12 +191,9 @@ export default function MediaGallery({ assets }: MediaGalleryProps) {
 
                     {/* Footer info */}
                     <div className="absolute bottom-4 left-0 right-0 text-center">
-                        <p className="text-white/60 text-sm">
-                            {selectedIndex + 1} of {assets.length}
-                        </p>
+                        <p className="text-white/60 text-sm">{t("posts:of", { value1: selectedIndex + 1, value2: assets.length })}</p>
                         <p className="text-white/40 text-xs mt-1">
-                            Press arrow keys to navigate • ESC to close
-                        </p>
+                            {t("posts:pressArrowKeysToNavigateESCToClose")}</p>
                     </div>
 
                     {/* Thumbnail strip for multiple images */}

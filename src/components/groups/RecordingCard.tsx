@@ -1,3 +1,6 @@
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState } from 'react';
 import { Play, Trash2, Edit2, Loader2 } from 'lucide-react';
 import { deleteRecording } from '@/services/group';
@@ -11,6 +14,7 @@ interface RecordingCardProps {
 }
 
 export default function RecordingCard({ recording, canEdit, onDeleted, onEdit }: RecordingCardProps) {
+    useTranslation();
     const [showModal, setShowModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -25,7 +29,7 @@ export default function RecordingCard({ recording, canEdit, onDeleted, onEdit }:
     };
 
     const handleDelete = async () => {
-        if (!confirm('Are you sure you want to delete this recording?')) return;
+        if (!confirm(t("groups:areYouSureYouWantToDeleteThisRecording"))) return;
 
         try {
             setIsDeleting(true);
@@ -33,14 +37,14 @@ export default function RecordingCard({ recording, canEdit, onDeleted, onEdit }:
             onDeleted(recording.id);
         } catch (error) {
             console.error('Error deleting recording:', error);
-            alert('Failed to delete recording');
+            alert(t("groups:failedToDeleteRecording"));
         } finally {
             setIsDeleting(false);
         }
     };
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+        return new Date(dateString).toLocaleDateString(activeLanguage(), {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
@@ -100,7 +104,7 @@ export default function RecordingCard({ recording, canEdit, onDeleted, onEdit }:
                         <button
                             onClick={() => onEdit?.(recording)}
                             className="p-1.5 text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded transition-colors"
-                            title="Edit recording"
+                            title={t("groups:editRecording2")}
                         >
                             <Edit2 className="w-4 h-4" />
                         </button>
@@ -108,7 +112,7 @@ export default function RecordingCard({ recording, canEdit, onDeleted, onEdit }:
                             onClick={handleDelete}
                             disabled={isDeleting}
                             className="p-1.5 text-surface-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors disabled:opacity-50"
-                            title="Delete recording"
+                            title={t("groups:deleteRecording")}
                         >
                             {isDeleting ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />

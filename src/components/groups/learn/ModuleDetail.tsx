@@ -1,3 +1,7 @@
+import { formatNumber } from '@/lib/locale';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Video, FileText, Plus, CheckCircle2, Circle, Play, Loader2, Edit2, Trash2 } from 'lucide-react';
 import type { ModuleWithProgress, RecordingWithCompletion, GroupAssetWithDetails, GroupRole } from '@/types';
@@ -29,6 +33,7 @@ export default function ModuleDetail({
     onEditModule,
     onDeleteModule,
 }: ModuleDetailProps) {
+    useTranslation();
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<TabValue>('recordings');
     const [recordings, setRecordings] = useState<RecordingWithCompletion[]>([]);
@@ -67,7 +72,7 @@ export default function ModuleDetail({
     };
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+        return new Date(dateString).toLocaleDateString(activeLanguage(), {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
@@ -84,8 +89,8 @@ export default function ModuleDetail({
     const formatFileSize = (bytes: number | null) => {
         if (!bytes) return '';
         if (bytes < 1024) return `${bytes} B`;
-        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        if (bytes < 1024 * 1024) return t("classroom:kB", { value1: formatNumber((bytes / 1024), { minimumFractionDigits: 1, maximumFractionDigits: 1 }) });
+        return t("classroom:mB", { value1: formatNumber((bytes / (1024 * 1024)), { minimumFractionDigits: 1, maximumFractionDigits: 1 }) });
     };
 
     return (
@@ -116,14 +121,14 @@ export default function ModuleDetail({
                         <button
                             onClick={onEditModule}
                             className="p-2 text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
-                            title="Edit module"
+                            title={t("classroom:editModule2")}
                         >
                             <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                             onClick={onDeleteModule}
                             className="p-2 text-surface-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                            title="Delete module"
+                            title={t("classroom:deleteModule")}
                         >
                             <Trash2 className="w-4 h-4" />
                         </button>
@@ -142,7 +147,7 @@ export default function ModuleDetail({
                     }`}
                 >
                     <Video className="w-4 h-4" />
-                    Recordings ({recordings.length})
+                    {t("classroom:recordings")}{formatNumber(recordings.length)})
                 </button>
                 <button
                     onClick={() => setActiveTab('assets')}
@@ -153,7 +158,7 @@ export default function ModuleDetail({
                     }`}
                 >
                     <FileText className="w-4 h-4" />
-                    Assets ({assets.length})
+                    {t("classroom:assets")}{formatNumber(assets.length)})
                 </button>
 
                 {/* Add buttons */}
@@ -165,8 +170,7 @@ export default function ModuleDetail({
                                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
                             >
                                 <Plus className="w-3.5 h-3.5" />
-                                Add Recording
-                            </button>
+                                {t("classroom:addRecording")}</button>
                         )}
                         {activeTab === 'assets' && (
                             <button
@@ -174,8 +178,7 @@ export default function ModuleDetail({
                                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
                             >
                                 <Plus className="w-3.5 h-3.5" />
-                                Upload Asset
-                            </button>
+                                {t("classroom:uploadAsset")}</button>
                         )}
                     </div>
                 )}
@@ -191,8 +194,7 @@ export default function ModuleDetail({
                     <div className="text-center py-12 bg-surface-50 dark:bg-surface-900 rounded-lg border-2 border-dashed border-surface-200 dark:border-surface-700">
                         <Video className="w-10 h-10 mx-auto text-surface-400 dark:text-surface-500 mb-3" />
                         <p className="text-sm text-surface-500 dark:text-surface-400">
-                            No recordings in this module yet
-                        </p>
+                            {t("classroom:noRecordingsInThisModuleYet")}</p>
                     </div>
                 ) : (
                     <div className="bg-white dark:bg-surface-900 rounded-lg border border-surface-200 dark:border-surface-700 divide-y divide-surface-100 dark:divide-surface-800">
@@ -253,8 +255,7 @@ export default function ModuleDetail({
                     <div className="text-center py-12 bg-surface-50 dark:bg-surface-900 rounded-lg border-2 border-dashed border-surface-200 dark:border-surface-700">
                         <FileText className="w-10 h-10 mx-auto text-surface-400 dark:text-surface-500 mb-3" />
                         <p className="text-sm text-surface-500 dark:text-surface-400">
-                            No assets in this module yet
-                        </p>
+                            {t("classroom:noAssetsInThisModuleYet")}</p>
                     </div>
                 ) : (
                     <div className="bg-white dark:bg-surface-900 rounded-lg border border-surface-200 dark:border-surface-700 divide-y divide-surface-100 dark:divide-surface-800">
@@ -270,7 +271,7 @@ export default function ModuleDetail({
                                         <button
                                             onClick={async () => {
                                                 try { window.open(await getSignedDownloadUrl(asset.file_url), '_blank', 'noopener,noreferrer'); }
-                                                catch { window.alert('This file is unavailable or you no longer have access.'); }
+                                                catch { window.alert(t("classroom:thisFileIsUnavailableOrYouNoLongerHave")); }
                                             }}
                                             className="text-sm font-medium text-surface-900 dark:text-surface-50 hover:text-primary-600 dark:hover:text-primary-400 truncate block"
                                         >

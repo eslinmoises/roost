@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, CheckCircle2, Circle, ArrowLeft, Menu, X } from 'lucide-react';
 import type { ModuleWithProgress, RecordingWithCompletion } from '@/types';
@@ -24,6 +26,7 @@ export default function LearnSidebar({
     onBackToModules,
     showBackButton,
 }: LearnSidebarProps) {
+    useTranslation();
     const [expandedModules, setExpandedModules] = useState<Set<string>>(
         new Set(activeModuleId ? [activeModuleId] : [])
     );
@@ -58,8 +61,7 @@ export default function LearnSidebar({
                     className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-primary-600 dark:text-primary-400 hover:bg-surface-50 dark:hover:bg-surface-800 border-b border-surface-200 dark:border-surface-700 transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    Back to Modules
-                </button>
+                    {t("classroom:backToModules")}</button>
             )}
 
             {/* Module list */}
@@ -128,8 +130,7 @@ export default function LearnSidebar({
 
                             {isExpanded && recordings.length === 0 && (
                                 <p className="text-xs text-surface-400 dark:text-surface-500 pl-10 pr-4 pb-3">
-                                    No lessons yet
-                                </p>
+                                    {t("classroom:noLessonsYet")}</p>
                             )}
                         </div>
                     );

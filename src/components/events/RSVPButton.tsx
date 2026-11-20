@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useState } from 'react';
 import { Check, X, HelpCircle } from 'lucide-react';
@@ -21,6 +24,7 @@ export default function RSVPButton({
     attendeeCounts,
     disabled = false,
 }: RSVPButtonProps) {
+    useTranslation();
     disabled = disabled || APP_CONFIG.demo.enabled;
     const [loading, setLoading] = useState(false);
 
@@ -41,21 +45,21 @@ export default function RSVPButton({
         {
             status: 'going' as RSVPStatus,
             icon: Check,
-            label: 'Going',
+            label: t("events:going2"),
             color: 'green',
             count: attendeeCounts?.going || 0,
         },
         {
             status: 'maybe' as RSVPStatus,
             icon: HelpCircle,
-            label: 'Maybe',
+            label: t("events:maybe"),
             color: 'yellow',
             count: attendeeCounts?.maybe || 0,
         },
         {
             status: 'not_going' as RSVPStatus,
             icon: X,
-            label: 'Can\'t Go',
+            label: t("events:canTGo"),
             color: 'red',
             count: attendeeCounts?.not_going || 0,
         },
@@ -92,7 +96,7 @@ export default function RSVPButton({
                         <span>{label}</span>
                         {count > 0 && (
                             <span className="ml-1 px-2 py-0.5 bg-black bg-opacity-10 dark:bg-white dark:bg-opacity-10 rounded-full text-xs font-semibold">
-                                {count}
+                                {formatNumber(count)}
                             </span>
                         )}
                     </button>

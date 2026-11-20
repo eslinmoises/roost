@@ -1,8 +1,11 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 interface VideoEmbedProps {
     url: string;
 }
 
 export default function VideoEmbed({ url }: VideoEmbedProps) {
+    useTranslation();
     const getEmbedUrl = (url: string) => {
         // YouTube
         const ytMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/);
@@ -31,7 +34,7 @@ export default function VideoEmbed({ url }: VideoEmbedProps) {
                 className="absolute inset-0 w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                title="Video embed"
+                title={t("posts:videoEmbed")}
             />
         </div>
     );
