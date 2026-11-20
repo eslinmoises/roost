@@ -1,0 +1,14 @@
+{
+  "mentionedYouInAComment": "{{value1}} mentioned you in a comment",
+  "failedToLoadNotifications": "Failed to load notifications",
+  "notifications": "Notifications",
+  "readOnlyDemo": "Read-only demo",
+  "markAllRead": "Mark all read",
+  "closeNotifications": "Close notifications",
+  "retry": "Retry",
+  "noNotificationsYet": "No notifications yet",
+  "youLlBeNotifiedAboutCommentsReactionsAndMessages": "You'll be notified about comments, reactions, and messages",
+  "loadingMore": "Loading more...",
+  "scrollForMore": "Scroll for more",
+  "newMention": "New Mention"
+}

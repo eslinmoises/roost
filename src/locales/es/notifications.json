@@ -1,0 +1,14 @@
+{
+  "mentionedYouInAComment": "{{value1}} te mencionó en un comentario",
+  "failedToLoadNotifications": "No se pudieron cargar las notificaciones",
+  "notifications": "Notificaciones",
+  "readOnlyDemo": "Demostración de solo lectura",
+  "markAllRead": "Marcar todas como leídas",
+  "closeNotifications": "Cerrar notificaciones",
+  "retry": "Reintentar",
+  "noNotificationsYet": "Aún no hay notificaciones",
+  "youLlBeNotifiedAboutCommentsReactionsAndMessages": "Recibirás notificaciones sobre comentarios, reacciones y mensajes",
+  "loadingMore": "Cargando más...",
+  "scrollForMore": "Desplázate para ver más",
+  "newMention": "Nueva mención"
+}
