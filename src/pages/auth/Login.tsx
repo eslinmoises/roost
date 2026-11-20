@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/services/supabase';
@@ -7,6 +10,7 @@ import { APP_CONFIG } from '@/config/app';
 type LoginStep = 'credentials' | '2fa' | 'email-not-confirmed';
 
 export default function Login() {
+    useTranslation();
     const navigate = useNavigate();
 
     // Form state
@@ -48,14 +52,14 @@ export default function Login() {
 
             if (assurance.nextLevel === 'aal2' && assurance.currentLevel !== 'aal2') {
                 const verifiedFactor = factors.totp.find((factor) => factor.status === 'verified');
-                if (!verifiedFactor) throw new Error('Your two-factor configuration is incomplete. Contact support.');
+                if (!verifiedFactor) throw new Error(t("auth:yourTwoFactorConfigurationIsIncompleteContactSupport"));
                 setMfaFactorId(verifiedFactor.id);
                 setStep('2fa');
             } else {
                 navigate('/');
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to sign in');
+            setError(err instanceof Error ? localizeError(err.message) : t("auth:failedToSignIn"));
         } finally {
             setIsLoading(false);
         }
@@ -67,7 +71,7 @@ export default function Login() {
         setIsLoading(true);
 
         try {
-            if (!mfaFactorId) throw new Error('No verified authenticator was found. Sign in again.');
+            if (!mfaFactorId) throw new Error(t("auth:noVerifiedAuthenticatorWasFoundSignInAgain"));
             const { error: verifyError } = await supabase.auth.mfa.challengeAndVerify({
                 factorId: mfaFactorId,
                 code: twoFactorCode,
@@ -75,7 +79,7 @@ export default function Login() {
             if (verifyError) throw verifyError;
             navigate('/');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to verify code');
+            setError(err instanceof Error ? localizeError(err.message) : t("auth:failedToVerifyCode"));
         } finally {
             setIsLoading(false);
         }
@@ -109,7 +113,7 @@ export default function Login() {
         } catch (err) {
             console.error('Error resending confirmation email:', err);
             setResendStatus('error');
-            setError(err instanceof Error ? err.message : 'Failed to resend confirmation email');
+            setError(err instanceof Error ? localizeError(err.message) : t("auth:failedToResendConfirmationEmail"));
         }
     };
 
@@ -124,8 +128,7 @@ export default function Login() {
                         : 'text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-300'
                 }`}
             >
-                Login
-            </Link>
+                {t("auth:login")}</Link>
             {APP_CONFIG.features.signup && (
                 <Link
                     to="/signup"
@@ -135,8 +138,7 @@ export default function Login() {
                             : 'text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-300'
                     }`}
                 >
-                    Sign Up
-                </Link>
+                    {t("auth:signUp")}</Link>
             )}
         </div>
     );
@@ -151,11 +153,9 @@ export default function Login() {
                         <Mail className="w-8 h-8 text-amber-600 dark:text-amber-400" />
                     </div>
                     <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">
-                        Email Not Confirmed
-                    </h1>
+                        {t("auth:emailNotConfirmed")}</h1>
                     <p className="text-surface-500 dark:text-surface-400 mt-2 text-sm">
-                        Please confirm your email address to continue
-                    </p>
+                        {t("auth:pleaseConfirmYourEmailAddressToContinue")}</p>
                 </div>
 
                 {/* Email display */}
@@ -168,12 +168,11 @@ export default function Login() {
                 {/* Instructions */}
                 <div className="bg-surface-50 dark:bg-surface-800/50 rounded-lg p-4 mb-6">
                     <p className="text-sm text-surface-600 dark:text-surface-400 mb-3">
-                        We've sent a confirmation link to your email. Please:
-                    </p>
+                        {t("auth:weVeSentAConfirmationLinkToYourEmail")}</p>
                     <ol className="text-sm text-surface-600 dark:text-surface-400 space-y-2 list-decimal list-inside">
-                        <li>Check your inbox (and spam folder)</li>
-                        <li>Click the confirmation link</li>
-                        <li>Return here and try logging in again</li>
+                        <li>{t("auth:checkYourInboxAndSpamFolder")}</li>
+                        <li>{t("auth:clickTheConfirmationLink")}</li>
+                        <li>{t("auth:returnHereAndTryLoggingInAgain")}</li>
                     </ol>
                 </div>
 
@@ -181,13 +180,13 @@ export default function Login() {
                 {resendStatus === 'sent' && (
                     <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400 mb-4">
                         <CheckCircle className="w-5 h-5" />
-                        <span className="text-sm">Confirmation email sent!</span>
+                        <span className="text-sm">{t("auth:confirmationEmailSent")}</span>
                     </div>
                 )}
 
                 {error && resendStatus === 'error' && (
                     <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm">
-                        {error}
+                        {localizeError(error)}
                     </div>
                 )}
 
@@ -201,18 +200,15 @@ export default function Login() {
                         {resendStatus === 'sending' ? (
                             <>
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                Sending...
-                            </>
+                                {t("auth:sending")}</>
                         ) : resendStatus === 'sent' ? (
                             <>
                                 <CheckCircle className="w-4 h-4" />
-                                Email Sent
-                            </>
+                                {t("auth:emailSent")}</>
                         ) : (
                             <>
                                 <RefreshCw className="w-4 h-4" />
-                                Resend Confirmation Email
-                            </>
+                                {t("auth:resendConfirmationEmail")}</>
                         )}
                     </button>
 
@@ -220,14 +216,12 @@ export default function Login() {
                         onClick={handleBackToCredentials}
                         className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-100 hover:bg-surface-200 dark:bg-surface-800 dark:hover:bg-surface-700 text-surface-700 dark:text-surface-300 rounded-lg font-medium transition-colors text-sm"
                     >
-                        Back to Login
-                    </button>
+                        {t("auth:backToLogin2")}</button>
                 </div>
 
                 {/* Help text */}
                 <p className="text-xs text-surface-500 mt-6 text-center">
-                    Didn't receive the email? Check your spam folder or try resending.
-                </p>
+                    {t("auth:didnTReceiveTheEmailCheckYourSpamFolder")}</p>
             </div>
         );
     }
@@ -241,16 +235,16 @@ export default function Login() {
 
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">{APP_CONFIG.demo.enabled ? 'Explore Roost' : 'Welcome back'}</h1>
-                    <p className="text-surface-500 dark:text-surface-400 mt-1 text-sm">{APP_CONFIG.demo.enabled ? 'A sample community, ready for you to explore.' : 'Sign in to your account to continue'}</p>
+                    <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">{APP_CONFIG.demo.enabled ? t("auth:exploreRoost") : t("auth:welcomeBack")}</h1>
+                    <p className="text-surface-500 dark:text-surface-400 mt-1 text-sm">{APP_CONFIG.demo.enabled ? t("auth:aSampleCommunityReadyForYouToExplore") : t("auth:signInToYourAccountToContinue")}</p>
                 </div>
 
-                {APP_CONFIG.demo.enabled && <p className="mb-6 rounded-xl bg-primary-50 p-4 text-sm text-primary-800 dark:bg-primary-900/30 dark:text-primary-200">Use the prefilled shared login below. This demo is read-only: accounts, content, and files cannot be changed. All people and community content are examples.</p>}
+                {APP_CONFIG.demo.enabled && <p className="mb-6 rounded-xl bg-primary-50 p-4 text-sm text-primary-800 dark:bg-primary-900/30 dark:text-primary-200">{t("auth:useThePrefilledSharedLoginBelowThisDemoIs")}</p>}
 
                 {/* Error message */}
                 {error && (
                     <div className="mb-6 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm">
-                        {error}
+                        {localizeError(error)}
                     </div>
                 )}
 
@@ -259,14 +253,13 @@ export default function Login() {
                     {/* Email field */}
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-surface-900 dark:text-surface-200 mb-1.5">
-                            Email
-                        </label>
+                            {t("auth:email")}</label>
                         <input
                             id="email"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="you@example.com"
+                            placeholder={t("auth:youExampleCom")}
                             required
                             className="input w-full"
                             disabled={isLoading}
@@ -276,15 +269,14 @@ export default function Login() {
                     {/* Password field */}
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-surface-900 dark:text-surface-200 mb-1.5">
-                            Password
-                        </label>
+                            {t("auth:password")}</label>
                         <div className="relative">
                             <input
                                 id="password"
                                 type={showPassword ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Enter your password"
+                                placeholder={t("auth:enterYourPassword")}
                                 required
                                 className="input w-full pr-10"
                                 disabled={isLoading}
@@ -309,8 +301,7 @@ export default function Login() {
                             to="/forgot-password"
                             className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
                         >
-                            Forgot password?
-                        </Link>
+                            {t("auth:forgotPassword")}</Link>
                     </div>}
 
                     {/* Submit button */}
@@ -322,10 +313,10 @@ export default function Login() {
                         {isLoading ? (
                             <>
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                <span>Signing in...</span>
+                                <span>{t("auth:signingIn")}</span>
                             </>
                         ) : (
-                            <span>{APP_CONFIG.demo.enabled ? 'Explore the demo' : 'Sign In'}</span>
+                            <span>{APP_CONFIG.demo.enabled ? t("auth:exploreTheDemo") : t("auth:signIn")}</span>
                         )}
                     </button>
                 </form>
@@ -342,17 +333,15 @@ export default function Login() {
                     <Shield className="w-8 h-8 text-primary-600 dark:text-primary-400" />
                 </div>
                 <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">
-                    Two-Factor Authentication
-                </h1>
+                    {t("auth:twoFactorAuthentication")}</h1>
                 <p className="text-surface-500 dark:text-surface-400 mt-2 text-sm">
-                    Enter the 6-digit code from your authenticator app
-                </p>
+                    {t("auth:enterThe6DigitCodeFromYourAuthenticatorApp")}</p>
             </div>
 
             {/* Error message */}
             {error && (
                 <div className="mb-6 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm">
-                    {error}
+                    {localizeError(error)}
                 </div>
             )}
 
@@ -360,8 +349,7 @@ export default function Login() {
             <form onSubmit={handle2FASubmit} className="space-y-5">
                 <div>
                         <label htmlFor="twoFactorCode" className="block text-sm font-medium text-surface-900 dark:text-surface-200 mb-1.5">
-                            Verification Code
-                        </label>
+                            {t("auth:verificationCode")}</label>
                         <input
                             id="twoFactorCode"
                             type="text"
@@ -388,10 +376,10 @@ export default function Login() {
                     {isLoading ? (
                         <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Verifying...</span>
+                            <span>{t("auth:verifying")}</span>
                         </>
                     ) : (
-                        <span>Verify & Sign in</span>
+                        <span>{t("auth:verifySignIn")}</span>
                     )}
                 </button>
             </form>
@@ -403,8 +391,7 @@ export default function Login() {
                     onClick={handleBackToCredentials}
                     className="text-sm text-surface-500 hover:text-surface-700 dark:text-surface-400 dark:hover:text-surface-200"
                 >
-                    &larr; Back to login
-                </button>
+                    {t("auth:backToLogin3")}</button>
             </div>
         </div>
     );

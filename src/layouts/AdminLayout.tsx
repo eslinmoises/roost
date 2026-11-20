@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { NavLink, Outlet, Navigate } from 'react-router-dom';
 import {
     LayoutDashboard,
@@ -26,20 +28,21 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-    { path: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
-    { path: '/admin/users', label: 'Users', icon: Users },
-    { path: '/admin/content', label: 'Content', icon: FileText, moderatorAccess: true },
-    { path: '/admin/categories', label: 'Categories', icon: Tag },
-    { path: '/admin/announcements', label: 'Announcements', icon: Megaphone },
-    { path: '/admin/subscriptions', label: 'Subscriptions', icon: CreditCard },
-    { path: '/admin/activations', label: 'Activations', icon: Key, moderatorAccess: true },
-    { path: '/admin/showcases', label: 'Showcases', icon: Rocket, moderatorAccess: true },
-    { path: '/admin/live-room', label: 'Live Room', icon: Radio },
-    { path: '/admin/backups', label: 'Backups', icon: Database },
-    { path: '/admin/site-settings', label: 'Site Settings', icon: Settings },
+    { path: '/admin', get label() { return t("admin:dashboard"); }, icon: LayoutDashboard, end: true },
+    { path: '/admin/users', get label() { return t("admin:users"); }, icon: Users },
+    { path: '/admin/content', get label() { return t("admin:content"); }, icon: FileText, moderatorAccess: true },
+    { path: '/admin/categories', get label() { return t("admin:categories"); }, icon: Tag },
+    { path: '/admin/announcements', get label() { return t("admin:announcements"); }, icon: Megaphone },
+    { path: '/admin/subscriptions', get label() { return t("admin:subscriptions"); }, icon: CreditCard },
+    { path: '/admin/activations', get label() { return t("admin:activations"); }, icon: Key, moderatorAccess: true },
+    { path: '/admin/showcases', get label() { return t("admin:showcases"); }, icon: Rocket, moderatorAccess: true },
+    { path: '/admin/live-room', get label() { return t("admin:liveRoom"); }, icon: Radio },
+    { path: '/admin/backups', get label() { return t("admin:backups"); }, icon: Database },
+    { path: '/admin/site-settings', get label() { return t("admin:siteSettings"); }, icon: Settings },
 ];
 
 export default function AdminLayout() {
+    useTranslation();
     const [collapsed, setCollapsed] = useState(false);
     const { isPlatformAdmin, profile } = useAuth();
     const isModerator = profile?.role === 'moderator';
@@ -66,13 +69,13 @@ export default function AdminLayout() {
                     {!collapsed && (
                         <div className="flex items-center gap-2">
                             <Shield className="w-6 h-6 text-primary-400" />
-                            <span className="font-semibold">{isPlatformAdmin ? 'Admin Panel' : 'Mod Panel'}</span>
+                            <span className="font-semibold">{isPlatformAdmin ? t("admin:adminPanel") : t("admin:modPanel")}</span>
                         </div>
                     )}
                     <button
                         onClick={() => setCollapsed(!collapsed)}
                         className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-                        title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                        title={collapsed ? t("admin:expandSidebar") : t("admin:collapseSidebar")}
                     >
                         <ChevronLeft
                             className={`w-5 h-5 transition-transform ${collapsed ? 'rotate-180' : ''}`}
@@ -109,10 +112,10 @@ export default function AdminLayout() {
                     <NavLink
                         to="/"
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-                        title={collapsed ? 'Back to Site' : undefined}
+                        title={collapsed ? t("admin:backToSite") : undefined}
                     >
                         <ChevronLeft className="w-5 h-5" />
-                        {!collapsed && <span>Back to Site</span>}
+                        {!collapsed && <span>{t("admin:backToSite")}</span>}
                     </NavLink>
                 </div>
             </aside>

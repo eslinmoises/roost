@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
+import i18n from '@/i18n';
+beforeAll(async () => { await i18n.changeLanguage('en'); });
 import { getNavigationItems } from './items';
 
 describe('shared desktop and mobile navigation', () => {

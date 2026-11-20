@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface SidebarContextType {
@@ -11,6 +12,7 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 const STORAGE_KEY = 'sidebar-collapsed';
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
+    useTranslation();
     const [isCollapsed, setIsCollapsed] = useState(() => {
         // Load from localStorage on initial render
         const stored = localStorage.getItem(STORAGE_KEY);

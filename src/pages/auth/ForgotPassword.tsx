@@ -1,3 +1,7 @@
+import { Trans } from 'react-i18next';
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Loader2, ArrowLeft, Check } from 'lucide-react';
@@ -5,6 +9,7 @@ import { Mail, Loader2, ArrowLeft, Check } from 'lucide-react';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function ForgotPassword() {
+    useTranslation();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -27,12 +32,12 @@ export default function ForgotPassword() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || 'Failed to send reset email');
+                throw new Error(data.error || t("auth:failedToSendResetEmail"));
             }
 
             setSuccess(true);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to send reset email');
+            setError(err instanceof Error ? localizeError(err.message) : t("auth:failedToSendResetEmail"));
         } finally {
             setIsLoading(false);
         }
@@ -46,17 +51,12 @@ export default function ForgotPassword() {
                 <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
                 </div>
-                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">Check your email</h1>
-                <p className="text-surface-500 dark:text-surface-400 mb-6">
-                    If an account exists with <strong>{email}</strong>, we've sent a password reset link.
-                    The link will expire in 1 hour.
-                </p>
+                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">{t("auth:checkYourEmail")}</h1>
+                <p className="text-surface-500 dark:text-surface-400 mb-6"><Trans i18nKey="auth:sentence10" components={{ part0: <strong /> }} values={{ value0: email }} /></p>
                 <p className="text-surface-400 dark:text-surface-500 text-sm mb-6">
-                    Don't see the email? Check your spam folder.
-                </p>
+                    {t("auth:donTSeeTheEmailCheckYourSpamFolder")}</p>
                 <Link to="/login" className="btn-primary w-full py-2.5">
-                    Back to login
-                </Link>
+                    {t("auth:backToLogin")}</Link>
             </div>
             </div>
         );
@@ -70,21 +70,20 @@ export default function ForgotPassword() {
                 className="inline-flex items-center gap-1 text-sm text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-300 mb-6"
             >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Back to login</span>
+                <span>{t("auth:backToLogin")}</span>
             </Link>
 
             {/* Header */}
             <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">Forgot password?</h1>
+                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">{t("auth:forgotPassword")}</h1>
                 <p className="text-surface-500 dark:text-surface-400 mt-2">
-                    No worries, we'll send you reset instructions
-                </p>
+                    {t("auth:noWorriesWeLlSendYouResetInstructions")}</p>
             </div>
 
             {/* Error message */}
             {error && (
                 <div className="mb-6 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm">
-                    {error}
+                    {localizeError(error)}
                 </div>
             )}
 
@@ -93,8 +92,7 @@ export default function ForgotPassword() {
                 {/* Email field */}
                 <div>
                     <label htmlFor="email" className="label">
-                        Email address
-                    </label>
+                        {t("auth:emailAddress")}</label>
                     <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
                         <input
@@ -102,7 +100,7 @@ export default function ForgotPassword() {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="you@example.com"
+                            placeholder={t("auth:youExampleCom")}
                             required
                             className="input pl-10"
                             disabled={isLoading}
@@ -119,10 +117,10 @@ export default function ForgotPassword() {
                     {isLoading ? (
                         <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Sending...</span>
+                            <span>{t("auth:sending")}</span>
                         </>
                     ) : (
-                        <span>Reset password</span>
+                        <span>{t("auth:resetPassword")}</span>
                     )}
                 </button>
             </form>

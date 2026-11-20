@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSidebar } from '@/contexts/SidebarContext';
@@ -7,6 +9,7 @@ import { Settings, Shield, LogOut, ChevronLeft, ChevronRight, Crown } from 'luci
 import { getNavigationItems } from './items';
 
 export default function SideNav() {
+    useTranslation();
     const { user, profile, signOut, isPremium } = useAuth();
     const location = useLocation();
     const { isCollapsed, toggleSidebar } = useSidebar();
@@ -55,7 +58,7 @@ export default function SideNav() {
                     <button
                         onClick={toggleSidebar}
                         className="p-1.5 rounded-lg text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
-                        title="Collapse sidebar"
+                        title={t("nav:collapseSidebar")}
                     >
                         <ChevronLeft className="w-5 h-5" />
                     </button>
@@ -68,7 +71,7 @@ export default function SideNav() {
                     <button
                         onClick={toggleSidebar}
                         className="w-full p-2 rounded-lg text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-600 dark:hover:text-surface-300 transition-colors flex items-center justify-center"
-                        title="Expand sidebar"
+                        title={t("nav:expandSidebar")}
                     >
                         <ChevronRight className="w-5 h-5" />
                     </button>
@@ -89,7 +92,7 @@ export default function SideNav() {
                                 <Link
                                     key={item.name}
                                     to="/upgrade"
-                                    title={isCollapsed ? `${item.name} (Premium)` : undefined}
+                                    title={isCollapsed ? t("nav:premium", { value1: item.name }) : undefined}
                                     className={`
                                         flex items-center rounded-lg text-sm font-medium transition-all
                                         ${isCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'}
@@ -133,12 +136,11 @@ export default function SideNav() {
                     <div className={`mt-6 pt-6 border-t border-surface-100 dark:border-surface-800 ${isCollapsed ? '' : ''}`}>
                         {!isCollapsed && (
                             <p className="px-3 mb-2 text-xs font-semibold text-surface-400 uppercase tracking-wider">
-                                Admin
-                            </p>
+                                {t("nav:admin")}</p>
                         )}
                         <Link
                             to="/admin"
-                            title={isCollapsed ? 'Admin Panel' : undefined}
+                            title={isCollapsed ? t("nav:adminPanel") : undefined}
                             className={`
                                 flex items-center rounded-lg text-sm font-medium transition-all
                                 ${isCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'}
@@ -149,7 +151,7 @@ export default function SideNav() {
                             `}
                         >
                             <Shield className="w-5 h-5 flex-shrink-0" />
-                            {!isCollapsed && <span>Admin Panel</span>}
+                            {!isCollapsed && <span>{t("nav:adminPanel")}</span>}
                         </Link>
                     </div>
                 )}
@@ -162,7 +164,7 @@ export default function SideNav() {
                     <div className="flex flex-col items-center gap-2">
                         <Link
                             to="/profile"
-                            title={profile?.display_name || 'Profile'}
+                            title={profile?.display_name || t("common:uiProfile")}
                             className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-primary-200 dark:hover:ring-primary-700 transition-all"
                         >
                             {profile?.avatar_url ? (
@@ -179,14 +181,14 @@ export default function SideNav() {
                         </Link>
                         <Link
                             to="/settings"
-                            title="Settings"
+                            title={t("nav:settings")}
                             className="p-2 rounded-lg text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
                         >
                             <Settings className="w-4 h-4" />
                         </Link>
                         <button
                             onClick={handleSignOut}
-                            title="Sign out"
+                            title={t("nav:signOut")}
                             className="p-2 rounded-lg text-error hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                         >
                             <LogOut className="w-4 h-4" />
@@ -212,10 +214,10 @@ export default function SideNav() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium text-surface-900 dark:text-surface-50 truncate">
-                                        {profile?.display_name || 'User'}
+                                        {profile?.display_name || t("common:uiUser")}
                                     </p>
                                     <p className="text-xs text-surface-500 dark:text-surface-400 truncate">
-                                        @{profile?.username || 'username'}
+                                        @{profile?.username || t('common:usernameFallback')}
                                     </p>
                                 </div>
                             </Link>

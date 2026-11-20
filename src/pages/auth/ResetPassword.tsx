@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Lock, Loader2, Eye, EyeOff, Check, AlertCircle } from 'lucide-react';
@@ -5,6 +8,7 @@ import { Lock, Loader2, Eye, EyeOff, Check, AlertCircle } from 'lucide-react';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function ResetPassword() {
+    useTranslation();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
@@ -20,9 +24,9 @@ export default function ResetPassword() {
 
     // Password requirements
     const passwordRequirements = [
-        { label: 'At least 8 characters', test: (p: string) => p.length >= 8 },
-        { label: 'Contains a number', test: (p: string) => /\d/.test(p) },
-        { label: 'Contains a letter', test: (p: string) => /[a-zA-Z]/.test(p) },
+        { label: t("auth:atLeast8Characters"), test: (p: string) => p.length >= 8 },
+        { label: t("auth:containsANumber"), test: (p: string) => /\d/.test(p) },
+        { label: t("auth:containsALetter"), test: (p: string) => /[a-zA-Z]/.test(p) },
     ];
 
     // Validate token on mount
@@ -62,7 +66,7 @@ export default function ResetPassword() {
 
         // Validate passwords match
         if (password !== confirmPassword) {
-            setError('Passwords do not match');
+            setError(t("auth:passwordsDoNotMatch"));
             return;
         }
 
@@ -71,7 +75,7 @@ export default function ResetPassword() {
             req.test(password)
         );
         if (!allRequirementsMet) {
-            setError('Password does not meet all requirements');
+            setError(t("auth:passwordDoesNotMeetAllRequirements"));
             return;
         }
 
@@ -89,7 +93,7 @@ export default function ResetPassword() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || 'Failed to reset password');
+                throw new Error(data.error || t("auth:failedToResetPassword"));
             }
 
             setSuccess(true);
@@ -99,7 +103,7 @@ export default function ResetPassword() {
                 navigate('/login');
             }, 3000);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to reset password');
+            setError(err instanceof Error ? localizeError(err.message) : t("auth:failedToResetPassword"));
         } finally {
             setIsLoading(false);
         }
@@ -110,7 +114,7 @@ export default function ResetPassword() {
         return (
             <div className="card p-8 animate-fade-in text-center max-w-md w-full mx-auto">
                 <Loader2 className="w-8 h-8 animate-spin text-primary-600 mx-auto mb-4" />
-                <p className="text-surface-500 dark:text-surface-400">Verifying reset link...</p>
+                <p className="text-surface-500 dark:text-surface-400">{t("auth:verifyingResetLink")}</p>
             </div>
         );
     }
@@ -122,13 +126,11 @@ export default function ResetPassword() {
                 <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
                 </div>
-                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">Invalid or Expired Link</h1>
+                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">{t("auth:invalidOrExpiredLink")}</h1>
                 <p className="text-surface-500 dark:text-surface-400 mb-6">
-                    This password reset link is invalid or has expired. Please request a new one.
-                </p>
+                    {t("auth:thisPasswordResetLinkIsInvalidOrHasExpired")}</p>
                 <Link to="/forgot-password" className="btn-primary w-full py-2.5">
-                    Request New Link
-                </Link>
+                    {t("auth:requestNewLink")}</Link>
             </div>
         );
     }
@@ -140,13 +142,11 @@ export default function ResetPassword() {
                 <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
                 </div>
-                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">Password Reset!</h1>
+                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">{t("auth:passwordReset")}</h1>
                 <p className="text-surface-500 dark:text-surface-400 mb-6">
-                    Your password has been successfully reset. Redirecting you to the login page...
-                </p>
+                    {t("auth:yourPasswordHasBeenSuccessfullyResetRedirectingYouTo")}</p>
                 <Link to="/login" className="btn-primary w-full py-2.5">
-                    Go to Login
-                </Link>
+                    {t("auth:goToLogin")}</Link>
             </div>
         );
     }
@@ -155,15 +155,15 @@ export default function ResetPassword() {
         <div className="card p-8 animate-fade-in max-w-md w-full mx-auto">
             {/* Header */}
             <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">Reset Password</h1>
-                <p className="text-surface-500 dark:text-surface-400 mt-2">Enter your new password below</p>
+                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">{t("auth:resetPassword2")}</h1>
+                <p className="text-surface-500 dark:text-surface-400 mt-2">{t("auth:enterYourNewPasswordBelow")}</p>
             </div>
 
             {/* Error message */}
             {error && (
                 <div className="mb-6 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    <span>{error}</span>
+                    <span>{localizeError(error)}</span>
                 </div>
             )}
 
@@ -172,8 +172,7 @@ export default function ResetPassword() {
                 {/* New Password field */}
                 <div>
                     <label htmlFor="password" className="label">
-                        New Password
-                    </label>
+                        {t("auth:newPassword")}</label>
                     <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
                         <input
@@ -181,7 +180,7 @@ export default function ResetPassword() {
                             type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Enter new password"
+                            placeholder={t("auth:enterNewPassword")}
                             required
                             className="input pl-10 pr-10"
                             disabled={isLoading}
@@ -225,8 +224,7 @@ export default function ResetPassword() {
                 {/* Confirm Password field */}
                 <div>
                     <label htmlFor="confirmPassword" className="label">
-                        Confirm New Password
-                    </label>
+                        {t("auth:confirmNewPassword")}</label>
                     <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
                         <input
@@ -234,7 +232,7 @@ export default function ResetPassword() {
                             type={showPassword ? 'text' : 'password'}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Confirm new password"
+                            placeholder={t("auth:confirmNewPassword2")}
                             required
                             className="input pl-10"
                             disabled={isLoading}
@@ -251,10 +249,10 @@ export default function ResetPassword() {
                     {isLoading ? (
                         <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Resetting...</span>
+                            <span>{t("auth:resetting")}</span>
                         </>
                     ) : (
-                        <span>Reset Password</span>
+                        <span>{t("auth:resetPassword2")}</span>
                     )}
                 </button>
             </form>

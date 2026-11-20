@@ -1,16 +1,20 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Crown, CheckCircle } from 'lucide-react';
 import { APP_CONFIG } from '@/config/app';
 
-const premiumBenefits = [
-    { text: 'Everything in Free, plus:', bold: true },
-    { text: 'Direct messaging with members', bold: false },
-    { text: 'Access to premium groups', bold: false },
-    { text: 'Priority support', bold: false },
-    { text: 'Exclusive content and events', bold: false },
-];
+
 
 export default function AuthLayout() {
+    useTranslation();
+    const premiumBenefits = [
+    { get text() { return t("nav:everythingInFreePlus"); }, bold: true },
+    { get text() { return t("nav:directMessagingWithMembers"); }, bold: false },
+    { get text() { return t("nav:accessToPremiumGroups"); }, bold: false },
+    { get text() { return t("nav:prioritySupport"); }, bold: false },
+    { get text() { return t("nav:exclusiveContentAndEvents"); }, bold: false },
+];
     const location = useLocation();
     const isMainAuth = ['/login', '/signup'].includes(location.pathname);
 
@@ -46,7 +50,7 @@ export default function AuthLayout() {
                         <img src="/logo-square-sm.png" alt={APP_CONFIG.name} className="w-12 h-12 rounded-xl shadow-lg" />
                         <div className="text-center">
                             <h2 className="text-lg font-bold text-surface-900 dark:text-surface-100 leading-tight">{APP_CONFIG.name}</h2>
-                            <p className="text-xs text-surface-500 dark:text-surface-400">Community Platform</p>
+                            <p className="text-xs text-surface-500 dark:text-surface-400">{t("nav:communityPlatform")}</p>
                         </div>
                     </div>
 
@@ -58,10 +62,9 @@ export default function AuthLayout() {
                             <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-400/30">
                                 <Crown className="w-7 h-7 text-white" />
                             </div>
-                            <h3 className="text-2xl font-bold text-surface-900 dark:text-surface-100">Go Premium</h3>
+                            <h3 className="text-2xl font-bold text-surface-900 dark:text-surface-100">{t("nav:goPremium")}</h3>
                             <p className="text-surface-500 dark:text-surface-400 text-sm mt-1">
-                                Unlock all features and exclusive content
-                            </p>
+                                {t("nav:unlockAllFeaturesAndExclusiveContent")}</p>
                         </div>
 
                         {/* Benefits List */}
@@ -78,25 +81,23 @@ export default function AuthLayout() {
 
                         {/* CTA Text */}
                         <div className="w-full py-3 text-sm flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl">
-                            <span>Get Premium Membership</span>
+                            <span>{t("nav:getPremiumMembership")}</span>
                         </div>
 
                         <p className="text-xs text-surface-500 dark:text-surface-400 text-center mt-3">
-                            Sign up to get started. Upgrade to premium anytime.
-                        </p>
+                            {t("nav:signUpToGetStartedUpgradeToPremiumAnytime")}</p>
 
                         {/* Note */}
                         <div className="mt-4 p-3 bg-white/60 dark:bg-surface-800/50 rounded-lg">
                             <p className="text-xs text-surface-600 dark:text-surface-400 text-center">
-                                Not sure yet? Start with a free account and upgrade anytime!
-                            </p>
+                                {t("nav:notSureYetStartWithAFreeAccountAnd")}</p>
                         </div>
                     </div>
                     ) : (
                         <div className="rounded-2xl border border-amber-200/80 dark:border-amber-800/50 p-6 xl:p-8 text-center">
-                            <h3 className="text-2xl font-bold text-surface-900 dark:text-surface-100">Learn, build, and grow together</h3>
+                            <h3 className="text-2xl font-bold text-surface-900 dark:text-surface-100">{t("nav:learnBuildAndGrowTogether")}</h3>
                             <p className="mt-4 text-surface-600 dark:text-surface-300">{APP_CONFIG.description}</p>
-                            <p className="mt-4 text-sm text-surface-500 dark:text-surface-400">Share your work, exchange ideas, and connect with the community.</p>
+                            <p className="mt-4 text-sm text-surface-500 dark:text-surface-400">{t("nav:shareYourWorkExchangeIdeasAndConnectWithThe")}</p>
                         </div>
                     )}
                 </div>

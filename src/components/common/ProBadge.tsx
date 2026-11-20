@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { Crown, Shield, ShieldCheck } from 'lucide-react';
 import type { UserRole } from '@/types';
 
@@ -13,6 +15,7 @@ interface ProBadgeProps {
  * Shows a golden badge with crown icon for premium members
  */
 export function ProBadge({ size = 'sm', className = '', absolute = false }: ProBadgeProps) {
+    useTranslation();
     const sizeClasses = {
         xs: 'text-[10px] px-1.5 py-0.5 gap-0.5',
         sm: 'text-xs px-2 py-0.5 gap-1',
@@ -36,7 +39,7 @@ export function ProBadge({ size = 'sm', className = '', absolute = false }: ProB
             `}
         >
             <Crown className={iconSizes[size]} />
-            <span>PRO</span>
+            <span>{t("common:pRO")}</span>
         </span>
     );
 }
@@ -50,12 +53,13 @@ interface RoleBadgeProps {
 }
 
 const roleConfig = {
-    superadmin: { label: 'Admin', icon: ShieldCheck, gradient: 'from-red-500 to-rose-600', text: 'text-white' },
-    admin: { label: 'Admin', icon: ShieldCheck, gradient: 'from-red-500 to-rose-600', text: 'text-white' },
-    moderator: { label: 'Mod', icon: Shield, gradient: 'from-blue-500 to-indigo-600', text: 'text-white' },
+    superadmin: { get label() { return t("common:admin"); }, icon: ShieldCheck, gradient: 'from-red-500 to-rose-600', text: 'text-white' },
+    admin: { get label() { return t("common:admin"); }, icon: ShieldCheck, gradient: 'from-red-500 to-rose-600', text: 'text-white' },
+    moderator: { get label() { return t("common:mod"); }, icon: Shield, gradient: 'from-blue-500 to-indigo-600', text: 'text-white' },
 } as const;
 
 export function RoleBadge({ role, size = 'sm', className = '' }: RoleBadgeProps) {
+    useTranslation();
     if (!role || !(role in roleConfig)) return null;
 
     const config = roleConfig[role as keyof typeof roleConfig];

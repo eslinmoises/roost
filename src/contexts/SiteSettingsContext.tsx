@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { supabase } from '@/services/supabase';
 
@@ -23,8 +25,8 @@ export interface SiteSettings {
 
 const DEFAULT_SETTINGS: SiteSettings = {
   site_name: import.meta.env.VITE_APP_NAME || 'Roost',
-  site_tagline: import.meta.env.VITE_APP_TAGLINE || 'Learn, Build, Grow Together',
-  site_description: import.meta.env.VITE_APP_DESCRIPTION || 'A community platform for learning, building, and growing together.',
+  get site_tagline() { return import.meta.env.VITE_APP_TAGLINE || t("settings:learnBuildGrowTogether"); },
+  get site_description() { return import.meta.env.VITE_APP_DESCRIPTION || t("settings:aCommunityPlatformForLearningBuildingAndGrowingTogether"); },
   primary_color: '#0ea5e9',
   logo_url: '',
   logo_dark_url: '',
@@ -112,8 +114,15 @@ function applyFavicon(url: string) {
 }
 
 export function SiteSettingsProvider({ children }: { children: ReactNode }) {
+    const { i18n } = useTranslation();
   const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    document.title = t('settings:communityPlatform', { value1: settings.site_name });
+    const meta = document.querySelector('meta[name="description"]');
+    meta?.setAttribute('content', settings.site_description);
+  }, [settings.site_name, settings.site_description, i18n.language]);
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -144,7 +153,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
         applyFavicon(merged.favicon_url);
 
         // Update document title
-        document.title = `${merged.site_name} - Community Platform`;
+        document.title = t("settings:communityPlatform", { value1: merged.site_name });
       }
     } catch (error) {
       console.error('Error loading site settings:', error);
@@ -160,7 +169,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
   const updateSettings = useCallback(async (updates: Partial<SiteSettings>) => {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw new Error('Not authenticated');
+    if (!session) throw new Error(t("settings:notAuthenticated"));
 
     const response = await fetch(`${API_URL}/api/site-settings`, {
       method: 'PUT',
@@ -173,7 +182,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
 
     if (!response.ok) {
       const data = await response.json();
-      throw new Error(data.error || 'Failed to update settings');
+      throw new Error(data.error || t("settings:failedToUpdateSettings"));
     }
 
     // Apply changes immediately
@@ -181,13 +190,13 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     setSettings(newSettings);
     applyPrimaryColor(newSettings.primary_color);
     applyFavicon(newSettings.favicon_url);
-    document.title = `${newSettings.site_name} - Community Platform`;
+    document.title = t("settings:communityPlatform", { value1: newSettings.site_name });
   }, [settings]);
 
   const uploadBrandingAsset = useCallback(async (file: File, type: 'logo' | 'logo_dark' | 'favicon'): Promise<string> => {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw new Error('Not authenticated');
+    if (!session) throw new Error(t("settings:notAuthenticated"));
 
     const formData = new FormData();
     formData.append('file', file);
@@ -203,7 +212,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
 
     if (!response.ok) {
       const data = await response.json();
-      throw new Error(data.error || 'Failed to upload file');
+      throw new Error(data.error || t("settings:failedToUploadFile"));
     }
 
     const data = await response.json();

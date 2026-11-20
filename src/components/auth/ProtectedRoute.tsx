@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
@@ -11,6 +13,7 @@ export default function ProtectedRoute({
     redirectTo = '/login',
     requirePremium = false,
 }: ProtectedRouteProps) {
+    useTranslation();
     const { isAuthenticated, isLoading: authLoading, isBanned, isPremium, isPremiumLoading, isEmailConfirmed } = useAuth();
 
     // Determine if we need to wait for loading
@@ -22,7 +25,7 @@ export default function ProtectedRoute({
             <div className="min-h-screen flex items-center justify-center bg-surface-50">
                 <div className="flex flex-col items-center gap-3">
                     <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
-                    <p className="text-sm text-surface-500">Loading...</p>
+                    <p className="text-sm text-surface-500">{t("auth:loading2")}</p>
                 </div>
             </div>
         );

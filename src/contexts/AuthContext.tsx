@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef, ReactNode } from 'react';
 import type { User, Session } from '@supabase/supabase-js';
 import { supabase, auth } from '@/services/supabase';
@@ -58,6 +60,7 @@ interface AuthProviderProps {
 
 // Auth provider component
 export function AuthProvider({ children }: AuthProviderProps) {
+    useTranslation();
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [session, setSession] = useState<Session | null>(null);
@@ -250,7 +253,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     // Update profile
     const updateProfile = useCallback(async (updates: Partial<Profile>) => {
-        if (!user) throw new Error('No user logged in');
+        if (!user) throw new Error(t("common:noUserLoggedIn"));
 
         const { error } = await supabase
             .from('profiles')

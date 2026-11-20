@@ -1,3 +1,8 @@
+import { Trans } from 'react-i18next';
+import { localizeError } from '@/i18n/errors';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -5,6 +10,7 @@ import { subscriptionService, SubscriptionStatus } from '@/services/subscription
 import { CreditCard, LogOut, Clock, AlertCircle, RefreshCw, Loader2, Settings } from 'lucide-react';
 
 export default function SubscriptionRequired() {
+    useTranslation();
     const { isAuthenticated, signOut, isLoading: authLoading } = useAuth();
     const navigate = useNavigate();
     const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null);
@@ -59,7 +65,7 @@ export default function SubscriptionRequired() {
             const url = await subscriptionService.createCheckoutSession();
             window.location.href = url;
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to start checkout');
+            setError(err instanceof Error ? localizeError(err.message) : t("auth:failedToStartCheckout"));
             setIsCheckoutLoading(false);
         }
     };
@@ -71,14 +77,14 @@ export default function SubscriptionRequired() {
             const url = await subscriptionService.createPortalSession();
             window.location.href = url;
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to open subscription management');
+            setError(err instanceof Error ? localizeError(err.message) : t("auth:failedToOpenSubscriptionManagement"));
             setIsPortalLoading(false);
         }
     };
 
     // Format date nicely
     const formatDate = (dateString: string) => {
-        return new Intl.DateTimeFormat('en-US', {
+        return new Intl.DateTimeFormat(activeLanguage(), {
             dateStyle: 'long',
         }).format(new Date(dateString));
     };
@@ -94,15 +100,15 @@ export default function SubscriptionRequired() {
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 
-        if (days > 0) return `${days} day${days > 1 ? 's' : ''} remaining`;
-        if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} remaining`;
-        return 'Less than an hour remaining';
+        if (days > 0) return t("auth:dayRemaining", { count: days });
+        if (hours > 0) return t("auth:hourRemaining", { count: hours });
+        return t("auth:lessThanAnHourRemaining");
     };
 
     if (authLoading || isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-950">
-                <p className="text-surface-500 dark:text-surface-400">Loading...</p>
+                <p className="text-surface-500 dark:text-surface-400">{t("auth:loading2")}</p>
             </div>
         );
     }
@@ -116,8 +122,8 @@ export default function SubscriptionRequired() {
                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/20 mb-4">
                             <CreditCard className="w-8 h-8 text-white" />
                         </div>
-                        <h1 className="text-2xl font-bold text-white">Subscription Required</h1>
-                        <p className="text-primary-100 mt-2">Access to the community requires an active subscription</p>
+                        <h1 className="text-2xl font-bold text-white">{t("auth:subscriptionRequired")}</h1>
+                        <p className="text-primary-100 mt-2">{t("auth:accessToTheCommunityRequiresAnActiveSubscription")}</p>
                     </div>
 
                     {/* Content */}
@@ -128,11 +134,8 @@ export default function SubscriptionRequired() {
                                 <div className="flex items-start gap-3">
                                     <Clock className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
                                     <div>
-                                        <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Grace Period Active</p>
-                                        <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
-                                            Your subscription was cancelled but you still have access until{' '}
-                                            <strong>{formatDate(subscription.currentPeriodEnd)}</strong>.
-                                        </p>
+                                        <p className="text-sm font-medium text-amber-800 dark:text-amber-300">{t("auth:gracePeriodActive")}</p>
+                                        <p className="text-sm text-amber-700 dark:text-amber-400 mt-1"><Trans i18nKey="auth:sentence12" components={{ part0: <strong /> }} values={{ value0: ' ', value1: formatDate(subscription.currentPeriodEnd) }} /></p>
                                         <p className="text-sm text-amber-600 dark:text-amber-500 mt-1 font-medium">
                                             {getTimeRemaining(subscription.currentPeriodEnd)}
                                         </p>
@@ -147,10 +150,9 @@ export default function SubscriptionRequired() {
                                 <div className="flex items-start gap-3">
                                     <AlertCircle className="w-5 h-5 text-surface-400 dark:text-surface-500 mt-0.5 flex-shrink-0" />
                                     <div>
-                                        <p className="text-sm font-medium text-surface-700 dark:text-surface-300">No Active Subscription</p>
+                                        <p className="text-sm font-medium text-surface-700 dark:text-surface-300">{t("auth:noActiveSubscription")}</p>
                                         <p className="text-sm text-surface-600 dark:text-surface-400 mt-1">
-                                            You don't have an active subscription. Purchase a membership to access the community.
-                                        </p>
+                                            {t("auth:youDonTHaveAnActiveSubscriptionPurchaseA")}</p>
                                     </div>
                                 </div>
                             </div>
@@ -162,10 +164,9 @@ export default function SubscriptionRequired() {
                                 <div className="flex items-start gap-3">
                                     <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
                                     <div>
-                                        <p className="text-sm font-medium text-surface-700 dark:text-surface-300">Subscription Expired</p>
+                                        <p className="text-sm font-medium text-surface-700 dark:text-surface-300">{t("auth:subscriptionExpired")}</p>
                                         <p className="text-sm text-surface-600 dark:text-surface-400 mt-1">
-                                            Your subscription has expired. Renew to continue accessing the community.
-                                        </p>
+                                            {t("auth:yourSubscriptionHasExpiredRenewToContinueAccessingThe")}</p>
                                     </div>
                                 </div>
                             </div>
@@ -177,17 +178,16 @@ export default function SubscriptionRequired() {
                                 <div className="flex items-start gap-3">
                                     <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
                                     <div>
-                                        <p className="text-sm font-medium text-red-800 dark:text-red-300">Payment Failed</p>
+                                        <p className="text-sm font-medium text-red-800 dark:text-red-300">{t("auth:paymentFailed")}</p>
                                         <p className="text-sm text-red-700 dark:text-red-400 mt-1">
-                                            There was an issue processing your payment. Please update your payment method.
-                                        </p>
+                                            {t("auth:thereWasAnIssueProcessingYourPaymentPleaseUpdate")}</p>
                                     </div>
                                 </div>
                             </div>
                         )}
 
                         {error && (
-                            <p className="text-sm text-red-600 dark:text-red-400 text-center">{error}</p>
+                            <p className="text-sm text-red-600 dark:text-red-400 text-center">{localizeError(error)}</p>
                         )}
 
                         {/* Action Buttons */}
@@ -201,12 +201,11 @@ export default function SubscriptionRequired() {
                                 {isCheckoutLoading ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        Redirecting...
-                                    </>
+                                        {t("auth:redirecting")}</>
                                 ) : (
                                     <>
                                         <CreditCard className="w-4 h-4" />
-                                        {subscription?.hasSubscription ? 'Renew Subscription' : 'Get Membership'}
+                                        {subscription?.hasSubscription ? t("auth:renewSubscription") : t("auth:getMembership")}
                                     </>
                                 )}
                             </button>
@@ -221,13 +220,11 @@ export default function SubscriptionRequired() {
                                     {isPortalLoading ? (
                                         <>
                                             <Loader2 className="w-4 h-4 animate-spin" />
-                                            Opening...
-                                        </>
+                                            {t("auth:opening")}</>
                                     ) : (
                                         <>
                                             <Settings className="w-4 h-4" />
-                                            Manage Subscription
-                                        </>
+                                            {t("auth:manageSubscription")}</>
                                     )}
                                 </button>
                             )}
@@ -239,15 +236,13 @@ export default function SubscriptionRequired() {
                                 className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 text-surface-700 dark:text-surface-300 rounded-lg font-medium transition-colors disabled:opacity-50"
                             >
                                 <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                                {isRefreshing ? 'Checking...' : 'Check Subscription Status'}
+                                {isRefreshing ? t("common:uiChecking") : t("auth:checkSubscriptionStatus")}
                             </button>
                         </div>
 
                         {/* Help text */}
                         <p className="text-sm text-surface-500 dark:text-surface-400 text-center">
-                            Already purchased? Click "Check Subscription Status" to refresh.
-                            If you're still having issues, please contact support.
-                        </p>
+                            {t("auth:alreadyPurchasedClickCheckSubscriptionStatusToRefreshIf")}</p>
 
                         {/* Divider */}
                         <div className="border-t border-surface-200 dark:border-surface-700" />
@@ -258,8 +253,7 @@ export default function SubscriptionRequired() {
                             className="w-full flex items-center justify-center gap-2 px-4 py-3 text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 rounded-lg font-medium transition-colors"
                         >
                             <LogOut className="w-4 h-4" />
-                            Sign Out
-                        </button>
+                            {t("auth:signOut")}</button>
                     </div>
                 </div>
             </div>

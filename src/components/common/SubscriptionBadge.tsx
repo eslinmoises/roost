@@ -1,3 +1,6 @@
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useSubscription } from '@/hooks/useSubscription';
 import { CheckCircle, AlertCircle, Clock, XCircle } from 'lucide-react';
 
@@ -7,6 +10,7 @@ interface SubscriptionBadgeProps {
 }
 
 export default function SubscriptionBadge({ showDetails = false, className = '' }: SubscriptionBadgeProps) {
+    useTranslation();
     const { subscription, isLoading, isActive, inGracePeriod } = useSubscription();
 
     if (isLoading) {
@@ -20,7 +24,7 @@ export default function SubscriptionBadge({ showDetails = false, className = '' 
         return (
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 bg-surface-100 text-surface-600 rounded-lg ${className}`}>
                 <XCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">No Subscription</span>
+                <span className="text-sm font-medium">{t("billing:noSubscription")}</span>
             </div>
         );
     }
@@ -31,7 +35,7 @@ export default function SubscriptionBadge({ showDetails = false, className = '' 
             <div className={`${showDetails ? 'p-4 rounded-xl border' : 'inline-flex items-center gap-2 px-3 py-1.5 rounded-lg'} bg-green-50 border-green-200 ${className}`}>
                 <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-700">Active</span>
+                    <span className="text-sm font-medium text-green-700">{t("billing:active")}</span>
                     {subscription.productName && !showDetails && (
                         <span className="text-sm text-green-600">- {subscription.variantName || subscription.productName}</span>
                     )}
@@ -43,14 +47,10 @@ export default function SubscriptionBadge({ showDetails = false, className = '' 
                             {subscription.variantName && ` (${subscription.variantName})`}
                         </p>
                         {subscription.billingCycle && (
-                            <p className="text-xs text-green-600 capitalize">
-                                Billing: {subscription.billingCycle}
-                            </p>
+                            <p className="text-xs text-green-600 capitalize">{t("billing:billing", { value1: t(`billing:cycle_${subscription.billingCycle}`, { defaultValue: subscription.billingCycle }) })}</p>
                         )}
                         {subscription.startedAt && (
-                            <p className="text-xs text-green-600">
-                                Member since: {new Date(subscription.startedAt).toLocaleDateString()}
-                            </p>
+                            <p className="text-xs text-green-600">{t("billing:memberSince", { value1: new Date(subscription.startedAt).toLocaleDateString(activeLanguage()) })}</p>
                         )}
                     </div>
                 )}
@@ -70,23 +70,17 @@ export default function SubscriptionBadge({ showDetails = false, className = '' 
             <div className={`${showDetails ? 'p-4 rounded-xl border' : 'inline-flex items-center gap-2 px-3 py-1.5 rounded-lg'} bg-amber-50 border-amber-200 ${className}`}>
                 <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-amber-600" />
-                    <span className="text-sm font-medium text-amber-700">Grace Period</span>
+                    <span className="text-sm font-medium text-amber-700">{t("billing:gracePeriod")}</span>
                     {daysRemaining !== null && !showDetails && (
-                        <span className="text-sm text-amber-600">
-                            - {daysRemaining} day{daysRemaining !== 1 ? 's' : ''} left
-                        </span>
+                        <span className="text-sm text-amber-600">{t("billing:dayLeft", { count: daysRemaining })}</span>
                     )}
                 </div>
                 {showDetails && (
                     <div className="mt-2 space-y-1">
                         <p className="text-sm text-amber-700">
-                            Your subscription was cancelled but you still have access.
-                        </p>
+                            {t("billing:yourSubscriptionWasCancelledButYouStillHaveAccess")}</p>
                         {endsAt && (
-                            <p className="text-xs text-amber-600">
-                                Access ends: {endsAt.toLocaleDateString()}
-                                {daysRemaining !== null && ` (${daysRemaining} day${daysRemaining !== 1 ? 's' : ''} remaining)`}
-                            </p>
+                            <p className="text-xs text-amber-600">{t("billing:accessEnds", { value1: endsAt.toLocaleDateString(activeLanguage()), value2: daysRemaining !== null ? t('billing:daysRemainingParenthesis', { count: daysRemaining }) : '' })}</p>
                         )}
                     </div>
                 )}
@@ -101,28 +95,28 @@ export default function SubscriptionBadge({ showDetails = false, className = '' 
             border: 'border-red-200',
             text: 'text-red-700',
             icon: XCircle,
-            label: 'Expired',
+            label: t("billing:expired"),
         },
         cancelled: {
             bg: 'bg-surface-100',
             border: 'border-surface-200',
             text: 'text-surface-600',
             icon: XCircle,
-            label: 'Cancelled',
+            label: t("billing:cancelled"),
         },
         failed_payment: {
             bg: 'bg-red-50',
             border: 'border-red-200',
             text: 'text-red-700',
             icon: AlertCircle,
-            label: 'Payment Failed',
+            label: t("billing:paymentFailed"),
         },
         refunded: {
             bg: 'bg-surface-100',
             border: 'border-surface-200',
             text: 'text-surface-600',
             icon: XCircle,
-            label: 'Refunded',
+            label: t("billing:refunded"),
         },
     };
 
@@ -138,8 +132,7 @@ export default function SubscriptionBadge({ showDetails = false, className = '' 
             {showDetails && (
                 <div className="mt-2">
                     <p className={`text-sm ${config.text}`}>
-                        Your subscription is no longer active. Please renew to continue accessing the community.
-                    </p>
+                        {t("billing:yourSubscriptionIsNoLongerActivePleaseRenewTo")}</p>
                 </div>
             )}
         </div>

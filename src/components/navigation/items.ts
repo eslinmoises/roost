@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { Home, Users, BookOpen, Calendar, Trophy, HelpCircle, MessageSquare, Rocket, Key, Lightbulb, Compass, Radio, type LucideIcon } from 'lucide-react';
 import { APP_CONFIG } from '@/config/app';
 import type { FeatureAccess } from '@/contexts/SiteSettingsContext';
@@ -12,18 +13,18 @@ interface NavItem {
 }
 
 const items: NavItem[] = [
-    { name: 'Home', href: '/', icon: Home },
-    { name: 'Explore', href: '/explore', icon: Compass },
-    { name: 'Classrooms', href: '/classrooms', icon: BookOpen },
-    { name: 'Showcase', href: '/showcase', icon: Rocket, featureKey: 'showcase' },
-    { name: 'Calendar', href: '/calendar', icon: Calendar, premiumOnly: true },
-    { name: 'Members', href: '/members', icon: Users },
-    { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
-    { name: 'Messages', href: '/messages', icon: MessageSquare, premiumOnly: true },
-    { name: 'Live Room', href: '/live', icon: Radio, premiumOnly: true, featureKey: 'live_room' },
-    { name: 'Activations', href: '/activations', icon: Key, premiumOnly: true, featureKey: 'activations' },
-    { name: 'Roadmap & Issues', href: '/roadmap', icon: Lightbulb, featureKey: 'roadmap' },
-    { name: 'Guide', href: '/guide', icon: HelpCircle },
+    { get name() { return t("nav:home"); }, href: '/', icon: Home },
+    { get name() { return t("nav:explore"); }, href: '/explore', icon: Compass },
+    { get name() { return t("nav:classrooms"); }, href: '/classrooms', icon: BookOpen },
+    { get name() { return t("nav:showcase"); }, href: '/showcase', icon: Rocket, featureKey: 'showcase' },
+    { get name() { return t("nav:calendar"); }, href: '/calendar', icon: Calendar, premiumOnly: true },
+    { get name() { return t("nav:members"); }, href: '/members', icon: Users },
+    { get name() { return t("nav:leaderboard"); }, href: '/leaderboard', icon: Trophy },
+    { get name() { return t("nav:messages"); }, href: '/messages', icon: MessageSquare, premiumOnly: true },
+    { get name() { return t("nav:liveRoom"); }, href: '/live', icon: Radio, premiumOnly: true, featureKey: 'live_room' },
+    { get name() { return t("nav:activations"); }, href: '/activations', icon: Key, premiumOnly: true, featureKey: 'activations' },
+    { get name() { return t("nav:roadmapIssues"); }, href: '/roadmap', icon: Lightbulb, featureKey: 'roadmap' },
+    { get name() { return t("nav:guide"); }, href: '/guide', icon: HelpCircle },
 ];
 
 // Both menus use the same feature and membership rules, without changing the source items.

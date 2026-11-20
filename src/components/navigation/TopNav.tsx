@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,6 +35,7 @@ import { ProBadge } from '@/components/common/ProBadge';
 import { getNavigationItems } from './items';
 
 function TopNav() {
+    useTranslation();
     const { user, profile, signOut, isPremium } = useAuth();
     const { isCollapsed } = useSidebar();
     const { resolvedTheme, setTheme } = useTheme();
@@ -138,14 +141,14 @@ function TopNav() {
 
                     {/* Search bar - Desktop (takes more space now) */}
                     <div className="hidden md:flex flex-1 max-w-full lg:max-w-4xl">
-                        <GlobalSearch className="w-full" placeholder="Search members, posts, classrooms..." />
+                        <GlobalSearch className="w-full" placeholder={t("nav:searchMembersPostsClassrooms")} />
                     </div>
 
                     {/* Right section */}
                     <div className="flex items-center gap-1">
                         {/* Search button - Mobile */}
                         <button
-                            aria-label={isSearchOpen ? 'Close search' : 'Open search'}
+                            aria-label={isSearchOpen ? t("nav:closeSearch") : t("nav:openSearch")}
                             aria-expanded={isSearchOpen}
                             onClick={() => setIsSearchOpen(!isSearchOpen)}
                             className="md:hidden p-2 rounded-lg text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800"
@@ -160,7 +163,7 @@ function TopNav() {
                                 ? 'text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800'
                                 : 'text-surface-400 dark:text-surface-500 hover:bg-amber-50 dark:hover:bg-amber-900/20'
                             }`}
-                            title={isPremium ? "Messages" : "Messages (Premium)"}
+                            title={isPremium ? t("common:uiMessages") : t("nav:messagesPremium")}
                         >
                             <MessageSquare className="w-5 h-5" />
                             {isPremium ? (
@@ -175,7 +178,7 @@ function TopNav() {
                         {/* Notifications */}
                         <div className="relative">
                             <button
-                                aria-label="Notifications"
+                                aria-label={t("nav:notifications")}
                                 aria-expanded={isNotificationCenterOpen}
                                 onClick={() => setIsNotificationCenterOpen(!isNotificationCenterOpen)}
                                 className="p-2 rounded-lg text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 relative"
@@ -198,21 +201,20 @@ function TopNav() {
                             <Link
                                 to="/live"
                                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-semibold transition-colors animate-pulse"
-                                title="A live session is happening now!"
+                                title={t("nav:aLiveSessionIsHappeningNow")}
                             >
                                 <span className="relative flex h-2 w-2">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                                 </span>
-                                LIVE
-                            </Link>
+                                {t("nav:lIVE")}</Link>
                         )}
 
                         {/* Dark mode toggle */}
                         <button
                             onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
                             className="p-2 rounded-lg text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800"
-                            title={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                            title={resolvedTheme === 'dark' ? t("nav:switchToLightMode") : t("nav:switchToDarkMode")}
                         >
                             {resolvedTheme === 'dark' ? (
                                 <Sun className="w-5 h-5" />
@@ -224,7 +226,7 @@ function TopNav() {
                         {/* Profile dropdown */}
                         <div className="relative">
                             <button
-                                aria-label="Account menu"
+                                aria-label={t("nav:accountMenu")}
                                 aria-expanded={isProfileMenuOpen}
                                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                                 className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800"
@@ -255,11 +257,11 @@ function TopNav() {
                                             {isPremium && <ProBadge size="xs" />}
                                             <div className="flex items-center gap-2">
                                                 <p className="font-medium text-surface-900 dark:text-surface-50">
-                                                    {profile?.display_name || 'User'}
+                                                    {profile?.display_name || t("common:uiUser")}
                                                 </p>
                                             </div>
                                             <p className="text-xs text-surface-500 dark:text-surface-400">
-                                                @{profile?.username || 'username'}
+                                                @{profile?.username || t('common:usernameFallback')}
                                             </p>
                                         </div>
                                         <div className="py-1">
@@ -269,7 +271,7 @@ function TopNav() {
                                                 onClick={() => setIsProfileMenuOpen(false)}
                                             >
                                                 <User className="w-4 h-4" />
-                                                <span>Profile</span>
+                                                <span>{t("nav:profile")}</span>
                                             </Link>
                                             <Link
                                                 to="/settings"
@@ -277,7 +279,7 @@ function TopNav() {
                                                 onClick={() => setIsProfileMenuOpen(false)}
                                             >
                                                 <Settings className="w-4 h-4" />
-                                                <span>Settings</span>
+                                                <span>{t("nav:settings")}</span>
                                             </Link>
                                             <Link
                                                 to="/guide"
@@ -285,7 +287,7 @@ function TopNav() {
                                                 onClick={() => setIsProfileMenuOpen(false)}
                                             >
                                                 <HelpCircle className="w-4 h-4" />
-                                                <span>Guide</span>
+                                                <span>{t("nav:guide")}</span>
                                             </Link>
                                             {profile?.role && ['admin', 'superadmin', 'moderator'].includes(profile.role) && (
                                                 <Link
@@ -294,7 +296,7 @@ function TopNav() {
                                                     onClick={() => setIsProfileMenuOpen(false)}
                                                 >
                                                     <Shield className="w-4 h-4" />
-                                                    <span>Admin Panel</span>
+                                                    <span>{t("nav:adminPanel")}</span>
                                                 </Link>
                                             )}
                                         </div>
@@ -304,7 +306,7 @@ function TopNav() {
                                                 className="dropdown-item text-error w-full"
                                             >
                                                 <LogOut className="w-4 h-4" />
-                                                <span>Sign out</span>
+                                                <span>{t("nav:signOut")}</span>
                                             </button>
                                         </div>
                                     </div>
@@ -314,7 +316,7 @@ function TopNav() {
 
                         {/* Mobile menu button */}
                         <button
-                            aria-label={isMobileMenuOpen ? 'Close navigation' : 'Open navigation'}
+                            aria-label={isMobileMenuOpen ? t("nav:closeNavigation") : t("nav:openNavigation")}
                             aria-expanded={isMobileMenuOpen}
                             aria-controls="mobile-navigation"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -334,7 +336,7 @@ function TopNav() {
                     <div className="md:hidden py-3 border-t border-surface-100 dark:border-surface-700">
                         <GlobalSearch
                             className="w-full"
-                            placeholder="Search members, posts, classrooms..."
+                            placeholder={t("nav:searchMembersPostsClassrooms")}
                             autoFocus
                             onClose={() => setIsSearchOpen(false)}
                         />
@@ -343,7 +345,7 @@ function TopNav() {
 
                 {/* Mobile navigation menu */}
                 {isMobileMenuOpen && (
-                    <nav id="mobile-navigation" aria-label="Mobile navigation" className="lg:hidden max-h-[calc(100dvh-4rem)] overflow-y-auto py-3 border-t border-surface-100 dark:border-surface-700">
+                    <nav id="mobile-navigation" aria-label={t("nav:mobileNavigation")} className="lg:hidden max-h-[calc(100dvh-4rem)] overflow-y-auto py-3 border-t border-surface-100 dark:border-surface-700">
                         <div className="flex flex-col gap-1">
                             {navTabs.map((tab) => {
                                 const isActive = location.pathname === tab.href;

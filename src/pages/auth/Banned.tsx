@@ -1,9 +1,13 @@
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Ban, LogOut, Clock, AlertCircle } from 'lucide-react';
 
 export default function Banned() {
+    useTranslation();
     const { isAuthenticated, isBanned, banInfo, signOut, isLoading } = useAuth();
     const navigate = useNavigate();
 
@@ -25,7 +29,7 @@ export default function Banned() {
 
     // Format expiration date
     const formatExpirationDate = (date: Date) => {
-        return new Intl.DateTimeFormat('en-US', {
+        return new Intl.DateTimeFormat(activeLanguage(), {
             dateStyle: 'full',
             timeStyle: 'short',
         }).format(date);
@@ -36,21 +40,21 @@ export default function Banned() {
         const now = new Date();
         const diff = expiresAt.getTime() - now.getTime();
 
-        if (diff <= 0) return 'Expired';
+        if (diff <= 0) return t('billing:expired');
 
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
-        if (days > 0) return `${days} day${days > 1 ? 's' : ''}, ${hours} hour${hours > 1 ? 's' : ''}`;
-        if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''}, ${minutes} minute${minutes > 1 ? 's' : ''}`;
-        return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+        if (days > 0) return t('common:durationPair', { first: t('common:durationDays', { count: days }), second: t('common:durationHours', { count: hours }) });
+        if (hours > 0) return t('common:durationPair', { first: t('common:durationHours', { count: hours }), second: t('common:durationMinutes', { count: minutes }) });
+        return t("auth:minute", { count: minutes });
     };
 
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-950">
-                <p className="text-surface-500 dark:text-surface-400">Loading...</p>
+                <p className="text-surface-500 dark:text-surface-400">{t("auth:loading2")}</p>
             </div>
         );
     }
@@ -64,8 +68,8 @@ export default function Banned() {
                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/20 mb-4">
                             <Ban className="w-8 h-8 text-white" />
                         </div>
-                        <h1 className="text-2xl font-bold text-white">Account Suspended</h1>
-                        <p className="text-red-100 mt-2">Your access to the community has been restricted</p>
+                        <h1 className="text-2xl font-bold text-white">{t("auth:accountSuspended")}</h1>
+                        <p className="text-red-100 mt-2">{t("auth:yourAccessToTheCommunityHasBeenRestricted")}</p>
                     </div>
 
                     {/* Content */}
@@ -76,7 +80,7 @@ export default function Banned() {
                                 <div className="flex items-start gap-3">
                                     <AlertCircle className="w-5 h-5 text-surface-400 dark:text-surface-500 mt-0.5 flex-shrink-0" />
                                     <div>
-                                        <p className="text-sm font-medium text-surface-700 dark:text-surface-300">Reason</p>
+                                        <p className="text-sm font-medium text-surface-700 dark:text-surface-300">{t("auth:reason")}</p>
                                         <p className="text-sm text-surface-600 dark:text-surface-400 mt-1">{banInfo.reason}</p>
                                     </div>
                                 </div>
@@ -88,19 +92,14 @@ export default function Banned() {
                             <div className="flex items-start gap-3">
                                 <Clock className="w-5 h-5 text-surface-400 dark:text-surface-500 mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <p className="text-sm font-medium text-surface-700 dark:text-surface-300">Duration</p>
+                                    <p className="text-sm font-medium text-surface-700 dark:text-surface-300">{t("auth:duration")}</p>
                                     {banInfo?.isPermanent ? (
                                         <p className="text-sm text-red-600 dark:text-red-400 mt-1 font-medium">
-                                            This suspension is permanent
-                                        </p>
+                                            {t("auth:thisSuspensionIsPermanent")}</p>
                                     ) : banInfo?.expiresAt ? (
                                         <div className="mt-1 space-y-1">
-                                            <p className="text-sm text-surface-600 dark:text-surface-400">
-                                                Expires: {formatExpirationDate(banInfo.expiresAt)}
-                                            </p>
-                                            <p className="text-sm text-primary-600 dark:text-primary-400 font-medium">
-                                                Time remaining: {getTimeRemaining(banInfo.expiresAt)}
-                                            </p>
+                                            <p className="text-sm text-surface-600 dark:text-surface-400">{t("auth:expires", { value1: formatExpirationDate(banInfo.expiresAt) })}</p>
+                                            <p className="text-sm text-primary-600 dark:text-primary-400 font-medium">{t("auth:timeRemaining", { value1: getTimeRemaining(banInfo.expiresAt) })}</p>
                                         </div>
                                     ) : null}
                                 </div>
@@ -109,8 +108,7 @@ export default function Banned() {
 
                         {/* Help text */}
                         <p className="text-sm text-surface-500 dark:text-surface-400 text-center">
-                            If you believe this was a mistake, please contact support for assistance.
-                        </p>
+                            {t("auth:ifYouBelieveThisWasAMistakePleaseContact")}</p>
 
                         {/* Sign out button */}
                         <button
@@ -118,8 +116,7 @@ export default function Banned() {
                             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 text-surface-700 dark:text-surface-300 rounded-lg font-medium transition-colors"
                         >
                             <LogOut className="w-4 h-4" />
-                            Sign Out
-                        </button>
+                            {t("auth:signOut")}</button>
                     </div>
                 </div>
             </div>

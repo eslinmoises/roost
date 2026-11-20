@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 const envFlag = (value: string | boolean | undefined, defaultValue = false) => {
   if (value === undefined || value === '') return defaultValue;
   return value === true || String(value).toLowerCase() === 'true' || value === '1';
@@ -6,8 +7,8 @@ const envFlag = (value: string | boolean | undefined, defaultValue = false) => {
 // App configuration - customize your community
 export const APP_CONFIG = {
   name: import.meta.env.VITE_APP_NAME || 'Roost',
-  tagline: import.meta.env.VITE_APP_TAGLINE || 'Learn, Build, Grow Together',
-  description: import.meta.env.VITE_APP_DESCRIPTION || 'A community platform for learning, building, and growing together.',
+  get tagline() { return import.meta.env.VITE_APP_TAGLINE || t("common:learnBuildGrowTogether"); },
+  get description() { return import.meta.env.VITE_APP_DESCRIPTION || t("common:aCommunityPlatformForLearningBuildingAndGrowingTogether"); },
   url: import.meta.env.VITE_APP_URL || 'http://localhost:5000',
   apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:3000',
   // Public, read-only demonstration credentials. Never use this account on a real community.

@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Mail, RefreshCw, LogOut, CheckCircle } from 'lucide-react';
@@ -6,6 +9,7 @@ import { supabase } from '@/services/supabase';
 import { APP_CONFIG } from '@/config/app';
 
 export default function ConfirmEmail() {
+    useTranslation();
     const { user, isEmailConfirmed, signOut, isLoading } = useAuth();
     const [resendStatus, setResendStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
@@ -40,7 +44,7 @@ export default function ConfirmEmail() {
         } catch (error) {
             console.error('Error resending confirmation email:', error);
             setResendStatus('error');
-            setErrorMessage(error instanceof Error ? error.message : 'Failed to resend email');
+            setErrorMessage(error instanceof Error ? localizeError(error.message) : t("auth:failedToResendEmail"));
         }
     };
 
@@ -63,13 +67,11 @@ export default function ConfirmEmail() {
 
                     {/* Title */}
                     <h1 className="text-2xl font-bold text-surface-900 dark:text-white mb-2">
-                        Confirm Your Email
-                    </h1>
+                        {t("auth:confirmYourEmail")}</h1>
 
                     {/* Description */}
                     <p className="text-surface-600 dark:text-surface-400 mb-6">
-                        We've sent a confirmation link to:
-                    </p>
+                        {t("auth:weVeSentAConfirmationLinkTo")}</p>
 
                     {/* Email display */}
                     <div className="bg-surface-100 dark:bg-surface-700 rounded-lg px-4 py-3 mb-6">
@@ -81,12 +83,11 @@ export default function ConfirmEmail() {
                     {/* Instructions */}
                     <div className="text-left bg-surface-50 dark:bg-surface-700/50 rounded-lg p-4 mb-6">
                         <p className="text-sm text-surface-600 dark:text-surface-400 mb-3">
-                            Please check your inbox and:
-                        </p>
+                            {t("auth:pleaseCheckYourInboxAnd")}</p>
                         <ol className="text-sm text-surface-600 dark:text-surface-400 space-y-2 list-decimal list-inside">
-                            <li>Open the email from {APP_CONFIG.name}</li>
-                            <li>Click the confirmation link</li>
-                            <li>Return here and refresh the page</li>
+                            <li>{t("auth:openTheEmailFrom", { value1: APP_CONFIG.name })}</li>
+                            <li>{t("auth:clickTheConfirmationLink")}</li>
+                            <li>{t("auth:returnHereAndRefreshThePage")}</li>
                         </ol>
                     </div>
 
@@ -94,13 +95,13 @@ export default function ConfirmEmail() {
                     {resendStatus === 'sent' && (
                         <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400 mb-4">
                             <CheckCircle className="w-5 h-5" />
-                            <span className="text-sm">Confirmation email sent!</span>
+                            <span className="text-sm">{t("auth:confirmationEmailSent")}</span>
                         </div>
                     )}
 
                     {resendStatus === 'error' && (
                         <div className="text-red-600 dark:text-red-400 text-sm mb-4">
-                            {errorMessage || 'Failed to resend email. Please try again.'}
+                            {errorMessage || t("auth:failedToResendEmailPleaseTryAgain")}
                         </div>
                     )}
 
@@ -114,18 +115,15 @@ export default function ConfirmEmail() {
                             {resendStatus === 'sending' ? (
                                 <>
                                     <RefreshCw className="w-5 h-5 animate-spin" />
-                                    Sending...
-                                </>
+                                    {t("auth:sending")}</>
                             ) : resendStatus === 'sent' ? (
                                 <>
                                     <CheckCircle className="w-5 h-5" />
-                                    Email Sent
-                                </>
+                                    {t("auth:emailSent")}</>
                             ) : (
                                 <>
                                     <RefreshCw className="w-5 h-5" />
-                                    Resend Confirmation Email
-                                </>
+                                    {t("auth:resendConfirmationEmail")}</>
                             )}
                         </button>
 
@@ -134,22 +132,19 @@ export default function ConfirmEmail() {
                             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-100 hover:bg-surface-200 dark:bg-surface-700 dark:hover:bg-surface-600 text-surface-700 dark:text-surface-300 rounded-lg font-medium transition-colors"
                         >
                             <RefreshCw className="w-5 h-5" />
-                            I've Confirmed - Refresh
-                        </button>
+                            {t("auth:iVeConfirmedRefresh")}</button>
 
                         <button
                             onClick={handleSignOut}
                             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white transition-colors"
                         >
                             <LogOut className="w-5 h-5" />
-                            Sign Out
-                        </button>
+                            {t("auth:signOut")}</button>
                     </div>
 
                     {/* Help text */}
                     <p className="text-xs text-surface-500 dark:text-surface-500 mt-6">
-                        Didn't receive the email? Check your spam folder or try resending.
-                    </p>
+                        {t("auth:didnTReceiveTheEmailCheckYourSpamFolder")}</p>
                 </div>
             </div>
         </div>

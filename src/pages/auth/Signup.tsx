@@ -1,3 +1,7 @@
+import { Trans } from 'react-i18next';
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, CheckCircle, Loader2, XCircle, AlertCircle, Mail } from 'lucide-react';
@@ -26,17 +30,18 @@ function calculatePasswordStrength(password: string): PasswordStrength {
     score = Math.min(score, 4);
 
     const strengths: PasswordStrength[] = [
-        { score: 0, label: 'Too weak', color: 'text-red-500', bgColor: 'bg-red-500' },
-        { score: 1, label: 'Weak', color: 'text-orange-500', bgColor: 'bg-orange-500' },
-        { score: 2, label: 'Fair', color: 'text-yellow-500', bgColor: 'bg-yellow-500' },
-        { score: 3, label: 'Good', color: 'text-lime-500', bgColor: 'bg-lime-500' },
-        { score: 4, label: 'Strong', color: 'text-green-500', bgColor: 'bg-green-500' },
+        { score: 0, label: t("auth:tooWeak"), color: 'text-red-500', bgColor: 'bg-red-500' },
+        { score: 1, label: t("auth:weak"), color: 'text-orange-500', bgColor: 'bg-orange-500' },
+        { score: 2, label: t("auth:fair"), color: 'text-yellow-500', bgColor: 'bg-yellow-500' },
+        { score: 3, label: t("auth:good"), color: 'text-lime-500', bgColor: 'bg-lime-500' },
+        { score: 4, label: t("auth:strong"), color: 'text-green-500', bgColor: 'bg-green-500' },
     ];
 
     return strengths[score];
 }
 
 export default function Signup() {
+    useTranslation();
     const navigate = useNavigate();
     const { signUp } = useAuth();
 
@@ -73,13 +78,13 @@ export default function Signup() {
 
         if (username.length < 3) {
             setUsernameStatus('invalid');
-            setUsernameError('Username must be at least 3 characters');
+            setUsernameError(t("auth:usernameMustBeAtLeast3Characters"));
             return;
         }
 
         if (!isValidUsername(username)) {
             setUsernameStatus('invalid');
-            setUsernameError('Only letters, numbers, underscores, and hyphens allowed');
+            setUsernameError(t("auth:onlyLettersNumbersUnderscoresAndHyphensAllowed"));
             return;
         }
 
@@ -90,7 +95,7 @@ export default function Signup() {
             try {
                 const available = await isUsernameAvailable(username);
                 setUsernameStatus(available ? 'available' : 'taken');
-                setUsernameError(available ? null : 'Username is already taken');
+                setUsernameError(available ? null : t("auth:usernameIsAlreadyTaken"));
             } catch {
                 setUsernameStatus('idle');
                 setUsernameError(null);
@@ -117,19 +122,19 @@ export default function Signup() {
 
     const validateForm = (): string | null => {
         if (!formData.email || !formData.password || !formData.username || !formData.displayName) {
-            return 'All fields are required';
+            return t("auth:allFieldsAreRequired");
         }
         if (formData.password.length < 6) {
-            return 'Password must be at least 6 characters';
+            return t("auth:passwordMustBeAtLeast6Characters");
         }
         if (formData.password !== formData.confirmPassword) {
-            return 'Passwords do not match';
+            return t("auth:passwordsDoNotMatch");
         }
         if (usernameStatus === 'taken') {
-            return 'Username is already taken';
+            return t("auth:usernameIsAlreadyTaken");
         }
         if (usernameStatus === 'invalid') {
-            return usernameError || 'Invalid username';
+            return usernameError || t("auth:invalidUsername");
         }
         return null;
     };
@@ -161,7 +166,7 @@ export default function Signup() {
                 navigate('/');
             }
         } catch (err) {
-            const message = err instanceof Error ? err.message : 'Failed to create account';
+            const message = err instanceof Error ? localizeError(err.message) : t("auth:failedToCreateAccount");
             setError(message);
         } finally {
             setIsLoading(false);
@@ -176,7 +181,7 @@ export default function Signup() {
             return (
                 <div className="flex items-center gap-1 mt-1 text-surface-500 text-xs">
                     <Loader2 className="w-3 h-3 animate-spin" />
-                    <span>Checking...</span>
+                    <span>{t("auth:checking")}</span>
                 </div>
             );
         }
@@ -185,7 +190,7 @@ export default function Signup() {
             return (
                 <div className="flex items-center gap-1 mt-1 text-green-600 dark:text-green-400 text-xs">
                     <CheckCircle className="w-3 h-3" />
-                    <span>Available</span>
+                    <span>{t("auth:available")}</span>
                 </div>
             );
         }
@@ -194,7 +199,7 @@ export default function Signup() {
             return (
                 <div className="flex items-center gap-1 mt-1 text-red-600 dark:text-red-400 text-xs">
                     <XCircle className="w-3 h-3" />
-                    <span>{usernameError}</span>
+                    <span>{localizeError(usernameError)}</span>
                 </div>
             );
         }
@@ -245,8 +250,7 @@ export default function Signup() {
                         : 'text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-300'
                 }`}
             >
-                Login
-            </Link>
+                {t("auth:login")}</Link>
             <Link
                 to="/signup"
                 className={`flex-1 py-2.5 text-center text-sm font-medium rounded-lg transition-all duration-200 ${
@@ -255,8 +259,7 @@ export default function Signup() {
                         : 'text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-300'
                 }`}
             >
-                Sign Up
-            </Link>
+                {t("auth:signUp")}</Link>
         </div>
     );
 
@@ -269,39 +272,33 @@ export default function Signup() {
                         <Mail className="w-7 h-7 text-green-600 dark:text-green-400" />
                     </div>
                     <h1 className="text-xl font-bold text-surface-900 dark:text-surface-100 mb-2">
-                        Check your email
-                    </h1>
+                        {t("auth:checkYourEmail")}</h1>
                     <p className="text-surface-600 dark:text-surface-400 text-sm mb-4">
-                        We've sent a confirmation link to:
-                    </p>
+                        {t("auth:weVeSentAConfirmationLinkTo")}</p>
                     <p className="font-medium text-surface-900 dark:text-surface-100 mb-6 break-all">
                         {confirmationEmail}
                     </p>
                     <div className="bg-surface-50 dark:bg-surface-800 rounded-lg p-4 text-left text-sm text-surface-600 dark:text-surface-400 mb-6">
-                        <p className="mb-2">
-                            <strong>Next steps:</strong>
-                        </p>
+                        <p className="mb-2"><Trans i18nKey="auth:sentence11" components={{ part0: <strong /> }} /></p>
                         <ol className="list-decimal list-inside space-y-1">
-                            <li>Open the email we just sent</li>
-                            <li>Click the confirmation link</li>
-                            <li>Start using {APP_CONFIG.name}!</li>
+                            <li>{t("auth:openTheEmailWeJustSent")}</li>
+                            <li>{t("auth:clickTheConfirmationLink")}</li>
+                            <li>{t("auth:startUsing", { value1: APP_CONFIG.name })}</li>
                         </ol>
                     </div>
                     <p className="text-xs text-surface-500 dark:text-surface-400 mb-4">
-                        Didn't receive the email? Check your spam folder or{' '}
+                        {t("auth:didnTReceiveTheEmailCheckYourSpamFolder2")}{' '}
                         <button
                             onClick={() => setEmailConfirmationSent(false)}
                             className="text-primary-600 hover:text-primary-700 dark:text-primary-400 font-medium"
                         >
-                            try again
-                        </button>
+                            {t("auth:tryAgain")}</button>
                     </p>
                     <Link
                         to="/login"
                         className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 font-medium"
                     >
-                        Back to login
-                    </Link>
+                        {t("auth:backToLogin")}</Link>
                 </div>
             </div>
         );
@@ -314,15 +311,14 @@ export default function Signup() {
 
             {/* Header */}
             <div className="text-center mb-6">
-                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">Create an account</h1>
+                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">{t("auth:createAnAccount")}</h1>
                 <p className="text-surface-500 dark:text-surface-400 mt-1 text-sm">
-                    Join the community and start vibing
-                </p>
+                    {t("auth:joinTheCommunityAndStartVibing")}</p>
             </div>
 
             {error && (
                 <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm">
-                    {error}
+                    {localizeError(error)}
                 </div>
             )}
 
@@ -330,8 +326,7 @@ export default function Signup() {
                 {/* Display Name */}
                 <div>
                     <label htmlFor="displayName" className="block text-sm font-medium text-surface-900 dark:text-surface-200 mb-1.5">
-                        Full Name
-                    </label>
+                        {t("auth:fullName")}</label>
                     <input
                         type="text"
                         id="displayName"
@@ -339,7 +334,7 @@ export default function Signup() {
                         value={formData.displayName}
                         onChange={handleChange}
                         className="input w-full"
-                        placeholder="Your full name"
+                        placeholder={t("auth:yourFullName")}
                         required
                         disabled={isLoading}
                     />
@@ -348,8 +343,7 @@ export default function Signup() {
                 {/* Username */}
                 <div>
                     <label htmlFor="username" className="block text-sm font-medium text-surface-900 dark:text-surface-200 mb-1.5">
-                        Username
-                    </label>
+                        {t("auth:username")}</label>
                     <input
                         type="text"
                         id="username"
@@ -373,8 +367,7 @@ export default function Signup() {
                 {/* Email */}
                 <div>
                     <label htmlFor="email" className="block text-sm font-medium text-surface-900 dark:text-surface-200 mb-1.5">
-                        Email
-                    </label>
+                        {t("auth:email")}</label>
                     <input
                         type="email"
                         id="email"
@@ -382,7 +375,7 @@ export default function Signup() {
                         value={formData.email}
                         onChange={handleChange}
                         className="input w-full"
-                        placeholder="you@example.com"
+                        placeholder={t("auth:youExampleCom")}
                         required
                         disabled={isLoading}
                     />
@@ -391,8 +384,7 @@ export default function Signup() {
                 {/* Password */}
                 <div>
                     <label htmlFor="password" className="block text-sm font-medium text-surface-900 dark:text-surface-200 mb-1.5">
-                        Password
-                    </label>
+                        {t("auth:password")}</label>
                     <div className="relative">
                         <input
                             type={showPassword ? 'text' : 'password'}
@@ -401,7 +393,7 @@ export default function Signup() {
                             value={formData.password}
                             onChange={handleChange}
                             className="input w-full pr-10"
-                            placeholder="Min. 6 characters"
+                            placeholder={t("auth:min6Characters")}
                             required
                             disabled={isLoading}
                         />
@@ -419,8 +411,7 @@ export default function Signup() {
                 {/* Confirm Password */}
                 <div>
                     <label htmlFor="confirmPassword" className="block text-sm font-medium text-surface-900 dark:text-surface-200 mb-1.5">
-                        Confirm Password
-                    </label>
+                        {t("auth:confirmPassword")}</label>
                     <div className="relative">
                         <input
                             type={showConfirmPassword ? 'text' : 'password'}
@@ -435,7 +426,7 @@ export default function Signup() {
                                     ? 'border-green-500 focus:ring-green-500'
                                     : ''
                             }`}
-                            placeholder="Confirm your password"
+                            placeholder={t("auth:confirmYourPassword")}
                             required
                             disabled={isLoading}
                         />
@@ -450,7 +441,7 @@ export default function Signup() {
                     {formData.confirmPassword && formData.password !== formData.confirmPassword && (
                         <div className="flex items-center gap-1 mt-1 text-red-600 dark:text-red-400 text-xs">
                             <XCircle className="w-3 h-3" />
-                            <span>Passwords do not match</span>
+                            <span>{t("auth:passwordsDoNotMatch")}</span>
                         </div>
                     )}
                 </div>
@@ -464,10 +455,10 @@ export default function Signup() {
                     {isLoading ? (
                         <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Creating account...</span>
+                            <span>{t("auth:creatingAccount")}</span>
                         </>
                     ) : (
-                        <span>Create Account</span>
+                        <span>{t("auth:createAccount")}</span>
                     )}
                 </button>
             </form>

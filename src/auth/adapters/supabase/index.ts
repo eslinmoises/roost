@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 // ============================================================
 // Roost - Supabase Auth Adapter
 // Wraps @supabase/supabase-js auth for the AuthAdapter interface
@@ -42,7 +43,7 @@ function mapSession(supaSession: any): AuthSession | null {
 function mapError(err: any): AuthError | null {
   if (!err) return null;
   return {
-    message: err.message ?? 'Unknown error',
+    message: err.message ?? t("auth:unknownError"),
     code: err.code,
     status: err.status,
   };

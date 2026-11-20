@@ -1,3 +1,5 @@
+import { t } from '@/i18n';
+import { useTranslation } from 'react-i18next';
 interface OnlineIndicatorProps {
     isOnline: boolean;
     size?: 'sm' | 'md' | 'lg';
@@ -15,6 +17,7 @@ export default function OnlineIndicator({
     size = 'sm',
     showLabel = false,
 }: OnlineIndicatorProps) {
+    useTranslation();
     return (
         <div className="flex items-center gap-1.5">
             <div
@@ -25,7 +28,7 @@ export default function OnlineIndicator({
             />
             {showLabel && (
                 <span className={`text-xs ${isOnline ? 'text-green-600 dark:text-green-400' : 'text-surface-400 dark:text-surface-500'}`}>
-                    {isOnline ? 'Online' : 'Offline'}
+                    {isOnline ? t("common:uiOnline") : t("common:uiOffline")}
                 </span>
             )}
         </div>
