@@ -1,3 +1,4 @@
+import { emailText, emailLocale } from '../locales/index.js';
 import nodemailer, { type Transporter } from 'nodemailer';
 
 // HTML escape function to prevent XSS in email templates
@@ -100,96 +101,19 @@ class EmailService {
   }): Promise<boolean> {
     const { email, name, productName, variantName, resetPasswordUrl } = params;
     // Escape user-provided data to prevent XSS
-    const safeName = escapeHtml(name || 'there');
+    const safeName = escapeHtml(name || emailText('nameFallback'));
     const safeProductName = escapeHtml(productName);
     const safeEmail = escapeHtml(email);
-    const planType = escapeHtml(variantName || 'Subscription');
+    const planType = escapeHtml(variantName || emailText('subscription'));
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5000';
 
-    const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to ${this.fromName}</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: #667eea; padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
-    <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to ${this.fromName}!</h1>
-  </div>
+    const html = emailText("WelcomeHtml0", { fromName: escapeHtml(this.fromName), safeName: safeName, safeProductName: safeProductName, planType: planType, safeEmail: safeEmail, resetPasswordUrl: resetPasswordUrl, year: new Date().getFullYear(), frontendUrl: frontendUrl });
 
-  <div style="background: #ffffff; padding: 40px 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-    <p style="font-size: 18px; margin-top: 0;">Hi ${safeName},</p>
-
-    <p>Thank you for purchasing <strong>${safeProductName}</strong> (${planType})! Your account has been created and you're ready to join our community.</p>
-
-    <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 24px 0;">
-      <p style="margin: 0 0 8px 0; font-weight: 600;">Your account details:</p>
-      <p style="margin: 0;">Email: <strong>${safeEmail}</strong></p>
-    </div>
-
-    <p>To get started, please set your password by clicking the button below:</p>
-
-    <div style="text-align: center; margin: 32px 0;">
-      <a href="${resetPasswordUrl}" style="display: inline-block; background: #667eea; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">Set Your Password</a>
-    </div>
-
-    <p style="color: #6b7280; font-size: 14px;">This link will expire in 24 hours. If you didn't make this purchase, please ignore this email.</p>
-
-    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 32px 0;">
-
-    <p style="margin-bottom: 0;">Once you've set your password, you can:</p>
-    <ul style="margin-top: 8px;">
-      <li>Access all community content and discussions</li>
-      <li>Connect with other members</li>
-      <li>Participate in events and activities</li>
-    </ul>
-
-    <p>We're excited to have you! If you have any questions, feel free to reach out.</p>
-
-    <p style="margin-bottom: 0;">Best,<br><strong>The ${this.fromName} Team</strong></p>
-  </div>
-
-  <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
-    <p style="margin: 0;">&copy; ${new Date().getFullYear()} ${this.fromName}. All rights reserved.</p>
-    <p style="margin: 8px 0 0 0;">
-      <a href="${frontendUrl}" style="color: #6b7280;">Visit our platform</a>
-    </p>
-  </div>
-</body>
-</html>
-    `;
-
-    const text = `
-Welcome to ${this.fromName}!
-
-Hi ${safeName},
-
-Thank you for purchasing ${safeProductName} (${planType})! Your account has been created and you're ready to join our community.
-
-Your account details:
-Email: ${safeEmail}
-
-To get started, please set your password by visiting:
-${resetPasswordUrl}
-
-This link will expire in 24 hours.
-
-Once you've set your password, you can:
-- Access all community content and discussions
-- Connect with other members
-- Participate in events and activities
-
-We're excited to have you!
-
-Best,
-The ${this.fromName} Team
-    `;
+    const text = emailText("WelcomeText1", { fromName: this.fromName, safeName: safeName, safeProductName: safeProductName, planType: planType, safeEmail: safeEmail, resetPasswordUrl: resetPasswordUrl });
 
     return this.sendEmail({
       to: email,
-      subject: `Welcome to ${this.fromName} - ${productName}`,
+      subject: emailText("WelcomeSubject2", { fromName: this.fromName, productName: productName }),
       html,
       text,
     });
@@ -203,48 +127,21 @@ The ${this.fromName} Team
   }): Promise<boolean> {
     const { email, name, productName, gracePeriodEnds } = params;
     // Escape user-provided data to prevent XSS
-    const safeName = escapeHtml(name || 'there');
+    const safeName = escapeHtml(name || emailText('nameFallback'));
     const safeProductName = escapeHtml(productName);
-    const formattedDate = gracePeriodEnds.toLocaleDateString('en-US', {
+    const formattedDate = gracePeriodEnds.toLocaleDateString(emailLocale(), {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
 
-    const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: #f59e0b; padding: 30px 20px; text-align: center; border-radius: 12px 12px 0 0;">
-    <h1 style="color: white; margin: 0; font-size: 24px;">Subscription Cancelled</h1>
-  </div>
-
-  <div style="background: #ffffff; padding: 40px 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-    <p style="font-size: 18px; margin-top: 0;">Hi ${safeName},</p>
-
-    <p>We're sorry to see you go! Your <strong>${safeProductName}</strong> subscription has been cancelled.</p>
-
-    <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #f59e0b;">
-      <p style="margin: 0; font-weight: 600;">Good news: You still have access!</p>
-      <p style="margin: 8px 0 0 0;">Your access continues until <strong>${formattedDate}</strong> (7-day grace period).</p>
-    </div>
-
-    <p>If you change your mind, you can reactivate your subscription anytime from your account settings.</p>
-
-    <p style="margin-bottom: 0;">Best,<br><strong>The ${this.fromName} Team</strong></p>
-  </div>
-</body>
-</html>
-    `;
+    const html = emailText("SubscriptionCancelledHtml3", { safeName: safeName, safeProductName: safeProductName, formattedDate: formattedDate, fromName: escapeHtml(this.fromName) });
 
     return this.sendEmail({
       to: email,
-      subject: `Your ${productName} subscription has been cancelled`,
+      subject: emailText("SubscriptionCancelledSubject4", { productName: productName }),
+      text: emailText("SubscriptionCancelledText", { safeName, safeProductName, formattedDate, fromName: this.fromName }),
       html,
     });
   }
@@ -256,42 +153,16 @@ The ${this.fromName} Team
   }): Promise<boolean> {
     const { email, name, productName } = params;
     // Escape user-provided data to prevent XSS
-    const safeName = escapeHtml(name || 'there');
+    const safeName = escapeHtml(name || emailText('nameFallback'));
     const safeProductName = escapeHtml(productName);
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5000';
 
-    const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: #10b981; padding: 30px 20px; text-align: center; border-radius: 12px 12px 0 0;">
-    <h1 style="color: white; margin: 0; font-size: 24px;">Welcome Back!</h1>
-  </div>
-
-  <div style="background: #ffffff; padding: 40px 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-    <p style="font-size: 18px; margin-top: 0;">Hi ${safeName},</p>
-
-    <p>Great news! Your <strong>${safeProductName}</strong> subscription has been reactivated.</p>
-
-    <p>You now have full access to all community features again. We're glad to have you back!</p>
-
-    <div style="text-align: center; margin: 32px 0;">
-      <a href="${frontendUrl}" style="display: inline-block; background: #10b981; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">Go to Community</a>
-    </div>
-
-    <p style="margin-bottom: 0;">Best,<br><strong>The ${this.fromName} Team</strong></p>
-  </div>
-</body>
-</html>
-    `;
+    const html = emailText("SubscriptionReactivatedHtml5", { safeName: safeName, safeProductName: safeProductName, frontendUrl: frontendUrl, fromName: escapeHtml(this.fromName) });
 
     return this.sendEmail({
       to: email,
-      subject: `Welcome back! Your ${productName} subscription is active`,
+      subject: emailText("SubscriptionReactivatedSubject6", { productName: productName }),
+      text: emailText("SubscriptionReactivatedText", { safeName, safeProductName, frontendUrl, fromName: this.fromName }),
       html,
     });
   }
@@ -303,73 +174,17 @@ The ${this.fromName} Team
   }): Promise<boolean> {
     const { email, name, resetUrl } = params;
     // Escape user-provided data to prevent XSS
-    const safeName = escapeHtml(name || 'there');
+    const safeName = escapeHtml(name || emailText('nameFallback'));
     const safeEmail = escapeHtml(email);
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5000';
 
-    const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reset Your Password</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: #667eea; padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
-    <h1 style="color: white; margin: 0; font-size: 28px;">Reset Your Password</h1>
-  </div>
+    const html = emailText("PasswordResetHtml7", { safeName: safeName, fromName: escapeHtml(this.fromName), safeEmail: safeEmail, resetUrl: resetUrl, year: new Date().getFullYear(), frontendUrl: frontendUrl });
 
-  <div style="background: #ffffff; padding: 40px 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-    <p style="font-size: 18px; margin-top: 0;">Hi ${safeName},</p>
-
-    <p>We received a request to reset the password for your ${this.fromName} account associated with <strong>${safeEmail}</strong>.</p>
-
-    <p>Click the button below to reset your password:</p>
-
-    <div style="text-align: center; margin: 32px 0;">
-      <a href="${resetUrl}" style="display: inline-block; background: #667eea; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">Reset Password</a>
-    </div>
-
-    <p style="color: #6b7280; font-size: 14px;">This link will expire in <strong>1 hour</strong>. If you didn't request a password reset, you can safely ignore this email - your password will remain unchanged.</p>
-
-    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 32px 0;">
-
-    <p style="color: #9ca3af; font-size: 13px; margin-bottom: 0;">
-      If the button doesn't work, copy and paste this link into your browser:<br>
-      <a href="${resetUrl}" style="color: #667eea; word-break: break-all;">${resetUrl}</a>
-    </p>
-  </div>
-
-  <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
-    <p style="margin: 0;">&copy; ${new Date().getFullYear()} ${this.fromName}. All rights reserved.</p>
-    <p style="margin: 8px 0 0 0;">
-      <a href="${frontendUrl}" style="color: #6b7280;">Visit our platform</a>
-    </p>
-  </div>
-</body>
-</html>
-    `;
-
-    const text = `
-Reset Your Password
-
-Hi ${safeName},
-
-We received a request to reset the password for your ${this.fromName} account associated with ${safeEmail}.
-
-Click the link below to reset your password:
-${resetUrl}
-
-This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email - your password will remain unchanged.
-
-Best,
-The ${this.fromName} Team
-    `;
+    const text = emailText("PasswordResetText8", { safeName: safeName, fromName: this.fromName, safeEmail: safeEmail, resetUrl: resetUrl });
 
     return this.sendEmail({
       to: email,
-      subject: `Reset your ${this.fromName} password`,
+      subject: emailText("PasswordResetSubject9", { fromName: this.fromName }),
       html,
       text,
     });
@@ -384,7 +199,7 @@ The ${this.fromName} Team
     link?: string;
   }): Promise<boolean> {
     const { to, userName, notificationType, title, message, link } = params;
-    const safeName = escapeHtml(userName || 'there');
+    const safeName = escapeHtml(userName || emailText('nameFallback'));
     const safeTitle = escapeHtml(title);
     const safeMessage = message ? escapeHtml(message) : '';
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5000';
@@ -405,64 +220,9 @@ The ${this.fromName} Team
       }
     }
 
-    const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${safeSubject}</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: ${color}; padding: 30px 20px; text-align: center; border-radius: 12px 12px 0 0;">
-    <div style="font-size: 32px; margin-bottom: 8px;">${icon}</div>
-    <h1 style="color: white; margin: 0; font-size: 22px;">${safeTitle}</h1>
-  </div>
+    const html = emailText("NotificationHtml10", { safeSubject: safeSubject, color: color, icon: icon, safeTitle: safeTitle, safeName: safeName, value5: safeMessage ? emailText("fragment1", { color: color, safeMessage: safeMessage, value2: safeMessage.length >= 100 ? '...' : '' }) : '', value6: safeLink ? emailText("fragment2", { safeLink: safeLink, color: color }) : '', frontendUrl: frontendUrl, year: new Date().getFullYear(), fromName: escapeHtml(this.fromName) });
 
-  <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-    <p style="font-size: 16px; margin-top: 0;">Hi ${safeName},</p>
-
-    ${safeMessage ? `
-    <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid ${color};">
-      <p style="margin: 0; color: #4b5563; font-style: italic;">"${safeMessage}${safeMessage.length >= 100 ? '...' : ''}"</p>
-    </div>
-    ` : ''}
-
-    ${safeLink ? `
-    <div style="text-align: center; margin: 24px 0;">
-      <a href="${safeLink}" style="display: inline-block; background: ${color}; color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px;">View on Platform</a>
-    </div>
-    ` : ''}
-
-    <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">
-      You can manage your notification preferences in your <a href="${frontendUrl}/settings" style="color: ${color};">account settings</a>.
-    </p>
-  </div>
-
-  <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
-    <p style="margin: 0;">&copy; ${new Date().getFullYear()} ${this.fromName}. All rights reserved.</p>
-    <p style="margin: 8px 0 0 0;">
-      <a href="${frontendUrl}" style="color: #6b7280;">Visit our platform</a>
-    </p>
-  </div>
-</body>
-</html>
-    `;
-
-    const text = `
-${title}
-
-Hi ${safeName},
-
-${message || ''}
-
-${link ? `View on platform: ${link}` : ''}
-
-You can manage your notification preferences in your account settings at ${frontendUrl}/settings
-
----
-${this.fromName}
-    `;
+    const text = emailText("NotificationText11", { title: title, safeName: safeName, value2: message || '', value3: link ? emailText("fragment3", { link: link }) : '', frontendUrl: frontendUrl, fromName: this.fromName });
 
     return this.sendEmail({
       to,
@@ -481,7 +241,7 @@ ${this.fromName}
     adminNotes?: string;
   }): Promise<boolean> {
     const { email, name, productName, status, websiteUrl, adminNotes } = params;
-    const safeName = escapeHtml(name || 'there');
+    const safeName = escapeHtml(name || emailText('nameFallback'));
     const safeProductName = escapeHtml(productName);
     const safeWebsiteUrl = escapeHtml(websiteUrl);
     const safeAdminNotes = adminNotes ? escapeHtml(adminNotes) : '';
@@ -492,106 +252,38 @@ ${this.fromName}
       pending: {
         color: '#f59e0b',
         icon: '⏳',
-        title: 'Activation Request Received',
-        message: `Your activation request for <strong>${safeProductName}</strong> has been received and is pending review.`,
+        title: emailText("ActivationStatusTitle12"),
+        message: emailText("ActivationStatusMessage13", { safeProductName: safeProductName }),
       },
       in_progress: {
         color: '#3b82f6',
         icon: '⚙️',
-        title: 'Activation In Progress',
-        message: `Good news! Your <strong>${safeProductName}</strong> activation is now being processed.`,
+        title: emailText("ActivationStatusTitle14"),
+        message: emailText("ActivationStatusMessage15", { safeProductName: safeProductName }),
       },
       completed: {
         color: '#10b981',
         icon: '✅',
-        title: 'Activation Completed',
-        message: `Great news! Your <strong>${safeProductName}</strong> has been successfully activated on your website.`,
+        title: emailText("ActivationStatusTitle16"),
+        message: emailText("ActivationStatusMessage17", { safeProductName: safeProductName }),
       },
       rejected: {
         color: '#ef4444',
         icon: '❌',
-        title: 'Activation Request Update',
-        message: `Your <strong>${safeProductName}</strong> activation request has been reviewed.`,
+        title: emailText("ActivationStatusTitle18"),
+        message: emailText("ActivationStatusMessage19", { safeProductName: safeProductName }),
       },
     };
 
     const config = statusConfig[status];
 
-    const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${config.title}</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: ${config.color}; padding: 30px 20px; text-align: center; border-radius: 12px 12px 0 0;">
-    <div style="font-size: 40px; margin-bottom: 8px;">${config.icon}</div>
-    <h1 style="color: white; margin: 0; font-size: 24px;">${config.title}</h1>
-  </div>
+    const html = emailText("ActivationStatusHtml20", { config_title: config.title, config_color: config.color, config_icon: config.icon, safeName: safeName, config_message: config.message, safeProductName: safeProductName, safeWebsiteUrl: safeWebsiteUrl, value7: emailText(`status_${status}`), value8: safeAdminNotes ? emailText("fragment4", { safeAdminNotes: safeAdminNotes }) : '', frontendUrl: frontendUrl, fromName: escapeHtml(this.fromName), year: new Date().getFullYear() });
 
-  <div style="background: #ffffff; padding: 40px 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-    <p style="font-size: 18px; margin-top: 0;">Hi ${safeName},</p>
-
-    <p>${config.message}</p>
-
-    <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 24px 0;">
-      <p style="margin: 0 0 8px 0; font-weight: 600; color: #4b5563;">Request Details:</p>
-      <p style="margin: 0; color: #6b7280;">
-        <strong>Product:</strong> ${safeProductName}<br>
-        <strong>Website:</strong> ${safeWebsiteUrl}<br>
-        <strong>Status:</strong> <span style="color: ${config.color}; font-weight: 600;">${status.replace('_', ' ').toUpperCase()}</span>
-      </p>
-    </div>
-
-    ${safeAdminNotes ? `
-    <div style="background: #fef3c7; padding: 16px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #f59e0b;">
-      <p style="margin: 0 0 8px 0; font-weight: 600; color: #92400e;">Note from our team:</p>
-      <p style="margin: 0; color: #78350f;">${safeAdminNotes}</p>
-    </div>
-    ` : ''}
-
-    <div style="text-align: center; margin: 32px 0;">
-      <a href="${frontendUrl}/activations" style="display: inline-block; background: ${config.color}; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">View My Activations</a>
-    </div>
-
-    <p style="margin-bottom: 0;">Best,<br><strong>The ${this.fromName} Team</strong></p>
-  </div>
-
-  <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
-    <p style="margin: 0;">&copy; ${new Date().getFullYear()} ${this.fromName}. All rights reserved.</p>
-    <p style="margin: 8px 0 0 0;">
-      <a href="${frontendUrl}" style="color: #6b7280;">Visit our platform</a>
-    </p>
-  </div>
-</body>
-</html>
-    `;
-
-    const text = `
-${config.title}
-
-Hi ${safeName},
-
-${config.message.replace(/<[^>]*>/g, '')}
-
-Request Details:
-- Product: ${safeProductName}
-- Website: ${safeWebsiteUrl}
-- Status: ${status.replace('_', ' ').toUpperCase()}
-
-${safeAdminNotes ? `Note from our team: ${safeAdminNotes}` : ''}
-
-View your activations at: ${frontendUrl}/activations
-
-Best,
-The ${this.fromName} Team
-    `;
+    const text = emailText("ActivationStatusText21", { config_title: config.title, safeName: safeName, value2: config.message.replace(/<[^>]*>/g, ''), safeProductName: safeProductName, safeWebsiteUrl: safeWebsiteUrl, value5: emailText(`status_${status}`), value6: safeAdminNotes ? emailText("fragment5", { safeAdminNotes: safeAdminNotes }) : '', frontendUrl: frontendUrl, fromName: this.fromName });
 
     return this.sendEmail({
       to: email,
-      subject: `${config.title} - ${productName}`,
+      subject: emailText("ActivationStatusSubject22", { config_title: config.title, productName: productName }),
       html,
       text,
     });
@@ -603,19 +295,19 @@ The ${this.fromName} Team
         return {
           color: '#3b82f6', // blue
           icon: '💬',
-          subject: `New Comment: ${title}`,
+          subject: emailText("getNotificationTypeStylesSubject23", { title: title }),
         };
       case 'comment_reply':
         return {
           color: '#06b6d4', // cyan
           icon: '↩️',
-          subject: `New Reply: ${title}`,
+          subject: emailText("getNotificationTypeStylesSubject24", { title: title }),
         };
       case 'new_reaction':
         return {
           color: '#ef4444', // red
           icon: '❤️',
-          subject: `New Reaction: ${title}`,
+          subject: emailText("getNotificationTypeStylesSubject25", { title: title }),
         };
       case 'new_message':
         return {
@@ -627,25 +319,25 @@ The ${this.fromName} Team
         return {
           color: '#f97316', // orange
           icon: '@',
-          subject: `You were mentioned: ${title}`,
+          subject: emailText("getNotificationTypeStylesSubject26", { title: title }),
         };
       case 'group_invite':
         return {
           color: '#8b5cf6', // purple
           icon: '👥',
-          subject: `Group Invitation: ${title}`,
+          subject: emailText("getNotificationTypeStylesSubject27", { title: title }),
         };
       case 'new_follower':
         return {
           color: '#22c55e', // green
           icon: '👤',
-          subject: `New Follower: ${title}`,
+          subject: emailText("getNotificationTypeStylesSubject28", { title: title }),
         };
       case 'event_reminder':
         return {
           color: '#eab308', // yellow
           icon: '📅',
-          subject: `Event Reminder: ${title}`,
+          subject: emailText("getNotificationTypeStylesSubject29", { title: title }),
         };
       default:
         return {

@@ -1,16 +1,17 @@
 {
   "name": "build-with-msr-server",
   "version": "1.0.0",
-    "engines": {
-        "node": ">=22.0.0"
-    },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "description": "Backend API for the Roost community platform",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "test": "node --test tests/*.test.cjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1166.0",
