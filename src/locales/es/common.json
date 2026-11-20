@@ -1,4 +1,7 @@
 {
+  "language": "Idioma",
+  "languageSpanish": "Español",
+  "languageEnglish": "English",
   "noResultsFoundFor": "No se encontraron resultados para «{{value1}}»",
   "by": "por {{value1}}",
   "welcomeTo": "¡Te damos la bienvenida a {{value1}}! {{value2}}",

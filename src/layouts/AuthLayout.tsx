@@ -3,6 +3,7 @@ import { t } from '@/i18n';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Crown, CheckCircle } from 'lucide-react';
 import { APP_CONFIG } from '@/config/app';
+import LanguageSelect from '@/components/common/LanguageSelect';
 
 
 
@@ -27,6 +28,9 @@ export default function AuthLayout() {
                     <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary-300/20 dark:bg-primary-800/20 rounded-full blur-3xl" />
                 </div>
                 <div className="relative z-10 w-full py-8 px-4">
+                    <div className="mx-auto mb-4 flex max-w-md justify-end">
+                        <LanguageSelect />
+                    </div>
                     <Outlet />
                 </div>
             </div>
@@ -106,6 +110,9 @@ export default function AuthLayout() {
             {/* Right Panel - Form */}
             <div className="flex-1 flex items-center justify-center px-5 py-8 sm:px-8 bg-white dark:bg-surface-950 min-h-screen lg:min-h-0 overflow-y-auto">
                 <div className="w-full max-w-[420px] lg:max-w-md">
+                    <div className="mb-4 flex justify-end">
+                        <LanguageSelect />
+                    </div>
                     <Outlet />
                 </div>
             </div>

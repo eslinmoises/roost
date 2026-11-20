@@ -1,4 +1,7 @@
 {
+  "language": "Language",
+  "languageSpanish": "Español",
+  "languageEnglish": "English",
   "noResultsFoundFor": "No results found for \"{{value1}}\"",
   "by": "by {{value1}}",
   "welcomeTo": "Welcome to {{value1}}! {{value2}}",

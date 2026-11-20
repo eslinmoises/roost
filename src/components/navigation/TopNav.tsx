@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSiteSettings } from '@/contexts/SiteSettingsContext';
+import LanguageSelect from '@/components/common/LanguageSelect';
 import {
     Search,
     Bell,
@@ -299,6 +300,9 @@ function TopNav() {
                                                     <span>{t("nav:adminPanel")}</span>
                                                 </Link>
                                             )}
+                                        </div>
+                                        <div className="border-t border-surface-100 px-3 py-2 dark:border-surface-700">
+                                            <LanguageSelect />
                                         </div>
                                         <div className="border-t border-surface-100 dark:border-surface-700 py-1">
                                             <button

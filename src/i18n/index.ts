@@ -3,6 +3,18 @@ import { initReactI18next } from 'react-i18next';
 import moment from 'moment';
 import 'moment/locale/es';
 
+type AppLanguage = 'es' | 'en';
+const LANGUAGE_STORAGE_KEY = 'roost-language';
+
+function savedLanguage(): AppLanguage | undefined {
+  try {
+    const value = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    return value === 'es' || value === 'en' ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 const dictionaries = import.meta.glob('../locales/*/*.json', { eager: true, import: 'default' });
 const resources: Record<string, Record<string, Record<string, string>>> = {};
 for (const [path, dictionary] of Object.entries(dictionaries)) {
@@ -10,8 +22,17 @@ for (const [path, dictionary] of Object.entries(dictionaries)) {
   (resources[language] ??= {})[namespace] = dictionary as Record<string, string>;
 }
 
-export function activeLanguage(): 'es' | 'en' {
+export function activeLanguage(): AppLanguage {
   return i18n.resolvedLanguage?.startsWith('en') ? 'en' : 'es';
+}
+
+export function selectLanguage(language: AppLanguage) {
+  try {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  } catch {
+    // Language switching still works when the browser blocks storage.
+  }
+  return i18n.changeLanguage(language);
 }
 
 function syncLanguage() {
@@ -28,7 +49,7 @@ const interpolation = {
 
 void i18n.use(initReactI18next).init({
   resources,
-  lng: import.meta.env.VITE_DEFAULT_LOCALE || 'es',
+  lng: savedLanguage() ?? (import.meta.env.VITE_DEFAULT_LOCALE || 'es'),
   fallbackLng: 'en',
   supportedLngs: ['es', 'en'],
   load: 'languageOnly',

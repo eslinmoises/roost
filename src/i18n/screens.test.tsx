@@ -1,7 +1,8 @@
-import { act, cleanup, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from './index';
+import AuthLayout from '@/layouts/AuthLayout';
 import Login from '@/pages/auth/Login';
 import Signup from '@/pages/auth/Signup';
 import NotFound from '@/pages/NotFound';
@@ -12,7 +13,10 @@ vi.mock('@/services/supabase', () => ({ supabase: { auth: {} } }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ signUp: vi.fn() }) }));
 vi.mock('@/services/profile', () => ({ isUsernameAvailable: vi.fn(), isValidUsername: vi.fn() }));
 vi.mock('@/services/module', () => ({ markLessonComplete: vi.fn(), markLessonIncomplete: vi.fn() }));
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 beforeEach(async () => { await i18n.changeLanguage('es'); });
 
 describe('localized screens', () => {
@@ -59,5 +63,35 @@ describe('localized screens', () => {
     await act(async () => { await i18n.changeLanguage('es'); });
     expect(screen.getByRole('button', { name: 'Iniciar sesión' })).toBeTruthy();
     expect(document.documentElement.lang).toBe('es');
+  });
+  it('lets visitors switch language from login and remembers their selection', async () => {
+    const saved = new Map<string, string>();
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => saved.get(key) ?? null,
+      setItem: (key: string, value: string) => saved.set(key, value),
+    });
+    render(
+      <MemoryRouter initialEntries={['/login']}>
+        <Routes>
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<Login />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+    fireEvent.change(screen.getByRole('combobox', { name: 'Idioma' }), { target: { value: 'en' } });
+    expect(await screen.findByRole('button', { name: 'Sign In' })).toBeTruthy();
+    expect(document.documentElement.lang).toBe('en');
+    expect(saved.get('roost-language')).toBe('en');
+    fireEvent.change(screen.getByRole('combobox', { name: 'Language' }), { target: { value: 'es' } });
+    expect(await screen.findByRole('button', { name: 'Iniciar sesión' })).toBeTruthy();
+    expect(saved.get('roost-language')).toBe('es');
+
+    fireEvent.change(screen.getByRole('combobox', { name: 'Idioma' }), { target: { value: 'en' } });
+    cleanup();
+    await i18n.changeLanguage('es');
+    vi.resetModules();
+    const { activeLanguage } = await import('./index');
+    expect(activeLanguage()).toBe('en');
   });
 });
