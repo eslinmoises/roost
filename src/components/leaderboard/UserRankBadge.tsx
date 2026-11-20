@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { Trophy } from 'lucide-react';
 
 interface UserRankBadgeProps {
@@ -6,6 +9,7 @@ interface UserRankBadgeProps {
 }
 
 export default function UserRankBadge({ rank, size = 'md' }: UserRankBadgeProps) {
+    useTranslation();
     // Size configurations
     const sizeClasses = {
         sm: 'w-6 h-6 text-xs',
@@ -39,7 +43,7 @@ export default function UserRankBadge({ rank, size = 'md' }: UserRankBadgeProps)
                 shadow-md
                 relative
             `}
-            title={`Rank #${rank}`}
+            title={t("leaderboard:rank", { value1: rank })}
         >
             {rank === 1 && (
                 <Trophy
@@ -48,7 +52,7 @@ export default function UserRankBadge({ rank, size = 'md' }: UserRankBadgeProps)
                     strokeWidth={3}
                 />
             )}
-            #{rank}
+            #{formatNumber(rank)}
         </div>
     );
 }

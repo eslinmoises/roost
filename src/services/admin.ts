@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 /**
  * Admin Service
  * Handles all admin dashboard operations: user management, content moderation,
@@ -66,11 +67,11 @@ export interface BanDuration {
 }
 
 export const BAN_DURATIONS: BanDuration[] = [
-    { label: '1 Hour', value: '1 hour' },
-    { label: '24 Hours', value: '1 day' },
-    { label: '7 Days', value: '7 days' },
-    { label: '30 Days', value: '30 days' },
-    { label: 'Permanent', value: null },
+    { get label() { return t("errors:1Hour"); }, value: '1 hour' },
+    { get label() { return t("errors:24Hours"); }, value: '1 day' },
+    { get label() { return t("errors:7Days"); }, value: '7 days' },
+    { get label() { return t("errors:30Days"); }, value: '30 days' },
+    { get label() { return t("errors:permanent"); }, value: null },
 ];
 
 // UserWithBanInfo is now just an alias for Profile since ban fields are in the Profile type
@@ -141,16 +142,16 @@ export async function banUser(
     if (durationInterval) {
         const now = new Date();
         switch (durationInterval) {
-            case '1 hour':
+            case t("errors:1Hour2"):
                 now.setHours(now.getHours() + 1);
                 break;
-            case '1 day':
+            case t("errors:1Day"):
                 now.setDate(now.getDate() + 1);
                 break;
-            case '7 days':
+            case t("errors:7Days2"):
                 now.setDate(now.getDate() + 7);
                 break;
-            case '30 days':
+            case t("errors:30Days2"):
                 now.setDate(now.getDate() + 30);
                 break;
         }

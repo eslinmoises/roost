@@ -1,3 +1,9 @@
+import { Trans } from 'react-i18next';
+import { formatNumber } from '@/lib/locale';
+import { localizeError } from '@/i18n/errors';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import {
     Radio,
@@ -29,6 +35,7 @@ import {
 } from '@/services/live-room';
 
 export default function AdminLiveRoom() {
+    useTranslation();
     const [sessions, setSessions] = useState<LiveSession[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -82,7 +89,7 @@ export default function AdminLiveRoom() {
         setCreateError(null);
 
         if (!createForm.title.trim()) {
-            setCreateError('Title is required');
+            setCreateError(t("admin:titleIsRequired"));
             return;
         }
 
@@ -102,7 +109,7 @@ export default function AdminLiveRoom() {
             setCreateForm({ title: '', description: '', youtube_embed_url: '', scheduled_at: '', visibility: 'unlisted' });
             await fetchData();
         } catch (error) {
-            setCreateError(error instanceof Error ? error.message : 'Failed to create session');
+            setCreateError(error instanceof Error ? localizeError(error.message) : t("admin:failedToCreateSession"));
         } finally {
             setIsCreating(false);
         }
@@ -127,7 +134,7 @@ export default function AdminLiveRoom() {
     };
 
     const handleDeleteSession = async (sessionId: string) => {
-        if (!window.confirm('Are you sure you want to delete this session?')) return;
+        if (!window.confirm(t("admin:areYouSureYouWantToDeleteThisSession"))) return;
         try {
             await liveRoomAdminService.deleteSession(sessionId);
             await fetchData();
@@ -180,7 +187,7 @@ export default function AdminLiveRoom() {
 
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return '\u2014';
-        return new Date(dateStr).toLocaleDateString('en-US', {
+        return new Date(dateStr).toLocaleDateString(activeLanguage(), {
             month: 'short',
             day: 'numeric',
             year: 'numeric',
@@ -198,20 +205,17 @@ export default function AdminLiveRoom() {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                         </span>
-                        LIVE
-                    </span>
+                        {t("admin:lIVE")}</span>
                 );
             case 'idle':
                 return (
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
-                        Ready
-                    </span>
+                        {t("admin:ready")}</span>
                 );
             case 'ended':
                 return (
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400">
-                        Ended
-                    </span>
+                        {t("admin:ended")}</span>
                 );
             default:
                 return null;
@@ -235,16 +239,15 @@ export default function AdminLiveRoom() {
                         <Radio className="w-6 h-6 text-red-600 dark:text-red-400" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">Live Room</h1>
+                        <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">{t("admin:liveRoom")}</h1>
                         <p className="text-sm text-surface-500 dark:text-surface-400">
-                            Manage live streaming sessions
-                        </p>
+                            {t("admin:manageLiveStreamingSessions")}</p>
                     </div>
                 </div>
                 <button
                     onClick={fetchData}
                     className="p-2 text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
-                    title="Refresh"
+                    title={t("admin:refresh")}
                 >
                     <RefreshCw className="w-5 h-5" />
                 </button>
@@ -256,37 +259,33 @@ export default function AdminLiveRoom() {
                 className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors"
             >
                 <Plus className="w-4 h-4" />
-                New Session
-            </button>
+                {t("admin:newSession")}</button>
 
             {/* Create Session Form */}
             {showCreateForm && (
                 <div className="bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-xl p-6">
                     <h3 className="font-semibold text-surface-900 dark:text-surface-50 mb-4">
-                        Create New Session
-                    </h3>
+                        {t("admin:createNewSession")}</h3>
                     <form onSubmit={handleCreateSession} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                                Title
-                            </label>
+                                {t("admin:title")}</label>
                             <input
                                 type="text"
                                 value={createForm.title}
                                 onChange={(e) => setCreateForm((prev) => ({ ...prev, title: e.target.value }))}
-                                placeholder="e.g., Weekly Office Hours"
+                                placeholder={t("admin:eGWeeklyOfficeHours")}
                                 className="w-full px-3 py-2 rounded-lg border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-50 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                                Description (optional)
-                            </label>
+                                {t("admin:descriptionOptional")}</label>
                             <textarea
                                 value={createForm.description}
                                 onChange={(e) => setCreateForm((prev) => ({ ...prev, description: e.target.value }))}
-                                placeholder="What's this session about?"
+                                placeholder={t("admin:whatSThisSessionAbout")}
                                 rows={2}
                                 className="w-full px-3 py-2 rounded-lg border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-50 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             />
@@ -294,8 +293,7 @@ export default function AdminLiveRoom() {
 
                         <div>
                             <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                                Scheduled Date & Time
-                            </label>
+                                {t("admin:scheduledDateTime")}</label>
                             <input
                                 type="datetime-local"
                                 value={createForm.scheduled_at}
@@ -303,14 +301,12 @@ export default function AdminLiveRoom() {
                                 className="w-full px-3 py-2 rounded-lg border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-50 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             />
                             <p className="mt-1 text-xs text-surface-400">
-                                RSVP closes 1 hour before this time. Leave empty if not scheduling in advance.
-                            </p>
+                                {t("admin:rSVPCloses1HourBeforeThisTimeLeaveEmpty")}</p>
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                                YouTube Visibility
-                            </label>
+                                {t("admin:youTubeVisibility")}</label>
                             <div className="flex gap-3">
                                 <button
                                     type="button"
@@ -322,8 +318,7 @@ export default function AdminLiveRoom() {
                                     }`}
                                 >
                                     <Globe className="w-4 h-4" />
-                                    Unlisted
-                                </button>
+                                    {t("admin:unlisted")}</button>
                                 <button
                                     type="button"
                                     onClick={() => setCreateForm((prev) => ({ ...prev, visibility: 'private' }))}
@@ -334,20 +329,18 @@ export default function AdminLiveRoom() {
                                     }`}
                                 >
                                     <Lock className="w-4 h-4" />
-                                    Private
-                                </button>
+                                    {t("admin:private")}</button>
                             </div>
                             <p className="mt-1 text-xs text-surface-400">
                                 {createForm.visibility === 'unlisted'
-                                    ? 'Stream embeds directly on the page. Anyone with the link can watch.'
-                                    : 'Users will see a link to watch on YouTube. You must add RSVP emails to YouTube\'s access list.'}
+                                    ? t("admin:streamEmbedsDirectlyOnThePageAnyoneWithThe")
+                                    : t("admin:usersWillSeeALinkToWatchOnYouTube")}
                             </p>
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                                YouTube Embed URL (optional &mdash; can add later)
-                            </label>
+                                {t("admin:youTubeEmbedURLOptionalCanAddLater")}</label>
                             <input
                                 type="url"
                                 value={createForm.youtube_embed_url}
@@ -356,14 +349,13 @@ export default function AdminLiveRoom() {
                                 className="w-full px-3 py-2 rounded-lg border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-50 focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono text-sm"
                             />
                             <p className="mt-1 text-xs text-surface-400">
-                                Create an unlisted live stream on YouTube Studio, then paste the embed URL here.
-                            </p>
+                                {t("admin:createAnUnlistedLiveStreamOnYouTubeStudioThen")}</p>
                         </div>
 
                         {createError && (
                             <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
                                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                {createError}
+                                {localizeError(createError)}
                             </div>
                         )}
 
@@ -373,7 +365,7 @@ export default function AdminLiveRoom() {
                                 disabled={isCreating}
                                 className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
                             >
-                                {isCreating ? 'Creating...' : 'Create Session'}
+                                {isCreating ? t("common:uiCreating") : t("admin:createSession")}
                             </button>
                             <button
                                 type="button"
@@ -383,8 +375,7 @@ export default function AdminLiveRoom() {
                                 }}
                                 className="px-4 py-2 text-surface-600 hover:text-surface-900 dark:text-surface-400 dark:hover:text-surface-200 text-sm"
                             >
-                                Cancel
-                            </button>
+                                {t("admin:cancel")}</button>
                         </div>
                     </form>
                 </div>
@@ -395,8 +386,7 @@ export default function AdminLiveRoom() {
                 <div className="bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-xl p-8 text-center">
                     <Video className="w-12 h-12 mx-auto text-surface-300 dark:text-surface-600" />
                     <p className="mt-3 text-surface-500 dark:text-surface-400">
-                        No sessions yet. Create one to get started.
-                    </p>
+                        {t("admin:noSessionsYetCreateOneToGetStarted")}</p>
                 </div>
             ) : (
                 <div className="space-y-3">
@@ -420,13 +410,11 @@ export default function AdminLiveRoom() {
                                                 {session.visibility === 'private' ? (
                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
                                                         <Lock className="w-3 h-3" />
-                                                        Private
-                                                    </span>
+                                                        {t("admin:private")}</span>
                                                 ) : (
                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
                                                         <Globe className="w-3 h-3" />
-                                                        Unlisted
-                                                    </span>
+                                                        {t("admin:unlisted")}</span>
                                                 )}
                                             </div>
                                             {session.description && (
@@ -438,15 +426,15 @@ export default function AdminLiveRoom() {
                                                 {session.scheduled_at && (
                                                     <span className="flex items-center gap-1 text-primary-500">
                                                         <Calendar className="w-3 h-3" />
-                                                        Scheduled {formatDate(session.scheduled_at)}
+                                                        {t("admin:scheduled")} {formatDate(session.scheduled_at)}
                                                     </span>
                                                 )}
                                                 <span className="flex items-center gap-1">
                                                     <Clock className="w-3 h-3" />
-                                                    Created {formatDate(session.created_at)}
+                                                    {t("admin:created2")} {formatDate(session.created_at)}
                                                 </span>
                                                 {session.started_at && (
-                                                    <span>Started {formatDate(session.started_at)}</span>
+                                                    <span>{t("admin:started", { value1: formatDate(session.started_at) })}</span>
                                                 )}
                                             </div>
 
@@ -466,14 +454,14 @@ export default function AdminLiveRoom() {
                                                                 onClick={() => handleSaveUrl(session.id)}
                                                                 disabled={urlSaving}
                                                                 className="p-1.5 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors disabled:opacity-50"
-                                                                title="Save"
+                                                                title={t("admin:save")}
                                                             >
                                                                 <Save className="w-4 h-4" />
                                                             </button>
                                                             <button
                                                                 onClick={() => setEditingUrl(null)}
                                                                 className="p-1.5 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 rounded-lg transition-colors"
-                                                                title="Cancel"
+                                                                title={t("admin:cancel")}
                                                             >
                                                                 <X className="w-4 h-4" />
                                                             </button>
@@ -489,14 +477,14 @@ export default function AdminLiveRoom() {
                                                                     setUrlValue(session.youtube_embed_url || '');
                                                                 }}
                                                                 className="p-1 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
-                                                                title="Edit URL"
+                                                                title={t("admin:editURL")}
                                                             >
                                                                 <Pencil className="w-3 h-3" />
                                                             </button>
                                                             <button
                                                                 onClick={() => handleCopy(session.youtube_embed_url!, `url-${session.id}`)}
                                                                 className="p-1 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
-                                                                title="Copy URL"
+                                                                title={t("admin:copyURL")}
                                                             >
                                                                 {copiedField === `url-${session.id}` ? (
                                                                     <Check className="w-3 h-3 text-green-600" />
@@ -514,8 +502,7 @@ export default function AdminLiveRoom() {
                                                             className="text-xs text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1"
                                                         >
                                                             <Youtube className="w-3 h-3" />
-                                                            Add YouTube URL
-                                                        </button>
+                                                            {t("admin:addYouTubeURL")}</button>
                                                     )}
                                                 </div>
                                             )}
@@ -527,7 +514,7 @@ export default function AdminLiveRoom() {
                                         <button
                                             onClick={() => toggleRsvpList(session.id)}
                                             className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
-                                            title="View RSVPs"
+                                            title={t("admin:viewRSVPs")}
                                         >
                                             <Users className="w-4 h-4" />
                                             {expandedRsvp === session.id ? (
@@ -542,8 +529,7 @@ export default function AdminLiveRoom() {
                                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
                                             >
                                                 <Play className="w-3.5 h-3.5" />
-                                                Go Live
-                                            </button>
+                                                {t("admin:goLive")}</button>
                                         )}
                                         {session.status === 'live' && (
                                             <button
@@ -551,14 +537,13 @@ export default function AdminLiveRoom() {
                                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-600 hover:bg-surface-700 text-white rounded-lg text-sm font-medium transition-colors"
                                             >
                                                 <Square className="w-3.5 h-3.5" />
-                                                End
-                                            </button>
+                                                {t("admin:end")}</button>
                                         )}
                                         {session.status !== 'live' && (
                                             <button
                                                 onClick={() => handleDeleteSession(session.id)}
                                                 className="p-1.5 text-surface-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                                                title="Delete session"
+                                                title={t("admin:deleteSession")}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -573,7 +558,7 @@ export default function AdminLiveRoom() {
                                     <div className="flex items-center justify-between mb-3">
                                         <h4 className="text-sm font-medium text-surface-700 dark:text-surface-300 flex items-center gap-2">
                                             <Users className="w-4 h-4" />
-                                            RSVPs ({rsvpLists[session.id]?.length || 0})
+                                            {t("admin:rSVPs")}{formatNumber(rsvpLists[session.id]?.length || 0)})
                                         </h4>
                                         {(rsvpLists[session.id]?.length || 0) > 0 && (
                                             <button
@@ -583,13 +568,11 @@ export default function AdminLiveRoom() {
                                                 {copiedField === `emails-${session.id}` ? (
                                                     <>
                                                         <Check className="w-3.5 h-3.5 text-green-600" />
-                                                        Copied!
-                                                    </>
+                                                        {t("admin:copied")}</>
                                                 ) : (
                                                     <>
                                                         <Copy className="w-3.5 h-3.5" />
-                                                        Copy All Emails
-                                                    </>
+                                                        {t("admin:copyAllEmails")}</>
                                                 )}
                                             </button>
                                         )}
@@ -608,7 +591,7 @@ export default function AdminLiveRoom() {
                                                 >
                                                     <div>
                                                         <p className="text-sm font-medium text-surface-900 dark:text-surface-50">
-                                                            {rsvp.display_name || 'Unknown User'}
+                                                            {rsvp.display_name || t("admin:unknownUser")}
                                                         </p>
                                                         <p className="text-xs text-surface-500 dark:text-surface-400 font-mono">
                                                             {rsvp.email}
@@ -617,7 +600,7 @@ export default function AdminLiveRoom() {
                                                     <button
                                                         onClick={() => handleCopy(rsvp.email, `email-${rsvp.id}`)}
                                                         className="p-1.5 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
-                                                        title="Copy email"
+                                                        title={t("admin:copyEmail")}
                                                     >
                                                         {copiedField === `email-${rsvp.id}` ? (
                                                             <Check className="w-3.5 h-3.5 text-green-600" />
@@ -630,8 +613,7 @@ export default function AdminLiveRoom() {
                                         </div>
                                     ) : (
                                         <p className="text-sm text-surface-400 dark:text-surface-500 text-center py-4">
-                                            No RSVPs yet for this session.
-                                        </p>
+                                            {t("admin:noRSVPsYetForThisSession")}</p>
                                     )}
                                 </div>
                             )}
@@ -644,16 +626,15 @@ export default function AdminLiveRoom() {
             <div className="bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-xl p-6">
                 <h3 className="font-semibold text-surface-900 dark:text-surface-50 mb-4 flex items-center gap-2">
                     <Youtube className="w-5 h-5 text-red-500" />
-                    How to Go Live
-                </h3>
+                    {t("admin:howToGoLive")}</h3>
                 <div className="text-sm text-surface-600 dark:text-surface-400 space-y-2">
                     <ol className="list-decimal list-inside space-y-1 ml-2">
-                        <li>Create a session above with a title and scheduled time</li>
-                        <li>Go to <strong>YouTube Studio</strong> and create a new live stream</li>
-                        <li>Set the privacy to <strong>Unlisted</strong> (or Private if using RSVP emails)</li>
-                        <li>Copy the embed URL (format: <code className="text-xs bg-surface-100 dark:bg-surface-800 px-1 py-0.5 rounded">https://www.youtube.com/embed/VIDEO_ID</code>)</li>
-                        <li>Edit the session to add the YouTube URL, then click <strong>Go Live</strong></li>
-                        <li>For private streams: expand the RSVP list and copy emails to add to YouTube's access list</li>
+                        <li>{t("admin:createASessionAboveWithATitleAndScheduled")}</li>
+                        <li><Trans i18nKey="admin:sentence5" components={{ part0: <strong /> }} /></li>
+                        <li><Trans i18nKey="admin:sentence6" components={{ part0: <strong /> }} /></li>
+                        <li><Trans i18nKey="admin:sentence7" components={{ part0: <code className="text-xs bg-surface-100 dark:bg-surface-800 px-1 py-0.5 rounded" /> }} /></li>
+                        <li><Trans i18nKey="admin:sentence8" components={{ part0: <strong /> }} /></li>
+                        <li>{t("admin:forPrivateStreamsExpandTheRSVPListAndCopy")}</li>
                     </ol>
                 </div>
             </div>

@@ -1,6 +1,8 @@
+import { formatDistanceToNow } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
 import { APP_CONFIG } from '@/config/app';
 import { ChevronUp, MessageSquare, Star } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+
 import type { FeatureRequestCardData } from '@/types/feature-request';
 import {
     FEATURE_REQUEST_STATUS_INFO,
@@ -25,6 +27,7 @@ export default function FeatureRequestRow({
     isVoting,
     onClick,
 }: FeatureRequestRowProps) {
+    useTranslation();
     const statusInfo = FEATURE_REQUEST_STATUS_INFO[request.status];
     const typeInfo = FEATURE_REQUEST_TYPE_INFO[request.type];
     const plainDescription = stripHtml(request.description);

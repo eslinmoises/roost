@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { MemberAvatar } from '../common/MemberAvatar';
 import { useState } from 'react';
 import { X, AlertTriangle } from 'lucide-react';
@@ -17,6 +20,7 @@ export default function BanUserModal({
     onClose,
     onBanned,
 }: BanUserModalProps) {
+    useTranslation();
     const [reason, setReason] = useState('');
     const [duration, setDuration] = useState<string | null>('1 day');
     const [loading, setLoading] = useState(false);
@@ -31,7 +35,7 @@ export default function BanUserModal({
             onBanned();
             onClose();
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to ban user');
+            setError(err instanceof Error ? localizeError(err.message) : t("admin:failedToBanUser"));
         } finally {
             setLoading(false);
         }
@@ -53,7 +57,7 @@ export default function BanUserModal({
                         <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
                             <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
                         </div>
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Ban User</h2>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t("admin:banUser")}</h2>
                     </div>
                     <button
                         onClick={onClose}
@@ -77,8 +81,7 @@ export default function BanUserModal({
                     {/* Duration */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Ban Duration
-                        </label>
+                            {t("admin:banDuration")}</label>
                         <div className="grid grid-cols-2 gap-2">
                             {BAN_DURATIONS.map(({ label, value }) => (
                                 <button
@@ -99,12 +102,11 @@ export default function BanUserModal({
                     {/* Reason */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Reason (optional)
-                        </label>
+                            {t("admin:reasonOptional")}</label>
                         <textarea
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}
-                            placeholder="Provide a reason for the ban..."
+                            placeholder={t("admin:provideAReasonForTheBan")}
                             rows={3}
                             className="w-full px-4 py-2 border border-gray-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
                         />
@@ -113,14 +115,13 @@ export default function BanUserModal({
                     {/* Error */}
                     {error && (
                         <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm rounded-lg">
-                            {error}
+                            {localizeError(error)}
                         </div>
                     )}
 
                     {/* Warning */}
                     <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400 text-sm rounded-lg">
-                        <strong>Warning:</strong> This will prevent the user from accessing the platform
-                        {duration ? ` for ${BAN_DURATIONS.find(d => d.value === duration)?.label.toLowerCase()}` : ' permanently'}.
+                        <strong>{t("admin:warning")}</strong> {t("admin:thisWillPreventTheUserFromAccessingThePlatform")}{duration ? t("admin:for", { value1: BAN_DURATIONS.find(d => d.value === duration)?.label.toLowerCase() }) : t("admin:permanently")}.
                     </div>
                 </div>
 
@@ -131,15 +132,14 @@ export default function BanUserModal({
                         onClick={onClose}
                         className="flex-1 px-4 py-2.5 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-surface-800 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-surface-700 transition-colors"
                     >
-                        Cancel
-                    </button>
+                        {t("admin:cancel")}</button>
                     <button
                         type="button"
                         onClick={handleBan}
                         disabled={loading}
                         className="flex-1 px-4 py-2.5 text-white bg-red-600 rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
                     >
-                        {loading ? 'Banning...' : 'Ban User'}
+                        {loading ? t("common:uiBanning") : t("admin:banUser")}
                     </button>
                 </div>
             </div>

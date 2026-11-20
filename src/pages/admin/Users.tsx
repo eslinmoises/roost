@@ -1,3 +1,7 @@
+import { localizeError } from '@/i18n/errors';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { MemberAvatar } from '../../components/common/MemberAvatar';
 import { useEffect, useState, useCallback } from 'react';
 import {
@@ -40,6 +44,7 @@ const ROLE_ICONS: Record<string, typeof Shield> = {
 };
 
 export default function AdminUsers() {
+    useTranslation();
     const { user: currentUser } = useAuth();
     const [users, setUsers] = useState<UserWithBanInfo[]>([]);
     const [total, setTotal] = useState(0);
@@ -105,7 +110,7 @@ export default function AdminUsers() {
             loadUsers();
         } catch (err) {
             console.error('Failed to update role:', err);
-            alert(err instanceof Error ? err.message : 'Failed to update role');
+            alert(err instanceof Error ? localizeError(err.message) : t("admin:failedToUpdateRole"));
         }
         setActionMenuUser(null);
     };
@@ -116,7 +121,7 @@ export default function AdminUsers() {
             loadUsers();
         } catch (err) {
             console.error('Failed to update membership:', err);
-            alert(err instanceof Error ? err.message : 'Failed to update membership');
+            alert(err instanceof Error ? localizeError(err.message) : t("admin:failedToUpdateMembership"));
         }
         setActionMenuUser(null);
     };
@@ -127,8 +132,8 @@ export default function AdminUsers() {
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">User Management</h1>
-                <p className="text-gray-500 dark:text-gray-400 mt-1">Manage users, roles, and bans</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t("admin:userManagement")}</h1>
+                <p className="text-gray-500 dark:text-gray-400 mt-1">{t("admin:manageUsersRolesAndBans")}</p>
             </div>
 
             {/* Filters */}
@@ -142,7 +147,7 @@ export default function AdminUsers() {
                             setSearch(e.target.value);
                             setPage(1);
                         }}
-                        placeholder="Search users..."
+                        placeholder={t("admin:searchUsers")}
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                 </div>
@@ -154,11 +159,11 @@ export default function AdminUsers() {
                     }}
                     className="px-4 py-2.5 border border-gray-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
-                    <option value="all">All Roles</option>
-                    <option value="user">Users</option>
-                    <option value="moderator">Moderators</option>
-                    <option value="admin">Admins</option>
-                    <option value="superadmin">Superadmins</option>
+                    <option value="all">{t("admin:allRoles")}</option>
+                    <option value="user">{t("admin:users")}</option>
+                    <option value="moderator">{t("admin:moderators")}</option>
+                    <option value="admin">{t("admin:admins")}</option>
+                    <option value="superadmin">{t("admin:superadmins")}</option>
                 </select>
             </div>
 
@@ -169,37 +174,29 @@ export default function AdminUsers() {
                         <thead className="bg-gray-50 dark:bg-surface-800 border-b border-gray-100 dark:border-surface-700">
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    User
-                                </th>
+                                    {t("admin:user")}</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    Role
-                                </th>
+                                    {t("admin:role")}</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    Membership
-                                </th>
+                                    {t("admin:membership")}</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    Status
-                                </th>
+                                    {t("admin:status")}</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    Joined
-                                </th>
+                                    {t("admin:joined")}</th>
                                 <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    Actions
-                                </th>
+                                    {t("admin:actions")}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-surface-700">
                             {loading ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                                        Loading...
-                                    </td>
+                                        {t("admin:loading")}</td>
                                 </tr>
                             ) : users.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                                        No users found
-                                    </td>
+                                        {t("admin:noUsersFound")}</td>
                                 </tr>
                             ) : (
                                 users.map((user) => {
@@ -220,19 +217,17 @@ export default function AdminUsers() {
                                             <td className="px-6 py-4">
                                                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${ROLE_COLORS[user.role || 'user']}`}>
                                                     <RoleIcon className="w-3.5 h-3.5" />
-                                                    {(user.role || 'user').charAt(0).toUpperCase() + (user.role || 'user').slice(1)}
+                                                    {t(`common:role_${user.role || 'user'}`)}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 {user.membership_type === 'premium' ? (
                                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
                                                         <Star className="w-3.5 h-3.5" />
-                                                        Premium
-                                                    </span>
+                                                        {t("admin:premium")}</span>
                                                 ) : (
                                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
-                                                        Free
-                                                    </span>
+                                                        {t("admin:free")}</span>
                                                 )}
                                             </td>
                                             <td className="px-6 py-4">
@@ -240,23 +235,19 @@ export default function AdminUsers() {
                                                     <div>
                                                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">
                                                             <Ban className="w-3.5 h-3.5" />
-                                                            Banned
-                                                        </span>
+                                                            {t("admin:banned")}</span>
                                                         {user.ban_expires_at && (
-                                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                                Until {new Date(user.ban_expires_at).toLocaleDateString()}
-                                                            </p>
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t("admin:until", { value1: new Date(user.ban_expires_at).toLocaleDateString(activeLanguage()) })}</p>
                                                         )}
                                                     </div>
                                                 ) : (
                                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
                                                         <UserCheck className="w-3.5 h-3.5" />
-                                                        Active
-                                                    </span>
+                                                        {t("admin:active")}</span>
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                                {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                                                {user.created_at ? new Date(user.created_at).toLocaleDateString(activeLanguage()) : t("common:uiNA")}
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 {!isCurrentUser && (
@@ -276,16 +267,14 @@ export default function AdminUsers() {
                                                                         className="w-full px-4 py-2 text-left text-sm text-green-600 dark:text-green-400 hover:bg-gray-50 dark:hover:bg-surface-700 flex items-center gap-2"
                                                                     >
                                                                         <UserCheck className="w-4 h-4" />
-                                                                        Unban User
-                                                                    </button>
+                                                                        {t("admin:unbanUser")}</button>
                                                                 ) : (
                                                                     <button
                                                                         onClick={() => handleBan(user)}
                                                                         className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-surface-700 flex items-center gap-2"
                                                                     >
                                                                         <Ban className="w-4 h-4" />
-                                                                        Ban User
-                                                                    </button>
+                                                                        {t("admin:banUser")}</button>
                                                                 )}
                                                                 <hr className="my-1 border-gray-100 dark:border-surface-700" />
                                                                 {user.membership_type === 'premium' ? (
@@ -294,21 +283,19 @@ export default function AdminUsers() {
                                                                         className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-surface-700 flex items-center gap-2"
                                                                     >
                                                                         <Star className="w-4 h-4" />
-                                                                        Remove Premium
-                                                                    </button>
+                                                                        {t("admin:removePremium")}</button>
                                                                 ) : (
                                                                     <button
                                                                         onClick={() => handleMembershipChange(user.id, 'premium')}
                                                                         className="w-full px-4 py-2 text-left text-sm text-amber-600 dark:text-amber-400 hover:bg-gray-50 dark:hover:bg-surface-700 flex items-center gap-2"
                                                                     >
                                                                         <Star className="w-4 h-4" />
-                                                                        Make Premium
-                                                                    </button>
+                                                                        {t("admin:makePremium")}</button>
                                                                 )}
                                                                 {isSuperadmin && user.role !== 'superadmin' && (
                                                                     <>
                                                                         <hr className="my-1 border-gray-100 dark:border-surface-700" />
-                                                                        <div className="px-4 py-1 text-xs text-gray-500 dark:text-gray-400">Change Role</div>
+                                                                        <div className="px-4 py-1 text-xs text-gray-500 dark:text-gray-400">{t("admin:changeRole")}</div>
                                                                         {(['user', 'moderator', 'admin'] as UserRole[])
                                                                             .filter((r) => r !== user.role)
                                                                             .map((role) => {
@@ -320,7 +307,7 @@ export default function AdminUsers() {
                                                                                         className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-surface-700 flex items-center gap-2"
                                                                                     >
                                                                                         <Icon className="w-4 h-4" />
-                                                                                        Make {role.charAt(0).toUpperCase() + role.slice(1)}
+                                                                                        {t('common:makeRole', { role: t(`common:role_${role}`) })}
                                                                                     </button>
                                                                                 );
                                                                             })}
@@ -342,9 +329,7 @@ export default function AdminUsers() {
                 {/* Pagination */}
                 {totalPages > 1 && (
                     <div className="px-6 py-4 border-t border-gray-100 dark:border-surface-700 flex items-center justify-between">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} users
-                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{t("admin:showingToOfUsers", { value1: (page - 1) * pageSize + 1, value2: Math.min(page * pageSize, total), value3: total })}</p>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -353,9 +338,7 @@ export default function AdminUsers() {
                             >
                                 <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                             </button>
-                            <span className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-                                Page {page} of {totalPages}
-                            </span>
+                            <span className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">{t("admin:pageOf", { value1: page, value2: totalPages })}</span>
                             <button
                                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                                 disabled={page === totalPages}

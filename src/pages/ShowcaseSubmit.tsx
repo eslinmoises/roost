@@ -1,3 +1,7 @@
+import { formatNumber } from '@/lib/locale';
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -47,6 +51,7 @@ interface DraftData {
 }
 
 export default function ShowcaseSubmit() {
+    useTranslation();
     const navigate = useNavigate();
     const { user } = useAuth();
 
@@ -179,12 +184,12 @@ export default function ShowcaseSubmit() {
 
         const file = files[0];
         if (!file.type.startsWith('image/')) {
-            setError('Please upload an image file');
+            setError(t("showcase:pleaseUploadAnImageFile"));
             return;
         }
 
         if (file.size > 5 * 1024 * 1024) {
-            setError('Thumbnail must be less than 5MB');
+            setError(t("showcase:thumbnailMustBeLessThan5MB"));
             return;
         }
 
@@ -196,7 +201,7 @@ export default function ShowcaseSubmit() {
             setThumbnailUrl(result.url);
         } catch (err) {
             console.error('Upload failed:', err);
-            setError('Failed to upload thumbnail');
+            setError(t("showcase:failedToUploadThumbnail"));
         } finally {
             setIsUploadingThumbnail(false);
         }
@@ -219,7 +224,7 @@ export default function ShowcaseSubmit() {
             }
         } catch (err) {
             console.error('Upload failed:', err);
-            setError('Failed to upload images');
+            setError(t("showcase:failedToUploadImages"));
         } finally {
             setIsUploadingImages(false);
         }
@@ -321,7 +326,7 @@ export default function ShowcaseSubmit() {
             });
         } catch (err) {
             console.error('Error submitting showcase:', err);
-            setError('Failed to submit showcase. Please try again.');
+            setError(t("showcase:failedToSubmitShowcasePleaseTryAgain"));
         } finally {
             setIsSubmitting(false);
         }
@@ -333,8 +338,7 @@ export default function ShowcaseSubmit() {
             {showDraftNotice && (
                 <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center justify-between">
                     <p className="text-sm text-green-700 dark:text-green-400">
-                        Your previous draft has been restored.
-                    </p>
+                        {t("showcase:yourPreviousDraftHasBeenRestored")}</p>
                     <button
                         onClick={() => setShowDraftNotice(false)}
                         className="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
@@ -354,20 +358,18 @@ export default function ShowcaseSubmit() {
                 </button>
                 <div className="flex-1">
                     <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">
-                        Submit Your Project
-                    </h1>
+                        {t("showcase:submitYourProject")}</h1>
                     <p className="text-surface-500 dark:text-surface-400 mt-1">
-                        Share what you've built with the community
-                    </p>
+                        {t("showcase:shareWhatYouVeBuiltWithTheCommunity")}</p>
                 </div>
                 {hasDraft && (
                     <button
                         onClick={clearDraft}
                         className="flex items-center gap-2 px-3 py-2 text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
-                        title="Clear saved draft and start fresh"
+                        title={t("showcase:clearSavedDraftAndStartFresh")}
                     >
                         <RotateCcw className="w-4 h-4" />
-                        <span className="hidden sm:inline">Clear Draft</span>
+                        <span className="hidden sm:inline">{t("showcase:clearDraft")}</span>
                     </button>
                 )}
             </div>
@@ -385,10 +387,10 @@ export default function ShowcaseSubmit() {
                                 }
                             `}
                         >
-                            {s}
+                            {formatNumber(s)}
                         </div>
                         <span className={`text-sm hidden sm:block ${step >= s ? 'text-surface-900 dark:text-surface-100' : 'text-surface-500'}`}>
-                            {s === 1 ? 'Basic Info' : s === 2 ? 'Description' : 'Media & Tags'}
+                            {s === 1 ? t("showcase:basicInfo") : s === 2 ? t("common:uiDescription") : t("showcase:mediaTags")}
                         </span>
                         {s < 3 && <div className={`flex-1 h-0.5 ${step > s ? 'bg-primary-600' : 'bg-surface-200 dark:bg-surface-700'}`} />}
                     </div>
@@ -398,7 +400,7 @@ export default function ShowcaseSubmit() {
             {/* Error Message */}
             {error && (
                 <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400">
-                    {error}
+                    {localizeError(error)}
                 </div>
             )}
 
@@ -407,38 +409,36 @@ export default function ShowcaseSubmit() {
                 <div className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Project Title *
-                        </label>
+                            {t("showcase:projectTitle")}</label>
                         <input
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="My Awesome Project"
+                            placeholder={t("showcase:myAwesomeProject")}
                             maxLength={255}
                             className="w-full px-4 py-3 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
-                        <p className="text-xs text-surface-500 mt-1">{title.length}/255 characters</p>
+                        <p className="text-xs text-surface-500 mt-1">{t("showcase:255Characters", { value1: title.length })}</p>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Tagline * <span className="font-normal text-surface-500">(Short description)</span>
+                            {t("showcase:tagline")} <span className="font-normal text-surface-500">{t("showcase:shortDescription")}</span>
                         </label>
                         <input
                             type="text"
                             value={tagline}
                             onChange={(e) => setTagline(e.target.value)}
-                            placeholder="The best tool for doing amazing things"
+                            placeholder={t("showcase:theBestToolForDoingAmazingThings")}
                             maxLength={150}
                             className="w-full px-4 py-3 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
-                        <p className="text-xs text-surface-500 mt-1">{tagline.length}/150 characters (min 10)</p>
+                        <p className="text-xs text-surface-500 mt-1">{t("showcase:150CharactersMin10", { value1: tagline.length })}</p>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Project URL *
-                        </label>
+                            {t("showcase:projectURL")}</label>
                         <div className="relative">
                             <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
                             <input
@@ -450,14 +450,13 @@ export default function ShowcaseSubmit() {
                             />
                         </div>
                         {url && !isValidUrl(url) && (
-                            <p className="text-xs text-red-500 mt-1">Please enter a valid URL</p>
+                            <p className="text-xs text-red-500 mt-1">{t("showcase:pleaseEnterAValidURL")}</p>
                         )}
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Category *
-                        </label>
+                            {t("showcase:category2")}</label>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {CATEGORY_OPTIONS.map((cat) => (
                                 <button
@@ -484,8 +483,7 @@ export default function ShowcaseSubmit() {
                             disabled={!canProceedStep1}
                             className="px-6 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                            Continue
-                        </button>
+                            {t("showcase:continue")}</button>
                     </div>
                 </div>
             )}
@@ -495,32 +493,27 @@ export default function ShowcaseSubmit() {
                 <div className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Full Description *
-                        </label>
+                            {t("showcase:fullDescription")}</label>
                         <p className="text-xs text-surface-500 mb-3">
-                            Tell us about your project. What does it do? What problems does it solve?
-                        </p>
+                            {t("showcase:tellUsAboutYourProjectWhatDoesItDo")}</p>
                         <RichTextEditor
                             value={description}
                             onChange={setDescription}
-                            placeholder="Describe your project in detail..."
+                            placeholder={t("showcase:describeYourProjectInDetail")}
                         />
-                        <p className="text-xs text-surface-500 mt-1">
-                            {description.replace(/<[^>]*>/g, '').length} characters (min 50)
-                        </p>
+                        <p className="text-xs text-surface-500 mt-1">{t("showcase:charactersMin50", { value1: description.replace(/<[^>]*>/g, '').length })}</p>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Tech Stack
-                        </label>
+                            {t("showcase:techStack")}</label>
                         <div className="flex gap-2 mb-3">
                             <input
                                 type="text"
                                 value={techInput}
                                 onChange={(e) => setTechInput(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTech())}
-                                placeholder="React, Node.js, PostgreSQL..."
+                                placeholder={t("showcase:reactNodeJsPostgreSQL")}
                                 className="flex-1 px-4 py-2 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                             />
                             <button
@@ -553,15 +546,13 @@ export default function ShowcaseSubmit() {
                             onClick={() => setStep(1)}
                             className="px-6 py-2.5 text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg font-medium transition-colors"
                         >
-                            Back
-                        </button>
+                            {t("showcase:back")}</button>
                         <button
                             onClick={() => setStep(3)}
                             disabled={!canProceedStep2}
                             className="px-6 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                            Continue
-                        </button>
+                            {t("showcase:continue")}</button>
                     </div>
                 </div>
             )}
@@ -572,11 +563,9 @@ export default function ShowcaseSubmit() {
                     {/* Thumbnail */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Thumbnail
-                        </label>
+                            {t("showcase:thumbnail")}</label>
                         <p className="text-xs text-surface-500 mb-3">
-                            Featured image for your project (recommended: 1200x630)
-                        </p>
+                            {t("showcase:featuredImageForYourProjectRecommended1200x630")}</p>
                         <div
                             {...thumbnailDropzone.getRootProps()}
                             className={`
@@ -594,7 +583,7 @@ export default function ShowcaseSubmit() {
                                 <div className="relative inline-block">
                                     <img
                                         src={thumbnailUrl}
-                                        alt="Thumbnail"
+                                        alt={t("showcase:thumbnail")}
                                         className="max-h-48 rounded-lg mx-auto"
                                     />
                                     <button
@@ -611,8 +600,7 @@ export default function ShowcaseSubmit() {
                                 <>
                                     <Upload className="w-8 h-8 mx-auto text-surface-400 mb-2" />
                                     <p className="text-surface-600 dark:text-surface-400">
-                                        Drop image here or click to upload
-                                    </p>
+                                        {t("showcase:dropImageHereOrClickToUpload")}</p>
                                 </>
                             )}
                         </div>
@@ -621,11 +609,9 @@ export default function ShowcaseSubmit() {
                     {/* Screenshots */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Screenshots
-                        </label>
+                            {t("showcase:screenshots")}</label>
                         <p className="text-xs text-surface-500 mb-3">
-                            Add up to 5 screenshots to showcase your project
-                        </p>
+                            {t("showcase:addUpTo5ScreenshotsToShowcaseYourProject")}</p>
                         <div
                             {...imagesDropzone.getRootProps()}
                             className={`
@@ -641,15 +627,14 @@ export default function ShowcaseSubmit() {
                                 <Loader2 className="w-6 h-6 mx-auto animate-spin text-primary-600" />
                             ) : (
                                 <p className="text-sm text-surface-600 dark:text-surface-400">
-                                    Drop images here or click to upload
-                                </p>
+                                    {t("showcase:dropImagesHereOrClickToUpload")}</p>
                             )}
                         </div>
                         {imageUrls.length > 0 && (
                             <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
                                 {imageUrls.map((img, index) => (
                                     <div key={index} className="relative aspect-video rounded-lg overflow-hidden group">
-                                        <img src={img} alt={`Screenshot ${index + 1}`} className="w-full h-full object-cover" />
+                                        <img src={img} alt={t("showcase:screenshot", { value1: index + 1 })} className="w-full h-full object-cover" />
                                         <button
                                             onClick={() => removeImage(index)}
                                             className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
@@ -665,8 +650,7 @@ export default function ShowcaseSubmit() {
                     {/* Tags */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Tags
-                        </label>
+                            {t("showcase:tags")}</label>
                         <div className="flex flex-wrap gap-2">
                             {availableTags.map((tag) => {
                                 const isSelected = selectedTags.includes(tag.id);
@@ -695,11 +679,9 @@ export default function ShowcaseSubmit() {
                     <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                         <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                         <div className="text-sm text-blue-800 dark:text-blue-300">
-                            <p className="font-medium">Review Process</p>
+                            <p className="font-medium">{t("showcase:reviewProcess")}</p>
                             <p className="mt-1 text-blue-700 dark:text-blue-400">
-                                Your submission will be reviewed by our team before it appears on the showcase.
-                                This usually takes 24-48 hours.
-                            </p>
+                                {t("showcase:yourSubmissionWillBeReviewedByOurTeamBefore")}</p>
                         </div>
                     </div>
 
@@ -708,16 +690,14 @@ export default function ShowcaseSubmit() {
                             onClick={() => setStep(2)}
                             className="px-6 py-2.5 text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg font-medium transition-colors"
                         >
-                            Back
-                        </button>
+                            {t("showcase:back")}</button>
                         <button
                             onClick={handleSubmit}
                             disabled={isSubmitting}
                             className="px-6 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors flex items-center gap-2"
                         >
                             {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                            Submit for Review
-                        </button>
+                            {t("showcase:submitForReview")}</button>
                     </div>
                 </div>
             )}

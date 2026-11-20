@@ -1,3 +1,8 @@
+import { formatNumber } from '@/lib/locale';
+import { localizeError } from '@/i18n/errors';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { backupService, BackupInfo, BackupResult } from '@/services/backup';
 import {
@@ -14,6 +19,7 @@ import {
 } from 'lucide-react';
 
 export default function AdminBackups() {
+    useTranslation();
     const [backups, setBackups] = useState<BackupInfo[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isBackingUp, setIsBackingUp] = useState(false);
@@ -48,20 +54,20 @@ export default function AdminBackups() {
             if (result.success) {
                 setBackupResult({
                     type: 'success',
-                    message: `Backup completed successfully in ${result.duration?.toFixed(1)}s`,
+                    message: t("admin:backupCompletedSuccessfullyInS", { value1: formatNumber(result.duration, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) }),
                 });
                 setLastBackupDetails(result);
                 await fetchBackups();
             } else {
                 setBackupResult({
                     type: 'error',
-                    message: result.error || 'Backup failed',
+                    message: result.error || t("admin:backupFailed"),
                 });
             }
         } catch (error) {
             setBackupResult({
                 type: 'error',
-                message: error instanceof Error ? error.message : 'Failed to trigger backup',
+                message: error instanceof Error ? localizeError(error.message) : t("admin:failedToTriggerBackup"),
             });
         } finally {
             setIsBackingUp(false);
@@ -70,7 +76,7 @@ export default function AdminBackups() {
 
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr);
-        return date.toLocaleString('en-US', {
+        return date.toLocaleString(activeLanguage(), {
             month: 'short',
             day: 'numeric',
             year: 'numeric',
@@ -87,9 +93,9 @@ export default function AdminBackups() {
         const diffHours = Math.floor(diffMs / 3600000);
         const diffDays = Math.floor(diffMs / 86400000);
 
-        if (diffMins < 60) return `${diffMins} minutes ago`;
-        if (diffHours < 24) return `${diffHours} hours ago`;
-        return `${diffDays} days ago`;
+        if (diffMins < 60) return t("admin:minutesAgo", { value1: diffMins });
+        if (diffHours < 24) return t("admin:hoursAgo", { value1: diffHours });
+        return t("admin:daysAgo", { value1: diffDays });
     };
 
     const handleDownload = async (filename: string) => {
@@ -100,7 +106,7 @@ export default function AdminBackups() {
             console.error('Download error:', error);
             setBackupResult({
                 type: 'error',
-                message: error instanceof Error ? error.message : 'Failed to download backup',
+                message: error instanceof Error ? localizeError(error.message) : t("admin:failedToDownloadBackup"),
             });
         } finally {
             setDownloadingFile(null);
@@ -123,18 +129,16 @@ export default function AdminBackups() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">Database Backups</h1>
+                    <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">{t("admin:databaseBackups")}</h1>
                     <p className="text-surface-500 dark:text-surface-400 mt-1">
-                        Manage database backups stored in S3
-                    </p>
+                        {t("admin:manageDatabaseBackupsStoredInS3")}</p>
                 </div>
                 <button
                     onClick={fetchBackups}
                     className="flex items-center gap-2 px-4 py-2 bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 rounded-lg text-surface-700 dark:text-surface-300 transition-colors"
                 >
                     <RefreshCw className="w-4 h-4" />
-                    Refresh
-                </button>
+                    {t("admin:refresh")}</button>
             </div>
 
             {/* Backup Result Message */}
@@ -154,9 +158,7 @@ export default function AdminBackups() {
                     <div>
                         <p className="font-medium">{backupResult.message}</p>
                         {lastBackupDetails && (
-                            <p className="text-sm mt-1 opacity-80">
-                                File: {lastBackupDetails.filename} ({((lastBackupDetails.size || 0) / (1024 * 1024)).toFixed(2)} MB)
-                            </p>
+                            <p className="text-sm mt-1 opacity-80">{t("admin:fileMB", { value1: lastBackupDetails.filename, value2: formatNumber(((lastBackupDetails.size || 0) / (1024 * 1024)), { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })}</p>
                         )}
                     </div>
                 </div>
@@ -170,8 +172,8 @@ export default function AdminBackups() {
                             <Database className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-surface-900 dark:text-surface-100">{backups.length}</p>
-                            <p className="text-sm text-surface-500 dark:text-surface-400">Total Backups</p>
+                            <p className="text-2xl font-bold text-surface-900 dark:text-surface-100">{formatNumber(backups.length)}</p>
+                            <p className="text-sm text-surface-500 dark:text-surface-400">{t("admin:totalBackups")}</p>
                         </div>
                     </div>
                 </div>
@@ -182,10 +184,8 @@ export default function AdminBackups() {
                             <HardDrive className="w-6 h-6 text-green-600 dark:text-green-400" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-surface-900 dark:text-surface-100">
-                                {totalSize.toFixed(1)} MB
-                            </p>
-                            <p className="text-sm text-surface-500 dark:text-surface-400">Total Storage Used</p>
+                            <p className="text-2xl font-bold text-surface-900 dark:text-surface-100">{t("admin:mB", { value1: formatNumber(totalSize, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) })}</p>
+                            <p className="text-sm text-surface-500 dark:text-surface-400">{t("admin:totalStorageUsed")}</p>
                         </div>
                     </div>
                 </div>
@@ -197,9 +197,9 @@ export default function AdminBackups() {
                         </div>
                         <div>
                             <p className="text-2xl font-bold text-surface-900 dark:text-surface-100">
-                                {latestBackup ? getTimeSince(latestBackup.createdAt) : 'Never'}
+                                {latestBackup ? getTimeSince(latestBackup.createdAt) : t("common:uiNever")}
                             </p>
-                            <p className="text-sm text-surface-500 dark:text-surface-400">Last Backup</p>
+                            <p className="text-sm text-surface-500 dark:text-surface-400">{t("admin:lastBackup")}</p>
                         </div>
                     </div>
                 </div>
@@ -207,7 +207,7 @@ export default function AdminBackups() {
 
             {/* Trigger Backup */}
             <div className="bg-white dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-700 p-6">
-                <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">Create Backup</h2>
+                <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">{t("admin:createBackup")}</h2>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                     <button
                         onClick={handleTriggerBackup}
@@ -217,19 +217,15 @@ export default function AdminBackups() {
                         {isBackingUp ? (
                             <>
                                 <RefreshCw className="w-5 h-5 animate-spin" />
-                                Creating Backup...
-                            </>
+                                {t("admin:creatingBackup")}</>
                         ) : (
                             <>
                                 <Play className="w-5 h-5" />
-                                Create Backup Now
-                            </>
+                                {t("admin:createBackupNow")}</>
                         )}
                     </button>
                     <p className="text-sm text-surface-500 dark:text-surface-400">
-                        Creates a compressed SQL dump of the database and uploads it to S3.
-                        This may take a few minutes depending on database size.
-                    </p>
+                        {t("admin:createsACompressedSQLDumpOfTheDatabaseAnd")}</p>
                 </div>
 
                 {/* Auto-backup info */}
@@ -237,10 +233,9 @@ export default function AdminBackups() {
                     <div className="flex items-start gap-3">
                         <AlertTriangle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                         <div className="text-sm text-blue-800 dark:text-blue-300">
-                            <p className="font-medium">Automatic Backups</p>
+                            <p className="font-medium">{t("admin:automaticBackups")}</p>
                             <p className="mt-1 opacity-80">
-                                Configure the deployment backup hook or a scheduled job for automatic backups. Retention follows your server configuration. Back up uploaded files separately.
-                            </p>
+                                {t("admin:configureTheDeploymentBackupHookOrAScheduledJob")}</p>
                         </div>
                     </div>
                 </div>
@@ -248,15 +243,14 @@ export default function AdminBackups() {
 
             {/* Backup List */}
             <div className="bg-white dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-700 p-6">
-                <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">Backup History</h2>
+                <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">{t("admin:backupHistory")}</h2>
 
                 {backups.length === 0 ? (
                     <div className="text-center py-12">
                         <FileArchive className="w-12 h-12 text-surface-300 dark:text-surface-600 mx-auto mb-4" />
-                        <p className="text-surface-500 dark:text-surface-400">No backups found</p>
+                        <p className="text-surface-500 dark:text-surface-400">{t("admin:noBackupsFound")}</p>
                         <p className="text-sm text-surface-400 dark:text-surface-500 mt-1">
-                            Create your first backup using the button above
-                        </p>
+                            {t("admin:createYourFirstBackupUsingTheButtonAbove")}</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
@@ -264,20 +258,15 @@ export default function AdminBackups() {
                             <thead>
                                 <tr className="border-b border-surface-200 dark:border-surface-700">
                                     <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">
-                                        Filename
-                                    </th>
+                                        {t("admin:filename")}</th>
                                     <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">
-                                        Size
-                                    </th>
+                                        {t("admin:size")}</th>
                                     <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">
-                                        Created
-                                    </th>
+                                        {t("admin:created2")}</th>
                                     <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">
-                                        Age
-                                    </th>
+                                        {t("admin:age")}</th>
                                     <th className="text-right py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">
-                                        Actions
-                                    </th>
+                                        {t("admin:actions")}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -296,15 +285,12 @@ export default function AdminBackups() {
                                                 </code>
                                                 {index === 0 && (
                                                     <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
-                                                        Latest
-                                                    </span>
+                                                        {t("admin:latest")}</span>
                                                 )}
                                             </div>
                                         </td>
                                         <td className="py-3 px-4">
-                                            <span className="text-sm text-surface-600 dark:text-surface-400">
-                                                {backup.sizeMB} MB
-                                            </span>
+                                            <span className="text-sm text-surface-600 dark:text-surface-400">{t("admin:mB", { value1: backup.sizeMB })}</span>
                                         </td>
                                         <td className="py-3 px-4">
                                             <span className="text-sm text-surface-600 dark:text-surface-400">
@@ -321,15 +307,14 @@ export default function AdminBackups() {
                                                 onClick={() => handleDownload(backup.filename)}
                                                 disabled={downloadingFile === backup.filename}
                                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors disabled:opacity-50"
-                                                title="Download backup"
+                                                title={t("admin:downloadBackup")}
                                             >
                                                 {downloadingFile === backup.filename ? (
                                                     <RefreshCw className="w-4 h-4 animate-spin" />
                                                 ) : (
                                                     <Download className="w-4 h-4" />
                                                 )}
-                                                Download
-                                            </button>
+                                                {t("admin:download")}</button>
                                         </td>
                                     </tr>
                                 ))}

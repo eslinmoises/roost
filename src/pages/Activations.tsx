@@ -1,3 +1,9 @@
+import { Trans } from 'react-i18next';
+import { formatNumber } from '@/lib/locale';
+import { localizeError } from '@/i18n/errors';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import {
     Key,
@@ -28,11 +34,12 @@ import type { ActivationRequestStatus } from '@/types/database';
 
 // Status badge helper
 function StatusBadge({ status }: { status: ActivationRequestStatus }) {
+    useTranslation();
     const config = {
-        pending: { label: 'Pending Review', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400', icon: Clock },
-        in_progress: { label: 'In Progress', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400', icon: Loader2 },
-        completed: { label: 'Completed', color: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400', icon: CheckCircle },
-        rejected: { label: 'Rejected', color: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400', icon: XCircle },
+        pending: { label: t("activations:pendingReview"), color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400', icon: Clock },
+        in_progress: { label: t("activations:inProgress"), color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400', icon: Loader2 },
+        completed: { label: t("activations:completed"), color: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400', icon: CheckCircle },
+        rejected: { label: t("activations:rejected"), color: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400', icon: XCircle },
     };
     const { label, color, icon: Icon } = config[status] || config.pending;
 
@@ -45,6 +52,7 @@ function StatusBadge({ status }: { status: ActivationRequestStatus }) {
 }
 
 export default function Activations() {
+    useTranslation();
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'available' | 'history'>('available');
 
@@ -92,7 +100,7 @@ export default function Activations() {
     const handleSubmitRequest = async () => {
         if (!user || !selectedProduct) return;
         if (!requestForm.website_url.trim() || !requestForm.wp_username.trim() || !requestForm.wp_password.trim()) {
-            setError('Please fill in all required fields');
+            setError(t("activations:pleaseFillInAllRequiredFields"));
             return;
         }
 
@@ -100,7 +108,7 @@ export default function Activations() {
         try {
             new URL(requestForm.website_url);
         } catch {
-            setError('Please enter a valid website URL');
+            setError(t("activations:pleaseEnterAValidWebsiteURL"));
             return;
         }
 
@@ -109,13 +117,13 @@ export default function Activations() {
             a => a.product_id === selectedProduct.id && (a.status === 'pending' || a.status === 'in_progress')
         );
         if (hasActiveRequest) {
-            setError('You already have an active request for this product');
+            setError(t("activations:youAlreadyHaveAnActiveRequestForThisProduct"));
             return;
         }
 
         // Check remaining activations
         if (selectedProduct.remaining_activations <= 0) {
-            setError('Monthly activation limit reached for this product');
+            setError(t("activations:monthlyActivationLimitReachedForThisProduct"));
             return;
         }
 
@@ -140,7 +148,7 @@ export default function Activations() {
             setActiveTab('history');
         } catch (err) {
             console.error('Error submitting request:', err);
-            setError(err instanceof Error ? err.message : 'Failed to submit request');
+            setError(err instanceof Error ? localizeError(err.message) : t("activations:failedToSubmitRequest"));
         } finally {
             setSubmitting(false);
         }
@@ -156,7 +164,7 @@ export default function Activations() {
             a => a.product_id === product.id && (a.status === 'pending' || a.status === 'in_progress')
         );
         if (hasActiveRequest) {
-            alert('You already have an active request for this product');
+            alert(t("activations:youAlreadyHaveAnActiveRequestForThisProduct"));
             return;
         }
 
@@ -180,11 +188,9 @@ export default function Activations() {
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-3">
                         <Key className="w-8 h-8 text-primary-500" />
-                        Product Activations
-                    </h1>
+                        {t("activations:productActivations")}</h1>
                     <p className="text-gray-600 dark:text-gray-400 mt-2">
-                        Request activation keys for premium products like Elementor, Bricks Builder, themes, and more.
-                    </p>
+                        {t("activations:requestActivationKeysForPremiumProductsLikeElementorBricks")}</p>
                 </div>
 
                 {/* Tabs */}
@@ -198,8 +204,7 @@ export default function Activations() {
                                     : 'border-transparent text-surface-500 hover:text-surface-700 dark:hover:text-surface-300'
                             }`}
                         >
-                            Available Products
-                        </button>
+                            {t("activations:availableProducts")}</button>
                         <button
                             onClick={() => setActiveTab('history')}
                             className={`pb-3 px-1 border-b-2 transition-colors font-medium ${
@@ -208,10 +213,9 @@ export default function Activations() {
                                     : 'border-transparent text-surface-500 hover:text-surface-700 dark:hover:text-surface-300'
                             }`}
                         >
-                            My Requests
-                            {myActivations.filter(a => a.status === 'pending' || a.status === 'in_progress').length > 0 && (
+                            {t("activations:myRequests")}{myActivations.filter(a => a.status === 'pending' || a.status === 'in_progress').length > 0 && (
                                 <span className="ml-2 px-2 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-full text-xs">
-                                    {myActivations.filter(a => a.status === 'pending' || a.status === 'in_progress').length}
+                                    {formatNumber(myActivations.filter(a => a.status === 'pending' || a.status === 'in_progress').length)}
                                 </span>
                             )}
                         </button>
@@ -224,8 +228,8 @@ export default function Activations() {
                         {products.length === 0 ? (
                             <div className="text-center py-12">
                                 <Package className="w-16 h-16 mx-auto text-surface-300 dark:text-surface-600 mb-4" />
-                                <p className="text-surface-600 dark:text-surface-400 text-lg">No products available</p>
-                                <p className="text-surface-500 dark:text-surface-500 mt-1">Check back later for new products</p>
+                                <p className="text-surface-600 dark:text-surface-400 text-lg">{t("activations:noProductsAvailable")}</p>
+                                <p className="text-surface-500 dark:text-surface-500 mt-1">{t("activations:checkBackLaterForNewProducts")}</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -255,10 +259,8 @@ export default function Activations() {
                                             )}
 
                                             <div className="flex items-center justify-between text-sm mb-4">
-                                                <span className="text-surface-500 dark:text-surface-400">Monthly Limit</span>
-                                                <span className="font-medium text-surface-900 dark:text-surface-100">
-                                                    {product.remaining_activations} / {product.monthly_limit} remaining
-                                                </span>
+                                                <span className="text-surface-500 dark:text-surface-400">{t("activations:monthlyLimit")}</span>
+                                                <span className="font-medium text-surface-900 dark:text-surface-100">{t("activations:remaining", { value1: product.remaining_activations, value2: product.monthly_limit })}</span>
                                             </div>
 
                                             {/* Progress bar */}
@@ -283,10 +285,10 @@ export default function Activations() {
                                                 className="w-full py-2.5 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-primary-500 hover:bg-primary-600 text-white disabled:hover:bg-primary-500"
                                             >
                                                 {product.has_active_request
-                                                    ? 'Request Pending'
+                                                    ? t("activations:requestPending")
                                                     : product.remaining_activations === 0
-                                                    ? 'Limit Reached'
-                                                    : 'Request Activation'}
+                                                    ? t("activations:limitReached")
+                                                    : t("activations:requestActivation")}
                                             </button>
                                         </div>
                                     </div>
@@ -302,16 +304,14 @@ export default function Activations() {
                         {myActivations.length === 0 ? (
                             <div className="text-center py-12">
                                 <Clock className="w-16 h-16 mx-auto text-surface-300 dark:text-surface-600 mb-4" />
-                                <p className="text-surface-600 dark:text-surface-400 text-lg">No activation requests yet</p>
+                                <p className="text-surface-600 dark:text-surface-400 text-lg">{t("activations:noActivationRequestsYet")}</p>
                                 <p className="text-surface-500 dark:text-surface-500 mt-1">
-                                    Browse available products and submit your first request
-                                </p>
+                                    {t("activations:browseAvailableProductsAndSubmitYourFirstRequest")}</p>
                                 <button
                                     onClick={() => setActiveTab('available')}
                                     className="mt-4 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors"
                                 >
-                                    View Products
-                                </button>
+                                    {t("activations:viewProducts")}</button>
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -338,9 +338,7 @@ export default function Activations() {
                                                         {activation.website_url}
                                                         <ExternalLink className="w-3 h-3" />
                                                     </a>
-                                                    <p className="text-xs text-surface-500 dark:text-surface-400 mt-2">
-                                                        Requested {activation.created_at ? new Date(activation.created_at).toLocaleDateString() : '-'}
-                                                    </p>
+                                                    <p className="text-xs text-surface-500 dark:text-surface-400 mt-2">{t("activations:requested", { value1: activation.created_at ? new Date(activation.created_at).toLocaleDateString(activeLanguage()) : '-' })}</p>
                                                 </div>
                                             </div>
                                             <StatusBadge status={activation.status || 'pending'} />
@@ -350,16 +348,14 @@ export default function Activations() {
                                         {activation.status === 'pending' && (
                                             <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                                                 <p className="text-sm text-yellow-800 dark:text-yellow-400">
-                                                    Your request is awaiting review. We'll notify you when it's being processed.
-                                                </p>
+                                                    {t("activations:yourRequestIsAwaitingReviewWeLlNotifyYou")}</p>
                                             </div>
                                         )}
 
                                         {activation.status === 'in_progress' && (
                                             <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                                                 <p className="text-sm text-blue-800 dark:text-blue-400">
-                                                    Your activation is being processed. This usually takes a few minutes.
-                                                </p>
+                                                    {t("activations:yourActivationIsBeingProcessedThisUsuallyTakesA")}</p>
                                             </div>
                                         )}
 
@@ -367,12 +363,9 @@ export default function Activations() {
                                             <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                                                 <p className="text-sm text-green-800 dark:text-green-400 flex items-center gap-2">
                                                     <CheckCircle className="w-4 h-4" />
-                                                    Your product has been activated successfully!
-                                                </p>
+                                                    {t("activations:yourProductHasBeenActivatedSuccessfully")}</p>
                                                 {activation.admin_notes && (
-                                                    <p className="text-sm text-green-700 dark:text-green-500 mt-2">
-                                                        <strong>Note:</strong> {activation.admin_notes}
-                                                    </p>
+                                                    <p className="text-sm text-green-700 dark:text-green-500 mt-2"><Trans i18nKey="common:sentence3" components={{ part0: <strong /> }} values={{ value0: activation.admin_notes }} /></p>
                                                 )}
                                             </div>
                                         )}
@@ -381,12 +374,9 @@ export default function Activations() {
                                             <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                                                 <p className="text-sm text-red-800 dark:text-red-400 flex items-center gap-2">
                                                     <XCircle className="w-4 h-4" />
-                                                    Your request could not be completed.
-                                                </p>
+                                                    {t("activations:yourRequestCouldNotBeCompleted")}</p>
                                                 {activation.admin_notes && (
-                                                    <p className="text-sm text-red-700 dark:text-red-500 mt-2">
-                                                        <strong>Reason:</strong> {activation.admin_notes}
-                                                    </p>
+                                                    <p className="text-sm text-red-700 dark:text-red-500 mt-2"><Trans i18nKey="common:sentence4" components={{ part0: <strong /> }} values={{ value0: activation.admin_notes }} /></p>
                                                 )}
                                             </div>
                                         )}
@@ -396,23 +386,20 @@ export default function Activations() {
                                             <div className="mt-4 p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg">
                                                 <div className="flex items-center justify-between gap-3">
                                                     <div className="min-w-0">
-                                                        <p className="text-sm font-medium text-primary-800 dark:text-primary-300">
-                                                            Download & install the {activation.product.product_type === 'theme' ? 'theme' : 'plugin'} on your WordPress site
-                                                        </p>
+                                                        <p className="text-sm font-medium text-primary-800 dark:text-primary-300">{t("activations:downloadInstallTheOnYourWordPressSite", { value1: activation.product.product_type === 'theme' ? t('errors:theme') : t('errors:plugin') })}</p>
                                                         <p className="text-xs text-primary-600 dark:text-primary-500 mt-0.5 truncate">
-                                                            {activation.product.file_name || 'File'}
+                                                            {activation.product.file_name || t("common:uiFile")}
                                                         </p>
                                                     </div>
                                                     <button
                                                         onClick={async () => {
                                                             try { window.open(await getSignedDownloadUrl(activation.product!.file_url!), '_blank', 'noopener,noreferrer'); }
-                                                            catch { window.alert('This download is unavailable or you no longer have access.'); }
+                                                            catch { window.alert(t("activations:thisDownloadIsUnavailableOrYouNoLongerHave")); }
                                                         }}
                                                         className="flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors flex-shrink-0"
                                                     >
                                                         <Download className="w-4 h-4" />
-                                                        Download
-                                                    </button>
+                                                        {t("activations:download")}</button>
                                                 </div>
                                             </div>
                                         )}
@@ -420,7 +407,7 @@ export default function Activations() {
                                         {/* User notes */}
                                         {activation.notes && (
                                             <div className="mt-4 pt-4 border-t border-surface-100 dark:border-surface-800">
-                                                <p className="text-xs text-surface-500 dark:text-surface-400 mb-1">Your notes:</p>
+                                                <p className="text-xs text-surface-500 dark:text-surface-400 mb-1">{t("activations:yourNotes")}</p>
                                                 <p className="text-sm text-surface-600 dark:text-surface-400">{activation.notes}</p>
                                             </div>
                                         )}
@@ -439,8 +426,7 @@ export default function Activations() {
                         <div className="p-6 border-b border-surface-200 dark:border-surface-700">
                             <div className="flex items-center justify-between">
                                 <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">
-                                    Request Activation
-                                </h2>
+                                    {t("activations:requestActivation")}</h2>
                                 <button
                                     onClick={() => {
                                         setShowRequestModal(false);
@@ -462,9 +448,7 @@ export default function Activations() {
                                 </div>
                                 <div>
                                     <p className="font-medium text-surface-900 dark:text-surface-100">{selectedProduct.name}</p>
-                                    <p className="text-sm text-surface-500 dark:text-surface-400">
-                                        {selectedProduct.remaining_activations} activation{selectedProduct.remaining_activations !== 1 ? 's' : ''} remaining this month
-                                    </p>
+                                    <p className="text-sm text-surface-500 dark:text-surface-400">{t("activations:activationRemainingThisMonth", { count: selectedProduct.remaining_activations })}</p>
                                 </div>
                             </div>
 
@@ -473,7 +457,7 @@ export default function Activations() {
                                 <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                                     <p className="text-sm text-red-700 dark:text-red-400 flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                        {error}
+                                        {localizeError(error)}
                                     </p>
                                 </div>
                             )}
@@ -481,7 +465,7 @@ export default function Activations() {
                             {/* Form Fields */}
                             <div>
                                 <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                                    Website URL <span className="text-red-500">*</span>
+                                    {t("activations:websiteURL")} <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="url"
@@ -494,7 +478,7 @@ export default function Activations() {
 
                             <div>
                                 <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                                    WordPress Username <span className="text-red-500">*</span>
+                                    {t("activations:wordPressUsername")} <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -507,14 +491,14 @@ export default function Activations() {
 
                             <div>
                                 <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                                    WordPress Password <span className="text-red-500">*</span>
+                                    {t("activations:wordPressPassword")} <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         value={requestForm.wp_password}
                                         onChange={(e) => setRequestForm({ ...requestForm, wp_password: e.target.value })}
-                                        placeholder="Your WordPress password"
+                                        placeholder={t("activations:yourWordPressPassword")}
                                         className="w-full px-3 py-2 pr-10 border border-surface-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100"
                                     />
                                     <button
@@ -529,12 +513,11 @@ export default function Activations() {
 
                             <div>
                                 <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                                    Notes (optional)
-                                </label>
+                                    {t("activations:notesOptional")}</label>
                                 <textarea
                                     value={requestForm.notes}
                                     onChange={(e) => setRequestForm({ ...requestForm, notes: e.target.value })}
-                                    placeholder="Any additional information..."
+                                    placeholder={t("activations:anyAdditionalInformation")}
                                     rows={3}
                                     className="w-full px-3 py-2 border border-surface-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100"
                                 />
@@ -544,10 +527,9 @@ export default function Activations() {
                             <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                                 <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                                 <div className="text-sm text-blue-700 dark:text-blue-400">
-                                    <p className="font-medium">Your credentials are secure</p>
+                                    <p className="font-medium">{t("activations:yourCredentialsAreSecure")}</p>
                                     <p className="mt-1 text-blue-600 dark:text-blue-500">
-                                        Your login details are stored securely and only used by our team to activate the product on your website.
-                                    </p>
+                                        {t("activations:yourLoginDetailsAreStoredSecurelyAndOnlyUsed")}</p>
                                 </div>
                             </div>
                         </div>
@@ -562,8 +544,7 @@ export default function Activations() {
                                 }}
                                 className="px-4 py-2 text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
                             >
-                                Cancel
-                            </button>
+                                {t("activations:cancel")}</button>
                             <button
                                 onClick={handleSubmitRequest}
                                 disabled={submitting || !requestForm.website_url || !requestForm.wp_username || !requestForm.wp_password}
@@ -572,13 +553,11 @@ export default function Activations() {
                                 {submitting ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        Submitting...
-                                    </>
+                                        {t("activations:submitting")}</>
                                 ) : (
                                     <>
                                         <Key className="w-4 h-4" />
-                                        Submit Request
-                                    </>
+                                        {t("activations:submitRequest")}</>
                                 )}
                             </button>
                         </div>

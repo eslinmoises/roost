@@ -1,3 +1,7 @@
+import { formatNumber } from '@/lib/locale';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
@@ -23,6 +27,7 @@ import { SHOWCASE_CATEGORY_INFO, SHOWCASE_STATUS_INFO } from '@/types/showcase';
 import DOMPurify from 'dompurify';
 
 export default function ShowcaseDetail() {
+    useTranslation();
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
 
@@ -46,7 +51,7 @@ export default function ShowcaseDetail() {
         try {
             const data = await getShowcaseById(id, user?.id);
             if (!data) {
-                setError('Showcase not found');
+                setError(t("showcase:showcaseNotFound"));
                 return;
             }
             setShowcase(data);
@@ -56,7 +61,7 @@ export default function ShowcaseDetail() {
             setReviews(reviewData);
         } catch (err) {
             console.error('Error fetching showcase:', err);
-            setError('Failed to load showcase');
+            setError(t("showcase:failedToLoadShowcase"));
         } finally {
             setIsLoading(false);
         }
@@ -168,14 +173,13 @@ export default function ShowcaseDetail() {
         return (
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
                 <h2 className="text-xl font-semibold text-surface-900 dark:text-surface-100 mb-2">
-                    {error || 'Showcase not found'}
+                    {error || t("showcase:showcaseNotFound")}
                 </h2>
                 <Link
                     to="/showcase"
                     className="text-primary-600 hover:text-primary-700 dark:text-primary-400"
                 >
-                    Back to Showcase
-                </Link>
+                    {t("showcase:backToShowcase")}</Link>
             </div>
         );
     }
@@ -189,8 +193,7 @@ export default function ShowcaseDetail() {
                 className="inline-flex items-center gap-2 text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-200 text-sm mb-6"
             >
                 <ArrowLeft className="w-4 h-4" />
-                Back to Showcase
-            </Link>
+                {t("showcase:backToShowcase")}</Link>
 
             {/* Main Layout - Content + Sidebar */}
             <div className="flex flex-col lg:flex-row gap-8">
@@ -224,8 +227,7 @@ export default function ShowcaseDetail() {
                                 </h1>
                                 {showcase.is_featured && (
                                     <span className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs font-medium rounded-full">
-                                        Featured
-                                    </span>
+                                        {t("showcase:featured")}</span>
                                 )}
                                 {showcase.status === 'pending' && (
                                     <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${SHOWCASE_STATUS_INFO.pending.bgColor} ${SHOWCASE_STATUS_INFO.pending.color}`}>
@@ -268,8 +270,7 @@ export default function ShowcaseDetail() {
                                         : 'border-transparent text-surface-500 hover:text-surface-700 dark:hover:text-surface-300'
                                 }`}
                             >
-                                Overview
-                            </button>
+                                {t("showcase:overview")}</button>
                             <button
                                 onClick={() => setActiveTab('reviews')}
                                 className={`pb-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
@@ -278,10 +279,9 @@ export default function ShowcaseDetail() {
                                         : 'border-transparent text-surface-500 hover:text-surface-700 dark:hover:text-surface-300'
                                 }`}
                             >
-                                Reviews
-                                {(showcase.review_count ?? 0) > 0 && (
+                                {t("showcase:reviews2")}{(showcase.review_count ?? 0) > 0 && (
                                     <span className="px-1.5 py-0.5 bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400 text-xs rounded">
-                                        {showcase.review_count}
+                                        {formatNumber(showcase.review_count)}
                                     </span>
                                 )}
                             </button>
@@ -366,8 +366,7 @@ export default function ShowcaseDetail() {
                             {showcase.tech_stack && showcase.tech_stack.length > 0 && (
                                 <div>
                                     <h3 className="text-sm font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider mb-3">
-                                        Built With
-                                    </h3>
+                                        {t("showcase:builtWith")}</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {showcase.tech_stack.map((tech) => (
                                             <span
@@ -384,8 +383,7 @@ export default function ShowcaseDetail() {
                             {/* Maker section */}
                             <div className="border-t border-surface-200 dark:border-surface-700 pt-6">
                                 <h3 className="text-sm font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider mb-4">
-                                    Made by
-                                </h3>
+                                    {t("showcase:madeBy")}</h3>
                                 <Link
                                     to={`/profile/${showcase.author.username}`}
                                     className="flex items-center gap-3 group"
@@ -446,21 +444,18 @@ export default function ShowcaseDetail() {
                             className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
                         >
                             <ExternalLink className="w-4 h-4" />
-                            Visit Website
-                        </a>
+                            {t("showcase:visitWebsite")}</a>
                         <button
                             onClick={handleShare}
                             className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-300 rounded-lg font-medium hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
                         >
                             <Share2 className="w-4 h-4" />
-                            Share
-                        </button>
+                            {t("showcase:share")}</button>
 
                         {/* Project Info Card */}
                         <div className="bg-surface-50 dark:bg-surface-800/50 rounded-xl p-4 space-y-4">
                             <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-100">
-                                Project Info
-                            </h3>
+                                {t("showcase:projectInfo")}</h3>
                             <div className="space-y-3">
                                 <div className="flex items-center gap-3 text-sm">
                                     <Globe className="w-4 h-4 text-surface-400 flex-shrink-0" />
@@ -476,24 +471,19 @@ export default function ShowcaseDetail() {
                                 {showcase.launch_date && (
                                     <div className="flex items-center gap-3 text-sm">
                                         <Calendar className="w-4 h-4 text-surface-400 flex-shrink-0" />
-                                        <span className="text-surface-600 dark:text-surface-400">
-                                            Launched {new Date(showcase.launch_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                                        </span>
+                                        <span className="text-surface-600 dark:text-surface-400">{t("showcase:launched", { value1: new Date(showcase.launch_date).toLocaleDateString(activeLanguage(), { month: 'short', year: 'numeric' }) })}</span>
                                     </div>
                                 )}
                                 {(showcase.average_rating ?? 0) > 0 && (
                                     <div className="flex items-center gap-3 text-sm">
                                         <Star className="w-4 h-4 text-amber-500 fill-current flex-shrink-0" />
                                         <span className="text-surface-600 dark:text-surface-400">
-                                            {(showcase.average_rating ?? 0).toFixed(1)} ({showcase.review_count ?? 0} reviews)
-                                        </span>
+                                            {t('showcase:ratingReviews', { rating: formatNumber((showcase.average_rating ?? 0), { minimumFractionDigits: 1, maximumFractionDigits: 1 }), count: showcase.review_count ?? 0 })}</span>
                                     </div>
                                 )}
                                 <div className="flex items-center gap-3 text-sm">
                                     <MessageSquare className="w-4 h-4 text-surface-400 flex-shrink-0" />
-                                    <span className="text-surface-600 dark:text-surface-400">
-                                        {showcase.review_count} review{showcase.review_count !== 1 ? 's' : ''}
-                                    </span>
+                                    <span className="text-surface-600 dark:text-surface-400">{t("showcase:review", { count: showcase.review_count ?? 0 })}</span>
                                 </div>
                             </div>
                         </div>
@@ -502,8 +492,7 @@ export default function ShowcaseDetail() {
                         {showcase.tags && showcase.tags.length > 0 && (
                             <div className="bg-surface-50 dark:bg-surface-800/50 rounded-xl p-4">
                                 <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-100 mb-3">
-                                    Tags
-                                </h3>
+                                    {t("showcase:tags")}</h3>
                                 <div className="flex flex-wrap gap-2">
                                     {showcase.tags.map((tag) => (
                                         <span
@@ -559,7 +548,7 @@ export default function ShowcaseDetail() {
 
                     <img
                         src={allImages[currentImageIndex]}
-                        alt={`Image ${currentImageIndex + 1}`}
+                        alt={t("showcase:image", { value1: currentImageIndex + 1 })}
                         className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
                         onClick={(e) => e.stopPropagation()}
                     />

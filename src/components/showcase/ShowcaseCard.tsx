@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { Link } from 'react-router-dom';
 import { ChevronUp, Star, MessageSquare } from 'lucide-react';
@@ -11,6 +14,7 @@ interface ShowcaseCardProps {
 }
 
 export default function ShowcaseCard({ showcase, onVote, isVoting }: ShowcaseCardProps) {
+    useTranslation();
     const categoryInfo = SHOWCASE_CATEGORY_INFO[showcase.category];
 
     const handleVote = (e: React.MouseEvent) => {
@@ -40,8 +44,7 @@ export default function ShowcaseCard({ showcase, onVote, isVoting }: ShowcaseCar
                 {/* Featured badge */}
                 {showcase.is_featured && (
                     <div className="absolute top-2 left-2 px-2 py-1 bg-purple-600 text-white text-xs font-medium rounded-full">
-                        Featured
-                    </div>
+                        {t("showcase:featured")}</div>
                 )}
                 {/* Category badge */}
                 <div
@@ -76,7 +79,7 @@ export default function ShowcaseCard({ showcase, onVote, isVoting }: ShowcaseCar
                                 </span>
                             ))}
                             {showcase.tags.length > 3 && (
-                                <span className="text-xs text-surface-400">+{showcase.tags.length - 3}</span>
+                                <span className="text-xs text-surface-400">+{formatNumber(showcase.tags.length - 3)}</span>
                             )}
                         </div>
                     )}
@@ -105,7 +108,7 @@ export default function ShowcaseCard({ showcase, onVote, isVoting }: ShowcaseCar
                         {showcase.review_count > 0 && (
                             <div className="flex items-center gap-1 text-xs text-surface-500 dark:text-surface-400">
                                 <MessageSquare className="w-3.5 h-3.5" />
-                                <span>{showcase.review_count}</span>
+                                <span>{formatNumber(showcase.review_count)}</span>
                             </div>
                         )}
 
@@ -113,7 +116,7 @@ export default function ShowcaseCard({ showcase, onVote, isVoting }: ShowcaseCar
                         {showcase.average_rating > 0 && (
                             <div className="flex items-center gap-1 text-xs text-amber-500">
                                 <Star className="w-3.5 h-3.5 fill-current" />
-                                <span>{showcase.average_rating.toFixed(1)}</span>
+                                <span>{formatNumber(showcase.average_rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                             </div>
                         )}
                     </div>
@@ -133,7 +136,7 @@ export default function ShowcaseCard({ showcase, onVote, isVoting }: ShowcaseCar
                     `}
                 >
                     <ChevronUp className={`w-5 h-5 -mb-0.5 ${showcase.user_has_voted ? 'text-primary-600 dark:text-primary-400' : ''}`} />
-                    <span className="text-sm font-semibold">{showcase.vote_count}</span>
+                    <span className="text-sm font-semibold">{formatNumber(showcase.vote_count)}</span>
                 </button>
             </div>
         </Link>

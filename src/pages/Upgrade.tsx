@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Crown, CheckCircle, MessageSquare, Users, Calendar, Star, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
@@ -6,6 +9,7 @@ import { APP_CONFIG } from '@/config/app';
 import { subscriptionService } from '@/services/subscription';
 
 export default function Upgrade() {
+    useTranslation();
     const { profile, isPremium } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -17,7 +21,7 @@ export default function Upgrade() {
             const url = await subscriptionService.createCheckoutSession();
             window.location.href = url;
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to start checkout');
+            setError(err instanceof Error ? localizeError(err.message) : t("billing:failedToStartCheckout"));
             setIsLoading(false);
         }
     };
@@ -25,33 +29,33 @@ export default function Upgrade() {
     const premiumFeatures = [
         {
             icon: MessageSquare,
-            title: 'Direct Messaging',
-            description: 'Send private messages to any community member',
+            title: t("billing:directMessaging"),
+            description: t("billing:sendPrivateMessagesToAnyCommunityMember"),
         },
         {
             icon: Users,
-            title: 'Premium Groups',
-            description: 'Access exclusive premium-only classrooms and content',
+            title: t("billing:premiumGroups"),
+            description: t("billing:accessExclusivePremiumOnlyClassroomsAndContent"),
         },
         {
             icon: Calendar,
-            title: 'Priority Events',
-            description: 'Early access to events and exclusive workshops',
+            title: t("billing:priorityEvents"),
+            description: t("billing:earlyAccessToEventsAndExclusiveWorkshops"),
         },
         {
             icon: Star,
-            title: 'Premium Badge',
-            description: 'Stand out with a premium badge on your profile',
+            title: t("billing:premiumBadge"),
+            description: t("billing:standOutWithAPremiumBadgeOnYourProfile"),
         },
     ];
 
     const benefits = [
-        'Unlimited direct messaging',
-        'Access to all premium classrooms',
-        'Priority support from the team',
-        'Exclusive content and resources',
-        'Early access to new features',
-        'Premium profile badge',
+        t("billing:unlimitedDirectMessaging"),
+        t("billing:accessToAllPremiumClassrooms"),
+        t("billing:prioritySupportFromTheTeam"),
+        t("billing:exclusiveContentAndResources"),
+        t("billing:earlyAccessToNewFeatures"),
+        t("billing:premiumProfileBadge"),
     ];
 
     // If user is already premium, show a different message
@@ -63,17 +67,15 @@ export default function Upgrade() {
                         <Crown className="w-10 h-10 text-white" />
                     </div>
                     <h1 className="text-3xl font-bold text-surface-900 dark:text-surface-100 mb-2">
-                        You're Already Premium!
-                    </h1>
+                        {t("billing:youReAlreadyPremium")}</h1>
                     <p className="text-surface-500 dark:text-surface-400 mb-6">
-                        Thank you for being a premium member. You have full access to all features.
-                    </p>
+                        {t("billing:thankYouForBeingAPremiumMemberYouHave")}</p>
                     <Link
                         to="/"
                         className="btn-primary inline-flex items-center gap-2"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        <span>Back to Community</span>
+                        <span>{t("billing:backToCommunity")}</span>
                     </Link>
                 </div>
             </div>
@@ -88,11 +90,8 @@ export default function Upgrade() {
                     <Crown className="w-10 h-10 text-white" />
                 </div>
                 <h1 className="text-4xl font-bold text-surface-900 dark:text-surface-100 mb-3">
-                    Upgrade to Premium
-                </h1>
-                <p className="text-lg text-surface-500 dark:text-surface-400 max-w-xl mx-auto">
-                    Unlock all features and get the most out of {APP_CONFIG.name}
-                </p>
+                    {t("billing:upgradeToPremium")}</h1>
+                <p className="text-lg text-surface-500 dark:text-surface-400 max-w-xl mx-auto">{t("billing:unlockAllFeaturesAndGetTheMostOutOf", { value1: APP_CONFIG.name })}</p>
             </div>
 
             {/* Features Grid */}
@@ -121,8 +120,7 @@ export default function Upgrade() {
                     {/* Benefits List */}
                     <div>
                         <h2 className="text-xl font-bold text-surface-900 dark:text-surface-100 mb-4">
-                            Everything you get with Premium:
-                        </h2>
+                            {t("billing:everythingYouGetWithPremium")}</h2>
                         <ul className="space-y-3">
                             {benefits.map((benefit, index) => (
                                 <li key={index} className="flex items-center gap-3">
@@ -137,17 +135,15 @@ export default function Upgrade() {
                     <div className="text-center">
                         <div className="bg-white dark:bg-surface-800 rounded-xl p-6 border border-surface-200 dark:border-surface-700">
                             <p className="text-sm text-surface-500 dark:text-surface-400 mb-2">
-                                Premium Membership
-                            </p>
+                                {t("billing:premiumMembership")}</p>
                             <div className="mb-4">
                                 <span className="text-4xl font-bold text-surface-900 dark:text-surface-100">
-                                    Join Now
-                                </span>
+                                    {t("billing:joinNow")}</span>
                             </div>
 
                             {error && (
                                 <p className="text-sm text-red-600 dark:text-red-400 mb-3">
-                                    {error}
+                                    {localizeError(error)}
                                 </p>
                             )}
 
@@ -159,18 +155,17 @@ export default function Upgrade() {
                                 {isLoading ? (
                                     <>
                                         <Loader2 className="w-5 h-5 animate-spin" />
-                                        <span>Redirecting to checkout...</span>
+                                        <span>{t("billing:redirectingToCheckout")}</span>
                                     </>
                                 ) : (
                                     <>
-                                        <span>Get Premium Access</span>
+                                        <span>{t("billing:getPremiumAccess")}</span>
                                         <ArrowRight className="w-5 h-5" />
                                     </>
                                 )}
                             </button>
                             <p className="text-xs text-surface-400 dark:text-surface-500 mt-4">
-                                Secure checkout via Stripe
-                            </p>
+                                {t("billing:secureCheckoutViaStripe")}</p>
                         </div>
                     </div>
                 </div>
@@ -180,11 +175,10 @@ export default function Upgrade() {
             {profile && (
                 <div className="mt-8 text-center">
                     <p className="text-sm text-surface-500 dark:text-surface-400">
-                        Signed in as <span className="font-medium">{profile.display_name}</span>
+                        {t("billing:signedInAs")} <span className="font-medium">{profile.display_name}</span>
                     </p>
                     <p className="text-xs text-surface-400 dark:text-surface-500 mt-1">
-                        Your account will be automatically upgraded after purchase
-                    </p>
+                        {t("billing:yourAccountWillBeAutomaticallyUpgradedAfterPurchase")}</p>
                 </div>
             )}
 
@@ -195,7 +189,7 @@ export default function Upgrade() {
                     className="inline-flex items-center gap-2 text-surface-500 hover:text-surface-700 dark:text-surface-400 dark:hover:text-surface-300 transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    <span>Back to Community</span>
+                    <span>{t("billing:backToCommunity")}</span>
                 </Link>
             </div>
         </div>

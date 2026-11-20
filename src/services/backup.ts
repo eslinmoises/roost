@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { supabase } from './supabase';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -26,7 +27,7 @@ export interface BackupListResponse {
 async function getAuthHeaders(): Promise<Record<string, string>> {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) {
-        throw new Error('Not authenticated');
+        throw new Error(t("errors:notAuthenticated"));
     }
     return {
         'Content-Type': 'application/json',
@@ -48,7 +49,7 @@ export const backupService = {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || data.message || 'Failed to trigger backup');
+            throw new Error(data.error || data.message || t("errors:failedToTriggerBackup"));
         }
 
         return data;
@@ -67,7 +68,7 @@ export const backupService = {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || data.message || 'Failed to list backups');
+            throw new Error(data.error || data.message || t("errors:failedToListBackups"));
         }
 
         return data;
@@ -86,7 +87,7 @@ export const backupService = {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || data.message || 'Failed to get download URL');
+            throw new Error(data.error || data.message || t("errors:failedToGetDownloadURL"));
         }
 
         return data.downloadUrl;
@@ -99,7 +100,7 @@ export const backupService = {
         const response = await fetch(`${API_URL}/api/backup/file/${encodeURIComponent(filename)}`, {
             headers: await getAuthHeaders(),
         });
-        if (!response.ok) throw new Error('Failed to download backup');
+        if (!response.ok) throw new Error(t("errors:failedToDownloadBackup"));
         const url = URL.createObjectURL(await response.blob());
         const link = document.createElement('a');
         link.href = url;

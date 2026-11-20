@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { Link } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
 import type { Profile } from '@/types/database';
@@ -8,6 +10,7 @@ interface MemberCardProps {
 }
 
 export function MemberCard({ member }: MemberCardProps) {
+    useTranslation();
     const isOnline = member.is_online;
     const isPremium = member.membership_type === 'premium';
 
@@ -30,7 +33,7 @@ export function MemberCard({ member }: MemberCardProps) {
                         )}
                     </div>
                     {isOnline && (
-                        <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white dark:border-surface-900 rounded-full" title="Online" />
+                        <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white dark:border-surface-900 rounded-full" title={t("profile:online")} />
                     )}
                 </div>
 
@@ -56,8 +59,7 @@ export function MemberCard({ member }: MemberCardProps) {
                     </p>
                 ) : (
                     <p className="text-sm text-surface-400 dark:text-surface-500 italic">
-                        No bio available
-                    </p>
+                        {t("profile:noBioAvailable")}</p>
                 )}
             </div>
 
@@ -67,15 +69,13 @@ export function MemberCard({ member }: MemberCardProps) {
                     to={`/profile/${member.username}`}
                     className="flex items-center justify-center px-3 py-2 rounded-lg bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors text-xs font-medium"
                 >
-                    Profile
-                </Link>
+                    {t("profile:profile")}</Link>
                 <Link
                     to={`/messages/${member.id}`}
                     className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary-600 text-white hover:bg-primary-700 transition-colors text-xs font-medium dark:bg-black dark:hover:bg-black"
                 >
                     <MessageCircle className="w-3.5 h-3.5" />
-                    Message
-                </Link>
+                    {t("profile:message")}</Link>
             </div>
         </div>
     );

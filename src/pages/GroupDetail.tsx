@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2, Crown, ArrowLeft } from 'lucide-react';
@@ -9,6 +12,7 @@ import { DefaultGroupLayout, SidebarGroupLayout, LearnGroupLayout } from '@/comp
 import type { TabValue } from '@/components/groups/GroupTabs';
 
 export default function GroupDetail() {
+    useTranslation();
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
     const { user, isPremium } = useAuth();
@@ -27,13 +31,13 @@ export default function GroupDetail() {
             setError(null);
             const data = await getGroupBySlug(slug, user?.id);
             if (!data) {
-                setError('Classroom not found');
+                setError(t("groups:classroomNotFound"));
             } else {
                 setGroup(data);
             }
         } catch (err) {
             console.error('Error fetching group:', err);
-            setError('Failed to load classroom');
+            setError(t("groups:failedToLoadClassroom"));
         } finally {
             setIsLoading(false);
         }
@@ -58,7 +62,7 @@ export default function GroupDetail() {
             } : null);
         } catch (err) {
             console.error('Error joining group:', err);
-            alert('Failed to join classroom');
+            alert(t("groups:failedToJoinClassroom"));
         } finally {
             setIsJoining(false);
         }
@@ -67,7 +71,7 @@ export default function GroupDetail() {
     const handleLeave = async () => {
         if (!user || !group) return;
 
-        if (!confirm('Are you sure you want to leave this classroom?')) return;
+        if (!confirm(t("groups:areYouSureYouWantToLeaveThisClassroom"))) return;
 
         try {
             setIsLeaving(true);
@@ -81,7 +85,7 @@ export default function GroupDetail() {
             } : null);
         } catch (err) {
             console.error('Error leaving group:', err);
-            alert(err instanceof Error ? err.message : 'Failed to leave classroom');
+            alert(err instanceof Error ? localizeError(err.message) : t("groups:failedToLeaveClassroom"));
         } finally {
             setIsLeaving(false);
         }
@@ -100,17 +104,15 @@ export default function GroupDetail() {
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="text-center py-12">
                     <h2 className="text-xl font-semibold text-surface-900 dark:text-surface-50 mb-2">
-                        {error || 'Classroom not found'}
+                        {error || t("groups:classroomNotFound")}
                     </h2>
                     <p className="text-surface-500 dark:text-surface-400 mb-4">
-                        The classroom you're looking for doesn't exist or you don't have access.
-                    </p>
+                        {t("groups:theClassroomYouReLookingForDoesnTExist")}</p>
                     <button
                         onClick={() => navigate('/classrooms')}
                         className="px-4 py-2 text-primary-600 dark:text-primary-400 font-medium hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
                     >
-                        Browse Classrooms
-                    </button>
+                        {t("groups:browseClassrooms")}</button>
                 </div>
             </div>
         );
@@ -129,14 +131,11 @@ export default function GroupDetail() {
                         <Crown className="w-10 h-10 text-white" />
                     </div>
                     <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">
-                        Premium Classroom
-                    </h1>
+                        {t("groups:premiumClassroom")}</h1>
                     <p className="text-surface-500 dark:text-surface-400 mb-2">
-                        <span className="font-semibold text-surface-700 dark:text-surface-300">{group.name}</span> is a premium-only classroom.
-                    </p>
+                        <span className="font-semibold text-surface-700 dark:text-surface-300">{group.name}</span> {t("groups:isAPremiumOnlyClassroom")}</p>
                     <p className="text-surface-500 dark:text-surface-400 mb-6">
-                        Upgrade to premium to access this classroom and all its content.
-                    </p>
+                        {t("groups:upgradeToPremiumToAccessThisClassroomAndAll")}</p>
 
                     {group.description && (
                         <div className="bg-surface-50 dark:bg-surface-800 rounded-lg p-4 mb-6 text-left">
@@ -152,14 +151,14 @@ export default function GroupDetail() {
                             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-lg transition-all"
                         >
                             <Crown className="w-5 h-5" />
-                            <span>Upgrade to Premium</span>
+                            <span>{t("groups:upgradeToPremium")}</span>
                         </Link>
                         <button
                             onClick={() => navigate('/classrooms')}
                             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 font-medium rounded-lg hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors"
                         >
                             <ArrowLeft className="w-5 h-5" />
-                            <span>Back to Classrooms</span>
+                            <span>{t("groups:backToClassrooms")}</span>
                         </button>
                     </div>
                 </div>

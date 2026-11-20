@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useRef } from 'react';
 import { Camera, Loader2, X } from 'lucide-react';
 import { uploadAvatar } from '@/services/s3';
@@ -24,6 +27,7 @@ export default function AvatarUpload({
     onUpload,
     size = 'lg',
 }: AvatarUploadProps) {
+    useTranslation();
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -39,13 +43,13 @@ export default function AvatarUpload({
 
         // Validate file type
         if (!file.type.startsWith('image/')) {
-            setError('Please select an image file');
+            setError(t("profile:pleaseSelectAnImageFile"));
             return;
         }
 
         // Validate file size (5MB)
         if (file.size > 5 * 1024 * 1024) {
-            setError('Image must be less than 5MB');
+            setError(t("profile:imageMustBeLessThan5MB"));
             return;
         }
 
@@ -60,7 +64,7 @@ export default function AvatarUpload({
             const result = await uploadAvatar(file, userId);
             onUpload(result.url);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Upload failed');
+            setError(err instanceof Error ? localizeError(err.message) : t("profile:uploadFailed"));
             setPreviewUrl(null);
         } finally {
             setIsUploading(false);
@@ -99,7 +103,7 @@ export default function AvatarUpload({
                     {displayUrl ? (
                         <img
                             src={displayUrl}
-                            alt={displayName || 'Avatar'}
+                            alt={displayName || t("common:uiAvatar")}
                             className="w-full h-full object-cover"
                         />
                     ) : (
@@ -130,14 +134,13 @@ export default function AvatarUpload({
             {error && (
                 <div className="flex items-center gap-1 text-sm text-error">
                     <X className="w-4 h-4" />
-                    <span>{error}</span>
+                    <span>{localizeError(error)}</span>
                 </div>
             )}
 
             {/* Helper text */}
             <p className="text-xs text-surface-400 dark:text-surface-500">
-                Click to upload • Max 5MB
-            </p>
+                {t("profile:clickToUploadMax5MB")}</p>
         </div>
     );
 }

@@ -1,3 +1,7 @@
+import { formatNumber } from '@/lib/locale';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
@@ -38,6 +42,7 @@ const FOLLOW_LIST_PAGE_SIZE = 20;
 type ProfileTab = 'posts' | 'activity' | 'followers' | 'following';
 
 export default function ProfilePage() {
+    useTranslation();
     const { username } = useParams<{ username: string }>();
     const { profile: authProfile } = useAuth();
     const navigate = useNavigate();
@@ -98,12 +103,12 @@ export default function ProfilePage() {
                 try {
                     const data = await getProfileByUsername(username);
                     if (!data) {
-                        setError('User not found');
+                        setError(t("profile:userNotFound"));
                     } else {
                         setProfile(data);
                     }
                 } catch (err) {
-                    setError('Failed to load profile');
+                    setError(t("profile:failedToLoadProfile"));
                     console.error(err);
                 } finally {
                     setIsLoading(false);
@@ -303,14 +308,14 @@ export default function ProfilePage() {
     }, [postsHasMore, postsLoadingMore, postsLoading, activeTab, loadMorePosts]);
 
     const handlePostDeleted = async (postId: string) => {
-        if (!window.confirm('Delete this post permanently?')) return;
+        if (!window.confirm(t("profile:deleteThisPostPermanently"))) return;
         try {
             await deletePost(postId);
             setPosts(prev => prev.filter(p => p.id !== postId));
             setUserStats(prev => ({ ...prev, postsCount: Math.max(0, prev.postsCount - 1) }));
         } catch (err) {
             console.error('Failed to delete post:', err);
-            window.alert('The post could not be deleted.');
+            window.alert(t("profile:thePostCouldNotBeDeleted"));
         }
     };
 
@@ -460,20 +465,18 @@ export default function ProfilePage() {
         return (
             <div className="max-w-2xl mx-auto px-4 py-12 text-center">
                 <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">
-                    {error || 'User not found'}
+                    {error || t("profile:userNotFound")}
                 </h1>
                 <p className="text-surface-500 dark:text-surface-400 mb-6">
-                    The profile you're looking for doesn't exist or has been removed.
-                </p>
+                    {t("profile:theProfileYouReLookingForDoesnTExist")}</p>
                 <Link to="/" className="btn-primary">
-                    Go Home
-                </Link>
+                    {t("profile:goHome")}</Link>
             </div>
         );
     }
 
     // Format join date
-    const joinDate = new Date(displayProfile.created_at || Date.now()).toLocaleDateString('en-US', {
+    const joinDate = new Date(displayProfile.created_at || Date.now()).toLocaleDateString(activeLanguage(), {
         month: 'long',
         year: 'numeric',
     });
@@ -481,10 +484,10 @@ export default function ProfilePage() {
     const isPremium = displayProfile.membership_type === 'premium';
 
     const TABS: { id: ProfileTab; label: string; count?: number }[] = [
-        { id: 'posts', label: 'Posts', count: userStats.postsCount },
-        { id: 'activity', label: 'Point Activity' },
-        { id: 'followers', label: 'Followers', count: followerCount },
-        { id: 'following', label: 'Following', count: followingCount },
+        { id: 'posts', label: t("profile:posts"), count: userStats.postsCount },
+        { id: 'activity', label: t("profile:pointActivity") },
+        { id: 'followers', label: t("profile:followers"), count: followerCount },
+        { id: 'following', label: t("profile:following"), count: followingCount },
     ];
 
     const renderUserRow = (user: Profile, followStatus: Set<string>, listType: 'followers' | 'following') => {
@@ -522,7 +525,7 @@ export default function ProfilePage() {
                                 : 'bg-primary-600 text-white hover:bg-primary-700'
                         }`}
                     >
-                        {isFollowed ? 'Following' : 'Follow'}
+                        {isFollowed ? t("common:uiFollowing") : t("common:uiFollow")}
                     </button>
                 )}
             </div>
@@ -583,7 +586,7 @@ export default function ProfilePage() {
                                 {isOwnProfile ? (
                                     <Link to="/settings" className="btn-secondary">
                                         <Settings className="w-4 h-4" />
-                                        <span>Edit Profile</span>
+                                        <span>{t("profile:editProfile")}</span>
                                     </Link>
                                 ) : (
                                     <div className="flex items-center justify-center sm:justify-start gap-2">
@@ -597,14 +600,14 @@ export default function ProfilePage() {
                                             ) : (
                                                 <UserPlus className="w-4 h-4" />
                                             )}
-                                            <span>{isFollowedByMe ? 'Following' : 'Follow'}</span>
+                                            <span>{isFollowedByMe ? t("common:uiFollowing") : t("common:uiFollow")}</span>
                                         </button>
                                         <button
                                             onClick={() => navigate(`/messages/${displayProfile.id}`)}
                                             className="btn-secondary"
                                         >
                                             <MessageSquare className="w-4 h-4" />
-                                            <span>Message</span>
+                                            <span>{t("profile:message")}</span>
                                         </button>
                                     </div>
                                 )}
@@ -631,12 +634,12 @@ export default function ProfilePage() {
                                         className="flex items-center gap-1 text-primary-600 hover:text-primary-700"
                                     >
                                         <LinkIcon className="w-4 h-4" />
-                                        <span>Website</span>
+                                        <span>{t("profile:website")}</span>
                                     </a>
                                 )}
                                 <div className="flex items-center gap-1">
                                     <Calendar className="w-4 h-4" />
-                                    <span>Joined {joinDate}</span>
+                                    <span>{t("profile:joined", { value1: joinDate })}</span>
                                 </div>
                             </div>
                         </div>
@@ -647,40 +650,38 @@ export default function ProfilePage() {
                         <div className="grid grid-cols-3 sm:grid-cols-5 gap-4 text-center items-center">
                             <button onClick={() => setActiveTab('followers')} className="group">
                                 <div className="text-2xl font-bold text-surface-900 dark:text-surface-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                                    {followerCount}
+                                    {formatNumber(followerCount)}
                                 </div>
-                                <div className="text-sm text-surface-500 dark:text-surface-400">Followers</div>
+                                <div className="text-sm text-surface-500 dark:text-surface-400">{t("profile:followers")}</div>
                             </button>
                             <button onClick={() => setActiveTab('following')} className="group">
                                 <div className="text-2xl font-bold text-surface-900 dark:text-surface-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                                    {followingCount}
+                                    {formatNumber(followingCount)}
                                 </div>
-                                <div className="text-sm text-surface-500 dark:text-surface-400">Following</div>
+                                <div className="text-sm text-surface-500 dark:text-surface-400">{t("profile:following")}</div>
                             </button>
                             <div>
                                 <div className="text-2xl font-bold text-surface-900 dark:text-surface-100">
-                                    {userStats.postsCount}
+                                    {formatNumber(userStats.postsCount)}
                                 </div>
-                                <div className="text-sm text-surface-500 dark:text-surface-400">Posts</div>
+                                <div className="text-sm text-surface-500 dark:text-surface-400">{t("profile:posts")}</div>
                             </div>
                             <div>
                                 <div className="text-2xl font-bold text-surface-900 dark:text-surface-100">
-                                    {userStats.commentsCount}
+                                    {formatNumber(userStats.commentsCount)}
                                 </div>
-                                <div className="text-sm text-surface-500 dark:text-surface-400">Comments</div>
+                                <div className="text-sm text-surface-500 dark:text-surface-400">{t("profile:comments")}</div>
                             </div>
                             <div>
                                 <div className="flex items-center justify-center gap-2 mb-2">
                                     {userRank && <UserRankBadge rank={userRank.rank} size="sm" />}
                                 </div>
                                 <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                                    {userRank ? userRank.points.toLocaleString() : '0'}
+                                    {userRank ? userRank.points.toLocaleString(activeLanguage()) : '0'}
                                 </div>
-                                <div className="text-sm text-surface-500 dark:text-surface-400">Points</div>
+                                <div className="text-sm text-surface-500 dark:text-surface-400">{t("profile:points")}</div>
                                 {userRank && (
-                                    <div className="text-xs text-surface-400 dark:text-surface-500 mt-1">
-                                        Rank #{userRank.rank}
-                                    </div>
+                                    <div className="text-xs text-surface-400 dark:text-surface-500 mt-1">{t("profile:rank", { value1: userRank.rank })}</div>
                                 )}
                             </div>
                         </div>
@@ -704,7 +705,7 @@ export default function ProfilePage() {
                             {tab.label}
                             {tab.count !== undefined && (
                                 <span className="ml-1.5 text-xs text-surface-400 dark:text-surface-500">
-                                    {tab.count}
+                                    {formatNumber(tab.count)}
                                 </span>
                             )}
                         </button>
@@ -725,7 +726,7 @@ export default function ProfilePage() {
                             <div className="card p-8 text-center">
                                 <FileText className="w-12 h-12 mx-auto mb-3 text-surface-300 dark:text-surface-600" />
                                 <p className="text-surface-500 dark:text-surface-400">
-                                    {isOwnProfile ? "You haven't created any posts yet." : "This user hasn't created any posts yet."}
+                                    {isOwnProfile ? t("profile:youHavenTCreatedAnyPostsYet") : t("profile:thisUserHasnTCreatedAnyPostsYet")}
                                 </p>
                             </div>
                         ) : (
@@ -743,12 +744,11 @@ export default function ProfilePage() {
                                         {postsLoadingMore ? (
                                             <div className="flex items-center justify-center gap-2 text-surface-500 dark:text-surface-400">
                                                 <Loader2 className="w-5 h-5 animate-spin" />
-                                                <span className="text-sm">Loading more posts...</span>
+                                                <span className="text-sm">{t("profile:loadingMorePosts")}</span>
                                             </div>
                                         ) : (
                                             <span className="text-sm text-surface-400 dark:text-surface-500">
-                                                Scroll for more
-                                            </span>
+                                                {t("profile:scrollForMore")}</span>
                                         )}
                                     </div>
                                 )}
@@ -775,7 +775,7 @@ export default function ProfilePage() {
                             <div className="card p-8 text-center">
                                 <Users className="w-12 h-12 mx-auto mb-3 text-surface-300 dark:text-surface-600" />
                                 <p className="text-surface-500 dark:text-surface-400">
-                                    {isOwnProfile ? "You don't have any followers yet." : "This user doesn't have any followers yet."}
+                                    {isOwnProfile ? t("profile:youDonTHaveAnyFollowersYet") : t("profile:thisUserDoesnTHaveAnyFollowersYet")}
                                 </p>
                             </div>
                         ) : (
@@ -787,12 +787,11 @@ export default function ProfilePage() {
                                         {followersLoadingMore ? (
                                             <div className="flex items-center justify-center gap-2 text-surface-500 dark:text-surface-400">
                                                 <Loader2 className="w-5 h-5 animate-spin" />
-                                                <span className="text-sm">Loading more...</span>
+                                                <span className="text-sm">{t("profile:loadingMore")}</span>
                                             </div>
                                         ) : (
                                             <span className="text-sm text-surface-400 dark:text-surface-500">
-                                                Scroll for more
-                                            </span>
+                                                {t("profile:scrollForMore")}</span>
                                         )}
                                     </div>
                                 )}
@@ -812,7 +811,7 @@ export default function ProfilePage() {
                             <div className="card p-8 text-center">
                                 <Users className="w-12 h-12 mx-auto mb-3 text-surface-300 dark:text-surface-600" />
                                 <p className="text-surface-500 dark:text-surface-400">
-                                    {isOwnProfile ? "You aren't following anyone yet." : "This user isn't following anyone yet."}
+                                    {isOwnProfile ? t("profile:youArenTFollowingAnyoneYet") : t("profile:thisUserIsnTFollowingAnyoneYet")}
                                 </p>
                             </div>
                         ) : (
@@ -824,12 +823,11 @@ export default function ProfilePage() {
                                         {followingLoadingMore ? (
                                             <div className="flex items-center justify-center gap-2 text-surface-500 dark:text-surface-400">
                                                 <Loader2 className="w-5 h-5 animate-spin" />
-                                                <span className="text-sm">Loading more...</span>
+                                                <span className="text-sm">{t("profile:loadingMore")}</span>
                                             </div>
                                         ) : (
                                             <span className="text-sm text-surface-400 dark:text-surface-500">
-                                                Scroll for more
-                                            </span>
+                                                {t("profile:scrollForMore")}</span>
                                         )}
                                     </div>
                                 )}

@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import type {
     Profile,
     Showcase,
@@ -84,21 +85,21 @@ export interface ShowcaseStats {
 
 // Category display info
 export const SHOWCASE_CATEGORY_INFO: Record<ShowcaseCategory, { label: string; icon: string; color: string }> = {
-    web_app: { label: 'Web App', icon: 'Globe', color: '#3B82F6' },
-    mobile_app: { label: 'Mobile App', icon: 'Smartphone', color: '#8B5CF6' },
-    saas: { label: 'SaaS', icon: 'Cloud', color: '#06B6D4' },
-    tool: { label: 'Tool', icon: 'Wrench', color: '#F59E0B' },
-    api: { label: 'API', icon: 'Code', color: '#10B981' },
-    website: { label: 'Website', icon: 'Layout', color: '#EC4899' },
-    game: { label: 'Game', icon: 'Gamepad2', color: '#EF4444' },
-    extension: { label: 'Extension', icon: 'Puzzle', color: '#84CC16' },
-    other: { label: 'Other', icon: 'Package', color: '#6B7280' },
+    web_app: { get label() { return t("common:metaWebApp"); }, icon: 'Globe', color: '#3B82F6' },
+    mobile_app: { get label() { return t("common:metaMobileApp"); }, icon: 'Smartphone', color: '#8B5CF6' },
+    saas: { get label() { return t("common:metaSaaS"); }, icon: 'Cloud', color: '#06B6D4' },
+    tool: { get label() { return t("common:metaTool"); }, icon: 'Wrench', color: '#F59E0B' },
+    api: { get label() { return t("common:metaAPI"); }, icon: 'Code', color: '#10B981' },
+    website: { get label() { return t("common:metaWebsite"); }, icon: 'Layout', color: '#EC4899' },
+    game: { get label() { return t("common:metaGame"); }, icon: 'Gamepad2', color: '#EF4444' },
+    extension: { get label() { return t("common:metaExtension"); }, icon: 'Puzzle', color: '#84CC16' },
+    other: { get label() { return t("common:metaOther"); }, icon: 'Package', color: '#6B7280' },
 };
 
 // Status display info
 export const SHOWCASE_STATUS_INFO: Record<ShowcaseStatus, { label: string; color: string; bgColor: string }> = {
-    pending: { label: 'Pending Review', color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
-    approved: { label: 'Approved', color: 'text-green-600', bgColor: 'bg-green-100' },
-    rejected: { label: 'Rejected', color: 'text-red-600', bgColor: 'bg-red-100' },
-    featured: { label: 'Featured', color: 'text-purple-600', bgColor: 'bg-purple-100' },
+    pending: { get label() { return t("common:metaPendingReview"); }, color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
+    approved: { get label() { return t("common:metaApproved"); }, color: 'text-green-600', bgColor: 'bg-green-100' },
+    rejected: { get label() { return t("common:metaRejected"); }, color: 'text-red-600', bgColor: 'bg-red-100' },
+    featured: { get label() { return t("common:metaFeatured"); }, color: 'text-purple-600', bgColor: 'bg-purple-100' },
 };

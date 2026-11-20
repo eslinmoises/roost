@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Loader2, Lightbulb, Bug, Sparkles, Upload, Trash2 } from 'lucide-react';
@@ -16,12 +19,13 @@ interface SubmitRequestModalProps {
 }
 
 const REQUEST_TYPES: { value: FeatureRequestType; label: string; icon: typeof Lightbulb; description: string }[] = [
-    { value: 'feature_request', label: 'Feature Request', icon: Lightbulb, description: 'Suggest a new feature' },
-    { value: 'bug_report', label: 'Bug Report', icon: Bug, description: 'Report something broken' },
-    { value: 'improvement', label: 'Improvement', icon: Sparkles, description: 'Improve existing functionality' },
+    { value: 'feature_request', get label() { return t("roadmap:featureRequest"); }, icon: Lightbulb, get description() { return t("roadmap:suggestANewFeature"); } },
+    { value: 'bug_report', get label() { return t("roadmap:bugReport"); }, icon: Bug, get description() { return t("roadmap:reportSomethingBroken"); } },
+    { value: 'improvement', get label() { return t("roadmap:improvement"); }, icon: Sparkles, get description() { return t("roadmap:improveExistingFunctionality"); } },
 ];
 
 export default function SubmitRequestModal({ isOpen, onClose, onSuccess }: SubmitRequestModalProps) {
+    useTranslation();
     const { user } = useAuth();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -53,7 +57,7 @@ export default function SubmitRequestModal({ isOpen, onClose, onSuccess }: Submi
                 }
 
                 if (file.size > 10 * 1024 * 1024) {
-                    setError(`File ${file.name} is too large. Maximum size is 10MB.`);
+                    setError(t("roadmap:fileIsTooLargeMaximumSizeIs10MB", { value1: file.name }));
                     continue;
                 }
 
@@ -76,7 +80,7 @@ export default function SubmitRequestModal({ isOpen, onClose, onSuccess }: Submi
             }
         } catch (err) {
             console.error('Upload failed:', err);
-            setError(err instanceof Error ? err.message : 'Failed to upload images');
+            setError(err instanceof Error ? localizeError(err.message) : t("roadmap:failedToUploadImages"));
         } finally {
             setIsUploading(false);
             setUploadProgress(0);
@@ -136,7 +140,7 @@ export default function SubmitRequestModal({ isOpen, onClose, onSuccess }: Submi
             onClose();
         } catch (err) {
             console.error('Error submitting request:', err);
-            setError('Failed to submit request. Please try again.');
+            setError(t("roadmap:failedToSubmitRequestPleaseTryAgain"));
         } finally {
             setIsSubmitting(false);
         }
@@ -157,8 +161,7 @@ export default function SubmitRequestModal({ isOpen, onClose, onSuccess }: Submi
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-surface-200 dark:border-surface-700">
                     <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">
-                        Submit Request
-                    </h2>
+                        {t("roadmap:submitRequest")}</h2>
                     <button
                         onClick={onClose}
                         className="p-1.5 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 text-surface-500 transition-colors"
@@ -174,8 +177,7 @@ export default function SubmitRequestModal({ isOpen, onClose, onSuccess }: Submi
                     {/* Type selector */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Type
-                        </label>
+                            {t("roadmap:type")}</label>
                         <div className="grid grid-cols-3 gap-2">
                             {REQUEST_TYPES.map((rt) => {
                                 const Icon = rt.icon;
@@ -203,41 +205,35 @@ export default function SubmitRequestModal({ isOpen, onClose, onSuccess }: Submi
                     {/* Title */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
-                            Title
-                        </label>
+                            {t("roadmap:title")}</label>
                         <input
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Brief summary of your request..."
+                            placeholder={t("roadmap:briefSummaryOfYourRequest")}
                             maxLength={255}
                             className="w-full px-3 py-2.5 rounded-lg border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100 placeholder-surface-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                         />
-                        <p className="text-xs text-surface-400 mt-1">
-                            {title.length}/255 characters (min 5)
-                        </p>
+                        <p className="text-xs text-surface-400 mt-1">{t("roadmap:255CharactersMin5", { value1: title.length })}</p>
                     </div>
 
                     {/* Description */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
-                            Description
-                        </label>
+                            {t("roadmap:description")}</label>
                         <RichTextEditor
                             value={description}
                             onChange={setDescription}
-                            placeholder="Describe your request in detail..."
+                            placeholder={t("roadmap:describeYourRequestInDetail")}
                         />
                         <p className="text-xs text-surface-400 mt-1">
-                            Min 20 characters of text
-                        </p>
+                            {t("roadmap:min20CharactersOfText")}</p>
                     </div>
 
                     {/* Image Upload Zone */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
-                            Screenshots (optional)
-                        </label>
+                            {t("roadmap:screenshotsOptional")}</label>
                         <div
                             onClick={open}
                             className={`
@@ -253,19 +249,16 @@ export default function SubmitRequestModal({ isOpen, onClose, onSuccess }: Submi
                                 {isUploading ? (
                                     <>
                                         <Loader2 className="w-6 h-6 text-primary-500 animate-spin" />
-                                        <p className="text-sm text-surface-600 dark:text-surface-400">
-                                            Uploading... {uploadProgress}%
-                                        </p>
+                                        <p className="text-sm text-surface-600 dark:text-surface-400">{t("roadmap:uploading", { value1: uploadProgress })}</p>
                                     </>
                                 ) : (
                                     <>
                                         <Upload className={`w-6 h-6 ${isDragActive ? 'text-primary-500' : 'text-surface-400 dark:text-surface-500'}`} />
                                         <p className="text-sm text-surface-600 dark:text-surface-400">
-                                            {isDragActive ? 'Drop images here' : 'Drag & drop images, or click to select'}
+                                            {isDragActive ? t("roadmap:dropImagesHere") : t("roadmap:dragDropImagesOrClickToSelect")}
                                         </p>
                                         <p className="text-xs text-surface-400 dark:text-surface-500">
-                                            PNG, JPG, GIF, WebP up to 10MB each
-                                        </p>
+                                            {t("roadmap:pNGJPGGIFWebPUpTo10MBEach")}</p>
                                     </>
                                 )}
                             </div>
@@ -299,7 +292,7 @@ export default function SubmitRequestModal({ isOpen, onClose, onSuccess }: Submi
                     {/* Error message */}
                     {error && (
                         <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm">
-                            {error}
+                            {localizeError(error)}
                         </div>
                     )}
                 </div>
@@ -308,9 +301,7 @@ export default function SubmitRequestModal({ isOpen, onClose, onSuccess }: Submi
                 <div className="flex items-center justify-between px-6 py-4 border-t border-surface-200 dark:border-surface-700">
                     <div className="flex items-center gap-2">
                         {assets.length > 0 && (
-                            <span className="text-xs text-surface-500 dark:text-surface-400">
-                                {assets.length} image{assets.length !== 1 ? 's' : ''} attached
-                            </span>
+                            <span className="text-xs text-surface-500 dark:text-surface-400">{t("roadmap:imageAttached", { count: assets.length })}</span>
                         )}
                     </div>
                     <div className="flex items-center gap-3">
@@ -318,8 +309,7 @@ export default function SubmitRequestModal({ isOpen, onClose, onSuccess }: Submi
                             onClick={onClose}
                             className="px-4 py-2 rounded-lg text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
                         >
-                            Cancel
-                        </button>
+                            {t("roadmap:cancel")}</button>
                         <button
                             onClick={handleSubmit}
                             disabled={!canSubmit || isSubmitting || isUploading}
@@ -328,10 +318,9 @@ export default function SubmitRequestModal({ isOpen, onClose, onSuccess }: Submi
                             {isSubmitting ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    Submitting...
-                                </>
+                                    {t("roadmap:submitting")}</>
                             ) : (
-                                'Submit Request'
+                                t("roadmap:submitRequest")
                             )}
                         </button>
                     </div>

@@ -1,3 +1,8 @@
+import { formatNumber } from '@/lib/locale';
+import { localizeError } from '@/i18n/errors';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import {
     RefreshCw,
@@ -38,11 +43,12 @@ import type { ActivationRequestStatus } from '@/types/database';
 
 // Status badge helper
 function StatusBadge({ status }: { status: ActivationRequestStatus }) {
+    useTranslation();
     const config = {
-        pending: { label: 'Pending', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400', icon: Clock },
-        in_progress: { label: 'In Progress', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400', icon: Loader2 },
-        completed: { label: 'Completed', color: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400', icon: CheckCircle },
-        rejected: { label: 'Rejected', color: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400', icon: XCircle },
+        pending: { label: t("admin:pending"), color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400', icon: Clock },
+        in_progress: { label: t("admin:inProgress"), color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400', icon: Loader2 },
+        completed: { label: t("admin:completed"), color: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400', icon: CheckCircle },
+        rejected: { label: t("admin:rejected"), color: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400', icon: XCircle },
     };
     const { label, color, icon: Icon } = config[status] || config.pending;
 
@@ -55,6 +61,7 @@ function StatusBadge({ status }: { status: ActivationRequestStatus }) {
 }
 
 export default function AdminActivations() {
+    useTranslation();
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'products' | 'requests'>('requests');
 
@@ -178,7 +185,7 @@ export default function AdminActivations() {
             await fetchStats();
         } catch (err) {
             console.error('Failed to create product:', err);
-            alert('Failed to create product');
+            alert(t("admin:failedToCreateProduct"));
         } finally {
             setSaving(false);
         }
@@ -212,14 +219,14 @@ export default function AdminActivations() {
             await fetchProducts();
         } catch (err) {
             console.error('Failed to update product:', err);
-            alert('Failed to update product');
+            alert(t("admin:failedToUpdateProduct"));
         } finally {
             setSaving(false);
         }
     };
 
     const handleDeleteProduct = async (productId: string) => {
-        if (!confirm('Are you sure you want to delete this product? Existing requests will not be affected.')) {
+        if (!confirm(t("admin:areYouSureYouWantToDeleteThisProduct"))) {
             return;
         }
         try {
@@ -228,7 +235,7 @@ export default function AdminActivations() {
             await fetchStats();
         } catch (err) {
             console.error('Failed to delete product:', err);
-            alert('Failed to delete product');
+            alert(t("admin:failedToDeleteProduct"));
         }
     };
 
@@ -279,7 +286,7 @@ export default function AdminActivations() {
 
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.error || 'Failed to process request');
+                throw new Error(error.error || t("admin:failedToProcessRequest"));
             }
 
             setSelectedRequest(null);
@@ -289,7 +296,7 @@ export default function AdminActivations() {
             await fetchStats();
         } catch (err) {
             console.error('Failed to process request:', err);
-            alert(err instanceof Error ? err.message : 'Failed to process request');
+            alert(err instanceof Error ? localizeError(err.message) : t("admin:failedToProcessRequest"));
         } finally {
             setProcessing(false);
         }
@@ -310,11 +317,9 @@ export default function AdminActivations() {
                 <div>
                     <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 flex items-center gap-3">
                         <Key className="w-7 h-7 text-primary-500" />
-                        Product Activations
-                    </h1>
+                        {t("admin:productActivations")}</h1>
                     <p className="text-surface-500 dark:text-surface-400 mt-1">
-                        Manage activation products and process user requests
-                    </p>
+                        {t("admin:manageActivationProductsAndProcessUserRequests")}</p>
                 </div>
                 <button
                     onClick={() => {
@@ -325,8 +330,7 @@ export default function AdminActivations() {
                     className="flex items-center gap-2 px-4 py-2 bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 rounded-lg text-surface-700 dark:text-surface-300 transition-colors"
                 >
                     <RefreshCw className="w-4 h-4" />
-                    Refresh
-                </button>
+                    {t("admin:refresh")}</button>
             </div>
 
             {/* Stats Cards */}
@@ -337,8 +341,8 @@ export default function AdminActivations() {
                             <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                            <p className="text-xl font-bold text-surface-900 dark:text-surface-100">{stats?.total_products || 0}</p>
-                            <p className="text-xs text-surface-500 dark:text-surface-400">Products</p>
+                            <p className="text-xl font-bold text-surface-900 dark:text-surface-100">{formatNumber(stats?.total_products || 0)}</p>
+                            <p className="text-xs text-surface-500 dark:text-surface-400">{t("admin:products")}</p>
                         </div>
                     </div>
                 </div>
@@ -349,8 +353,8 @@ export default function AdminActivations() {
                             <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
                         </div>
                         <div>
-                            <p className="text-xl font-bold text-surface-900 dark:text-surface-100">{stats?.pending_requests || 0}</p>
-                            <p className="text-xs text-surface-500 dark:text-surface-400">Pending</p>
+                            <p className="text-xl font-bold text-surface-900 dark:text-surface-100">{formatNumber(stats?.pending_requests || 0)}</p>
+                            <p className="text-xs text-surface-500 dark:text-surface-400">{t("admin:pending")}</p>
                         </div>
                     </div>
                 </div>
@@ -361,8 +365,8 @@ export default function AdminActivations() {
                             <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                         </div>
                         <div>
-                            <p className="text-xl font-bold text-surface-900 dark:text-surface-100">{stats?.completed_this_month || 0}</p>
-                            <p className="text-xs text-surface-500 dark:text-surface-400">This Month</p>
+                            <p className="text-xl font-bold text-surface-900 dark:text-surface-100">{formatNumber(stats?.completed_this_month || 0)}</p>
+                            <p className="text-xs text-surface-500 dark:text-surface-400">{t("admin:thisMonth")}</p>
                         </div>
                     </div>
                 </div>
@@ -373,8 +377,8 @@ export default function AdminActivations() {
                             <Key className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div>
-                            <p className="text-xl font-bold text-surface-900 dark:text-surface-100">{stats?.total_requests || 0}</p>
-                            <p className="text-xs text-surface-500 dark:text-surface-400">Total Requests</p>
+                            <p className="text-xl font-bold text-surface-900 dark:text-surface-100">{formatNumber(stats?.total_requests || 0)}</p>
+                            <p className="text-xs text-surface-500 dark:text-surface-400">{t("admin:totalRequests")}</p>
                         </div>
                     </div>
                 </div>
@@ -391,10 +395,9 @@ export default function AdminActivations() {
                                 : 'border-transparent text-surface-500 hover:text-surface-700 dark:hover:text-surface-300'
                         }`}
                     >
-                        Requests
-                        {(stats?.pending_requests || 0) > 0 && (
+                        {t("admin:requests")}{(stats?.pending_requests || 0) > 0 && (
                             <span className="ml-2 px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full text-xs">
-                                {stats?.pending_requests}
+                                {formatNumber(stats?.pending_requests)}
                             </span>
                         )}
                     </button>
@@ -406,8 +409,7 @@ export default function AdminActivations() {
                                 : 'border-transparent text-surface-500 hover:text-surface-700 dark:hover:text-surface-300'
                         }`}
                     >
-                        Products
-                    </button>
+                        {t("admin:products")}</button>
                 </div>
             </div>
 
@@ -424,15 +426,15 @@ export default function AdminActivations() {
                             }}
                             className="px-3 py-2 border border-surface-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100"
                         >
-                            <option value="all">All Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="completed">Completed</option>
-                            <option value="rejected">Rejected</option>
+                            <option value="all">{t("admin:allStatus")}</option>
+                            <option value="pending">{t("admin:pending")}</option>
+                            <option value="in_progress">{t("admin:inProgress")}</option>
+                            <option value="completed">{t("admin:completed")}</option>
+                            <option value="rejected">{t("admin:rejected")}</option>
                         </select>
                         <input
                             type="text"
-                            placeholder="Search by website..."
+                            placeholder={t("admin:searchByWebsite")}
                             value={searchQuery}
                             onChange={(e) => {
                                 setSearchQuery(e.target.value);
@@ -447,19 +449,19 @@ export default function AdminActivations() {
                         {requests.length === 0 ? (
                             <div className="p-8 text-center text-surface-500 dark:text-surface-400">
                                 <Clock className="w-12 h-12 mx-auto text-surface-300 dark:text-surface-600 mb-3" />
-                                <p>No activation requests found</p>
+                                <p>{t("admin:noActivationRequestsFound")}</p>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full">
                                     <thead>
                                         <tr className="border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800">
-                                            <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">User</th>
-                                            <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">Product</th>
-                                            <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">Website</th>
-                                            <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">Status</th>
-                                            <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">Date</th>
-                                            <th className="text-right py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">Actions</th>
+                                            <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">{t("admin:user")}</th>
+                                            <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">{t("admin:product")}</th>
+                                            <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">{t("admin:website")}</th>
+                                            <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">{t("admin:status")}</th>
+                                            <th className="text-left py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">{t("admin:date")}</th>
+                                            <th className="text-right py-3 px-4 text-sm font-medium text-surface-500 dark:text-surface-400">{t("admin:actions")}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -498,7 +500,7 @@ export default function AdminActivations() {
                                                     <StatusBadge status={request.status || 'pending'} />
                                                 </td>
                                                 <td className="py-3 px-4 text-sm text-surface-500 dark:text-surface-400">
-                                                    {request.created_at ? new Date(request.created_at).toLocaleDateString() : '-'}
+                                                    {request.created_at ? new Date(request.created_at).toLocaleDateString(activeLanguage()) : '-'}
                                                 </td>
                                                 <td className="py-3 px-4 text-right">
                                                     <button
@@ -511,7 +513,7 @@ export default function AdminActivations() {
                                                         }}
                                                         className="px-3 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-sm rounded-lg transition-colors"
                                                     >
-                                                        {request.status === 'completed' || request.status === 'rejected' ? 'View' : 'Process'}
+                                                        {request.status === 'completed' || request.status === 'rejected' ? t("common:uiView") : t("common:uiProcess")}
                                                     </button>
                                                 </td>
                                             </tr>
@@ -524,24 +526,20 @@ export default function AdminActivations() {
                         {/* Pagination */}
                         {requestsTotal > 20 && (
                             <div className="flex items-center justify-between p-4 border-t border-surface-200 dark:border-surface-700">
-                                <p className="text-sm text-surface-500 dark:text-surface-400">
-                                    Showing {(requestsPage - 1) * 20 + 1} to {Math.min(requestsPage * 20, requestsTotal)} of {requestsTotal}
-                                </p>
+                                <p className="text-sm text-surface-500 dark:text-surface-400">{t("admin:showingToOf", { value1: (requestsPage - 1) * 20 + 1, value2: Math.min(requestsPage * 20, requestsTotal), value3: requestsTotal })}</p>
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => setRequestsPage(p => Math.max(1, p - 1))}
                                         disabled={requestsPage === 1}
                                         className="px-3 py-1 border border-surface-200 dark:border-surface-700 rounded-lg disabled:opacity-50"
                                     >
-                                        Previous
-                                    </button>
+                                        {t("admin:previous")}</button>
                                     <button
                                         onClick={() => setRequestsPage(p => p + 1)}
                                         disabled={requestsPage * 20 >= requestsTotal}
                                         className="px-3 py-1 border border-surface-200 dark:border-surface-700 rounded-lg disabled:opacity-50"
                                     >
-                                        Next
-                                    </button>
+                                        {t("admin:next")}</button>
                                 </div>
                             </div>
                         )}
@@ -559,29 +557,28 @@ export default function AdminActivations() {
                             className="flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors"
                         >
                             <Plus className="w-4 h-4" />
-                            Add Product
-                        </button>
+                            {t("admin:addProduct")}</button>
                     )}
 
                     {/* Product Form */}
                     {(showProductForm || editingProduct) && (
                         <div className="bg-white dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-700 p-6">
                             <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">
-                                {editingProduct ? 'Edit Product' : 'New Product'}
+                                {editingProduct ? t("admin:editProduct") : t("admin:newProduct")}
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Name</label>
+                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">{t("admin:name")}</label>
                                     <input
                                         type="text"
                                         value={productForm.name}
                                         onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                                        placeholder="e.g., Elementor Pro"
+                                        placeholder={t("admin:eGElementorPro")}
                                         className="w-full px-3 py-2 border border-surface-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Type</label>
+                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">{t("admin:type")}</label>
                                     <select
                                         value={productForm.product_type}
                                         onChange={(e) => setProductForm({ ...productForm, product_type: e.target.value })}
@@ -593,7 +590,7 @@ export default function AdminActivations() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Monthly Limit</label>
+                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">{t("admin:monthlyLimit")}</label>
                                     <input
                                         type="number"
                                         min="1"
@@ -603,44 +600,43 @@ export default function AdminActivations() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Description</label>
+                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">{t("admin:description")}</label>
                                     <input
                                         type="text"
                                         value={productForm.description}
                                         onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                                        placeholder="Optional description"
+                                        placeholder={t("admin:optionalDescription")}
                                         className="w-full px-3 py-2 border border-surface-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100"
                                     />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Instructions (shown to users)</label>
+                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">{t("admin:instructionsShownToUsers")}</label>
                                     <textarea
                                         value={productForm.instructions}
                                         onChange={(e) => setProductForm({ ...productForm, instructions: e.target.value })}
-                                        placeholder="Instructions for users after activation..."
+                                        placeholder={t("admin:instructionsForUsersAfterActivation")}
                                         rows={3}
                                         className="w-full px-3 py-2 border border-surface-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100"
                                     />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">License Key</label>
+                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">{t("admin:licenseKey")}</label>
                                     <input
                                         type="text"
                                         value={productForm.license_key}
                                         onChange={(e) => setProductForm({ ...productForm, license_key: e.target.value })}
-                                        placeholder="Product license key (shown to admins when processing requests)"
+                                        placeholder={t("admin:productLicenseKeyShownToAdminsWhenProcessingRequests")}
                                         className="w-full px-3 py-2 border border-surface-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100 font-mono text-sm"
                                     />
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                                        Plugin/Theme File
-                                    </label>
+                                        {t("admin:pluginThemeFile")}</label>
                                     {(productForm.file_url || productFile) ? (
                                         <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                                             <FileDown className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
                                             <span className="text-sm text-green-800 dark:text-green-300 truncate flex-1">
-                                                {productFile?.name || productForm.file_name || 'Uploaded file'}
+                                                {productFile?.name || productForm.file_name || t("admin:uploadedFile")}
                                             </span>
                                             <button
                                                 type="button"
@@ -649,7 +645,7 @@ export default function AdminActivations() {
                                                     setProductForm({ ...productForm, file_url: '', file_name: '' });
                                                 }}
                                                 className="p-1 hover:bg-green-200 dark:hover:bg-green-800 rounded transition-colors text-green-600 dark:text-green-400"
-                                                title="Remove file"
+                                                title={t("admin:removeFile")}
                                             >
                                                 <X className="w-4 h-4" />
                                             </button>
@@ -658,8 +654,7 @@ export default function AdminActivations() {
                                         <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-surface-300 dark:border-surface-600 rounded-lg cursor-pointer hover:border-primary-400 dark:hover:border-primary-500 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors">
                                             <Upload className="w-5 h-5 text-surface-400" />
                                             <span className="text-sm text-surface-500 dark:text-surface-400">
-                                                Click to upload .zip file
-                                            </span>
+                                                {t("admin:clickToUploadZipFile")}</span>
                                             <input
                                                 type="file"
                                                 accept=".zip,.rar,.7z"
@@ -672,8 +667,7 @@ export default function AdminActivations() {
                                         </label>
                                     )}
                                     <p className="text-xs text-surface-400 dark:text-surface-500 mt-1">
-                                        Upload the plugin/theme zip file. Users can download it after submitting an activation request.
-                                    </p>
+                                        {t("admin:uploadThePluginThemeZipFileUsersCanDownload")}</p>
                                 </div>
                             </div>
                             <div className="flex gap-3 mt-4">
@@ -684,7 +678,7 @@ export default function AdminActivations() {
                                 >
                                     {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                                     {!saving && <Check className="w-4 h-4" />}
-                                    {uploading ? 'Uploading...' : saving ? 'Saving...' : editingProduct ? 'Update' : 'Create'}
+                                    {uploading ? t("common:uiUploading") : saving ? t("common:uiSaving") : editingProduct ? t("common:uiUpdate") : t("common:uiCreate")}
                                 </button>
                                 <button
                                     onClick={() => {
@@ -695,8 +689,7 @@ export default function AdminActivations() {
                                     className="flex items-center gap-2 px-4 py-2 bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 rounded-lg hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors"
                                 >
                                     <X className="w-4 h-4" />
-                                    Cancel
-                                </button>
+                                    {t("admin:cancel")}</button>
                             </div>
                         </div>
                     )}
@@ -706,8 +699,8 @@ export default function AdminActivations() {
                         {products.length === 0 ? (
                             <div className="p-8 text-center text-surface-500 dark:text-surface-400">
                                 <Package className="w-12 h-12 mx-auto text-surface-300 dark:text-surface-600 mb-3" />
-                                <p>No products yet</p>
-                                <p className="text-sm mt-1">Create your first product to start accepting activation requests</p>
+                                <p>{t("admin:noProductsYet")}</p>
+                                <p className="text-sm mt-1">{t("admin:createYourFirstProductToStartAcceptingActivationRequests")}</p>
                             </div>
                         ) : (
                             <ul className="divide-y divide-surface-100 dark:divide-surface-800">
@@ -731,15 +724,11 @@ export default function AdminActivations() {
                                                         {product.name}
                                                         {!product.is_active && (
                                                             <span className="px-2 py-0.5 bg-surface-100 dark:bg-surface-800 text-surface-500 text-xs rounded">
-                                                                Inactive
-                                                            </span>
+                                                                {t("admin:inactive")}</span>
                                                         )}
                                                     </p>
                                                     <p className="text-sm text-surface-500 dark:text-surface-400">
-                                                        {PRODUCT_TYPES.find(t => t.value === product.product_type)?.label || product.product_type}
-                                                        {' · '}
-                                                        {product.monthly_limit} activation{product.monthly_limit > 1 ? 's' : ''}/month
-                                                    </p>
+                                                        {t('admin:productActivationLimit', { product: PRODUCT_TYPES.find(t => t.value === product.product_type)?.label || product.product_type, count: product.monthly_limit })}</p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2">
@@ -751,19 +740,19 @@ export default function AdminActivations() {
                                                             : 'bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400 hover:bg-surface-200'
                                                     }`}
                                                 >
-                                                    {product.is_active ? 'Active' : 'Inactive'}
+                                                    {product.is_active ? t("common:uiActive") : t("common:uiInactive")}
                                                 </button>
                                                 <button
                                                     onClick={() => startEditProduct(product)}
                                                     className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
-                                                    title="Edit"
+                                                    title={t("admin:edit")}
                                                 >
                                                     <Edit2 className="w-4 h-4 text-surface-500 dark:text-surface-400" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteProduct(product.id)}
                                                     className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                                                    title="Delete"
+                                                    title={t("admin:delete")}
                                                 >
                                                     <Trash2 className="w-4 h-4 text-red-500 dark:text-red-400" />
                                                 </button>
@@ -784,8 +773,7 @@ export default function AdminActivations() {
                         <div className="p-6 border-b border-surface-200 dark:border-surface-700">
                             <div className="flex items-center justify-between">
                                 <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">
-                                    Process Activation Request
-                                </h2>
+                                    {t("admin:processActivationRequest")}</h2>
                                 <button
                                     onClick={() => {
                                         setSelectedRequest(null);
@@ -816,7 +804,7 @@ export default function AdminActivations() {
 
                             {/* Product */}
                             <div>
-                                <label className="block text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">Product</label>
+                                <label className="block text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">{t("admin:product")}</label>
                                 <p className="text-surface-900 dark:text-surface-100 font-medium">{selectedRequest.product?.name}</p>
                             </div>
 
@@ -826,8 +814,7 @@ export default function AdminActivations() {
                                     <div className="flex items-center justify-between">
                                         <span className="text-sm font-medium text-purple-800 dark:text-purple-400 flex items-center gap-2">
                                             <Key className="w-4 h-4" />
-                                            License Key
-                                        </span>
+                                            {t("admin:licenseKey")}</span>
                                         <button
                                             onClick={() => {
                                                 navigator.clipboard.writeText(selectedRequest.product?.license_key || '');
@@ -835,10 +822,10 @@ export default function AdminActivations() {
                                                 setTimeout(() => setCopiedField(null), 2000);
                                             }}
                                             className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-800 text-purple-700 dark:text-purple-300 rounded-lg text-sm font-medium transition-colors"
-                                            title="Copy license key"
+                                            title={t("admin:copyLicenseKey")}
                                         >
                                             {copiedField === 'license' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
-                                            {copiedField === 'license' ? 'Copied!' : 'Copy'}
+                                            {copiedField === 'license' ? t("common:uiCopied") : t("common:uiCopy")}
                                         </button>
                                     </div>
                                 </div>
@@ -846,7 +833,7 @@ export default function AdminActivations() {
 
                             {/* Website URL */}
                             <div>
-                                <label className="block text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">Website URL</label>
+                                <label className="block text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">{t("admin:websiteURL")}</label>
                                 <a
                                     href={selectedRequest.website_url}
                                     target="_blank"
@@ -862,11 +849,10 @@ export default function AdminActivations() {
                             <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                                 <p className="text-sm font-medium text-yellow-800 dark:text-yellow-400 mb-3 flex items-center gap-2">
                                     <AlertCircle className="w-4 h-4" />
-                                    WordPress Credentials
-                                </p>
+                                    {t("admin:wordPressCredentials")}</p>
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm text-yellow-700 dark:text-yellow-500">Username:</span>
+                                        <span className="text-sm text-yellow-700 dark:text-yellow-500">{t("admin:username")}</span>
                                         <div className="flex items-center gap-2">
                                             <code className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-300 rounded text-sm">
                                                 {selectedRequest.wp_username}
@@ -878,14 +864,14 @@ export default function AdminActivations() {
                                                     setTimeout(() => setCopiedField(null), 2000);
                                                 }}
                                                 className="p-1 hover:bg-yellow-200 dark:hover:bg-yellow-800 rounded transition-colors"
-                                                title="Copy username"
+                                                title={t("admin:copyUsername")}
                                             >
                                                 {copiedField === 'username' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
                                             </button>
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm text-yellow-700 dark:text-yellow-500">Password:</span>
+                                        <span className="text-sm text-yellow-700 dark:text-yellow-500">{t("admin:password")}</span>
                                         <div className="flex items-center gap-2">
                                             <code className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-300 rounded text-sm">
                                                 {showPassword ? selectedRequest.wp_password : '••••••••'}
@@ -897,14 +883,14 @@ export default function AdminActivations() {
                                                     setTimeout(() => setCopiedField(null), 2000);
                                                 }}
                                                 className="p-1 hover:bg-yellow-200 dark:hover:bg-yellow-800 rounded transition-colors"
-                                                title="Copy password"
+                                                title={t("admin:copyPassword")}
                                             >
                                                 {copiedField === 'password' ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
                                             </button>
                                             <button
                                                 onClick={() => setShowPassword(!showPassword)}
                                                 className="p-1 hover:bg-yellow-200 dark:hover:bg-yellow-800 rounded transition-colors"
-                                                title={showPassword ? 'Hide password' : 'Show password'}
+                                                title={showPassword ? t("admin:hidePassword") : t("admin:showPassword")}
                                             >
                                                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                             </button>
@@ -916,7 +902,7 @@ export default function AdminActivations() {
                             {/* User Notes */}
                             {selectedRequest.notes && (
                                 <div>
-                                    <label className="block text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">User Notes</label>
+                                    <label className="block text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">{t("admin:userNotes")}</label>
                                     <p className="text-surface-700 dark:text-surface-300 text-sm p-3 bg-surface-50 dark:bg-surface-800 rounded-lg">
                                         {selectedRequest.notes}
                                     </p>
@@ -927,26 +913,25 @@ export default function AdminActivations() {
                             {selectedRequest.status !== 'completed' && selectedRequest.status !== 'rejected' && (
                                 <>
                                     <div>
-                                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Update Status</label>
+                                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">{t("admin:updateStatus")}</label>
                                         <select
                                             value={processForm.status}
                                             onChange={(e) => setProcessForm({ ...processForm, status: e.target.value as ActivationRequestStatus })}
                                             className="w-full px-3 py-2 border border-surface-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100"
                                         >
-                                            <option value="in_progress">In Progress</option>
-                                            <option value="completed">Completed</option>
-                                            <option value="rejected">Rejected</option>
+                                            <option value="in_progress">{t("admin:inProgress")}</option>
+                                            <option value="completed">{t("admin:completed")}</option>
+                                            <option value="rejected">{t("admin:rejected")}</option>
                                         </select>
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                                            Admin Notes (visible to user)
-                                        </label>
+                                            {t("admin:adminNotesVisibleToUser")}</label>
                                         <textarea
                                             value={processForm.admin_notes}
                                             onChange={(e) => setProcessForm({ ...processForm, admin_notes: e.target.value })}
-                                            placeholder="Add notes about the activation..."
+                                            placeholder={t("admin:addNotesAboutTheActivation")}
                                             rows={3}
                                             className="w-full px-3 py-2 border border-surface-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100"
                                         />
@@ -957,7 +942,7 @@ export default function AdminActivations() {
                             {/* Show admin notes if already processed */}
                             {(selectedRequest.status === 'completed' || selectedRequest.status === 'rejected') && selectedRequest.admin_notes && (
                                 <div>
-                                    <label className="block text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">Admin Notes</label>
+                                    <label className="block text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">{t("admin:adminNotes")}</label>
                                     <p className="text-surface-700 dark:text-surface-300 text-sm p-3 bg-surface-50 dark:bg-surface-800 rounded-lg">
                                         {selectedRequest.admin_notes}
                                     </p>
@@ -975,8 +960,7 @@ export default function AdminActivations() {
                                     }}
                                     className="px-4 py-2 text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
                                 >
-                                    Cancel
-                                </button>
+                                    {t("admin:cancel")}</button>
                                 <button
                                     onClick={handleProcessRequest}
                                     disabled={processing}
@@ -987,7 +971,7 @@ export default function AdminActivations() {
                                     ) : (
                                         <Check className="w-4 h-4" />
                                     )}
-                                    {processing ? 'Processing...' : 'Update Status'}
+                                    {processing ? t("common:uiProcessing") : t("admin:updateStatus")}
                                 </button>
                             </div>
                         )}

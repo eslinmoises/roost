@@ -1,4 +1,7 @@
-import { format, isToday, isYesterday } from 'date-fns';
+import { format } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
+import { isToday, isYesterday } from 'date-fns';
 import type { MessageWithSender } from '../../services/message';
 import { Image as ImageIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -6,20 +9,21 @@ import { useAssetUrl } from '@/hooks/useAssetUrl';
 import type { Asset } from '@/types/database';
 
 function MessageAttachment({ asset, isSent, onOpen }: { asset: Asset; isSent: boolean; onOpen: (url: string) => void }) {
+    useTranslation();
   const { url, error, isLoading } = useAssetUrl(asset.file_url);
   if (isLoading) return <div className="h-20 rounded-lg animate-pulse bg-black/10" />;
-  if (error || !url) return <p className="text-xs opacity-80">Attachment unavailable</p>;
+  if (error || !url) return <p className="text-xs opacity-80">{t("messages:attachmentUnavailable")}</p>;
   if (asset.asset_type === 'image') {
     return (
       <button onClick={() => onOpen(url)} className="block rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
-        <img src={url} alt={asset.filename || 'Attachment'} className="max-w-full h-auto max-h-64 object-cover" />
+        <img src={url} alt={asset.filename || t("common:uiAttachment")} className="max-w-full h-auto max-h-64 object-cover" />
       </button>
     );
   }
   return (
     <a href={url} download={asset.filename || undefined} className={`flex items-center gap-2 p-2 rounded-lg ${isSent ? 'bg-primary-700' : 'bg-surface-50 dark:bg-surface-700'} hover:opacity-80 transition-opacity`}>
       <ImageIcon className="w-4 h-4" />
-      <span className="text-xs truncate">{asset.filename ?? 'File'}</span>
+      <span className="text-xs truncate">{asset.filename ?? t("common:uiFile")}</span>
     </a>
   );
 }
@@ -31,6 +35,7 @@ interface MessageBubbleProps {
 }
 
 export default function MessageBubble({ message, isSent, showTimestamp = true }: MessageBubbleProps) {
+    useTranslation();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const formatMessageTime = (date: string) => {
@@ -39,7 +44,7 @@ export default function MessageBubble({ message, isSent, showTimestamp = true }:
     if (isToday(messageDate)) {
       return format(messageDate, 'h:mm a');
     } else if (isYesterday(messageDate)) {
-      return `Yesterday ${format(messageDate, 'h:mm a')}`;
+      return t("messages:yesterday", { value1: format(messageDate, 'h:mm a') });
     } else {
       return format(messageDate, 'MMM d, h:mm a');
     }
@@ -84,7 +89,7 @@ export default function MessageBubble({ message, isSent, showTimestamp = true }:
         >
           <img
             src={selectedImage}
-            alt="Full size"
+            alt={t("messages:fullSize")}
             className="max-w-full max-h-full object-contain"
             onClick={(e) => e.stopPropagation()}
           />

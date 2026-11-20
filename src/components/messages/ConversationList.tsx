@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Loader2, MessageSquareOff } from 'lucide-react';
 import { getConversations } from '../../services/message';
@@ -17,6 +20,7 @@ export default function ConversationList({
   selectedConversationId,
   onNewMessage
 }: ConversationListProps) {
+    useTranslation();
   const { user } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +39,7 @@ export default function ConversationList({
       setConversations(data);
     } catch (err) {
       console.error('Error loading conversations:', err);
-      setError('Failed to load conversations');
+      setError(t("messages:failedToLoadConversations"));
     } finally {
       if (showLoading) {
         setIsLoading(false);
@@ -100,13 +104,12 @@ export default function ConversationList({
     return (
       <div className="flex flex-col items-center justify-center h-full bg-white dark:bg-surface-900 border-r border-surface-200 dark:border-surface-700 p-4">
         <MessageSquareOff className="w-12 h-12 text-error mb-2" />
-        <p className="text-sm text-error text-center">{error}</p>
+        <p className="text-sm text-error text-center">{localizeError(error)}</p>
         <button
           onClick={() => loadConversations()}
           className="btn btn-secondary mt-4"
         >
-          Retry
-        </button>
+          {t("messages:retry")}</button>
       </div>
     );
   }
@@ -115,11 +118,11 @@ export default function ConversationList({
     <div className="flex flex-col h-full bg-white dark:bg-surface-900 border-r border-surface-200 dark:border-surface-700">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-surface-200 dark:border-surface-700">
-        <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">Messages</h2>
+        <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">{t("messages:messages")}</h2>
         <button
           onClick={onNewMessage}
           className="p-2 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
-          title="New message"
+          title={t("messages:newMessage")}
         >
           <Plus className="w-5 h-5" />
         </button>
@@ -130,14 +133,12 @@ export default function ConversationList({
         {conversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full p-4 text-center">
             <MessageSquareOff className="w-12 h-12 text-surface-300 dark:text-surface-600 mb-3" />
-            <p className="text-sm text-surface-500 dark:text-surface-400 mb-1">No conversations yet</p>
+            <p className="text-sm text-surface-500 dark:text-surface-400 mb-1">{t("messages:noConversationsYet")}</p>
             <p className="text-xs text-surface-400 dark:text-surface-500 mb-4">
-              Start a new conversation to begin chatting
-            </p>
+              {t("messages:startANewConversationToBeginChatting")}</p>
             <button onClick={onNewMessage} className="btn btn-primary">
               <Plus className="w-4 h-4" />
-              New Message
-            </button>
+              {t("messages:newMessage2")}</button>
           </div>
         ) : (
           conversations.map((conversation) => (

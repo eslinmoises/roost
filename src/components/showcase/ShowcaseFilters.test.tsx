@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import i18n from '@/i18n';
+beforeAll(async () => { await i18n.changeLanguage('en'); });
 import ShowcaseFilters from './ShowcaseFilters';
 import ShowcaseFilterSidebar from './ShowcaseFilterSidebar';
 import type { ShowcaseFilters as Filters } from '@/types/showcase';

@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 interface NotificationBadgeProps {
   count: number;
   className?: string;
 }
 
 export default function NotificationBadge({ count, className = '' }: NotificationBadgeProps) {
+    useTranslation();
   if (count === 0) return null;
 
   return (

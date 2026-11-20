@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { supabase } from './supabase';
 import type { Message, Profile, Asset } from '../types/database';
 import { deleteFile, uploadFile, type UploadResult } from './s3';
@@ -160,17 +161,17 @@ export async function sendMessage(
   try {
     // Validate content
     if (!content.trim() && (!files || files.length === 0)) {
-      throw new Error('A message or attachment is required');
+      throw new Error(t("errors:aMessageOrAttachmentIsRequired"));
     }
 
     if (content.length > 5000) {
-      throw new Error('Message content exceeds maximum length (5000 characters)');
+      throw new Error(t("errors:messageContentExceedsMaximumLength5000Characters"));
     }
 
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      throw new Error('User not authenticated');
+      throw new Error(t("errors:userNotAuthenticated"));
     }
 
     const uploadedFiles: Array<{ file: File; upload: UploadResult }> = [];

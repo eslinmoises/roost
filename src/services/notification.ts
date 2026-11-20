@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { supabase } from './supabase';
 import type { Notification } from '../types/database';
 
@@ -253,8 +254,8 @@ export async function createMentionNotifications(
       .map(u => ({
         user_id: u.id,
         type: 'mention' as const,
-        title: 'New Mention',
-        message: `${actorName} mentioned you in a comment`,
+        title: t("notifications:newMention"),
+        message: t("notifications:mentionedYouInAComment", { value1: actorName }),
         link: `/post/${postId}`,
         is_read: false,
       }));

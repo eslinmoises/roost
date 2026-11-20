@@ -1,3 +1,8 @@
+import { formatNumber } from '@/lib/locale';
+import { localizeError } from '@/i18n/errors';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { MessageCircle, ThumbsUp, Calendar, Award, FileText, Loader2 } from 'lucide-react';
 import { getUserPointActivities } from '../../services';
@@ -12,17 +17,18 @@ const ITEMS_PER_PAGE = 15;
 
 // Map action types to icons and labels
 const ACTION_CONFIG = {
-    post_created: { icon: FileText, label: 'Created a post', color: 'text-blue-500' },
-    comment_created: { icon: MessageCircle, label: 'Wrote a comment', color: 'text-green-500' },
-    reaction_given: { icon: ThumbsUp, label: 'Reacted to content', color: 'text-purple-500' },
-    reaction_received: { icon: Award, label: 'Received a reaction', color: 'text-yellow-500' },
-    event_attended: { icon: Calendar, label: 'Attended an event', color: 'text-pink-500' },
-    daily_login: { icon: Award, label: 'Daily login', color: 'text-indigo-500' },
-    profile_completed: { icon: Award, label: 'Completed profile', color: 'text-teal-500' },
-    manual_adjustment: { icon: Award, label: 'Manual adjustment', color: 'text-gray-500' },
+    post_created: { icon: FileText, get label() { return t("leaderboard:createdAPost"); }, color: 'text-blue-500' },
+    comment_created: { icon: MessageCircle, get label() { return t("leaderboard:wroteAComment"); }, color: 'text-green-500' },
+    reaction_given: { icon: ThumbsUp, get label() { return t("leaderboard:reactedToContent"); }, color: 'text-purple-500' },
+    reaction_received: { icon: Award, get label() { return t("leaderboard:receivedAReaction"); }, color: 'text-yellow-500' },
+    event_attended: { icon: Calendar, get label() { return t("leaderboard:attendedAnEvent"); }, color: 'text-pink-500' },
+    daily_login: { icon: Award, get label() { return t("leaderboard:dailyLogin"); }, color: 'text-indigo-500' },
+    profile_completed: { icon: Award, get label() { return t("leaderboard:completedProfile"); }, color: 'text-teal-500' },
+    manual_adjustment: { icon: Award, get label() { return t("leaderboard:manualAdjustment"); }, color: 'text-gray-500' },
 } as const;
 
 export default function PointActivityFeed({ userId, limit = ITEMS_PER_PAGE }: PointActivityFeedProps) {
+    useTranslation();
     const [activities, setActivities] = useState<PointActivity[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -41,7 +47,7 @@ export default function PointActivityFeed({ userId, limit = ITEMS_PER_PAGE }: Po
             setHasMore(data.length >= limit);
         } catch (err) {
             console.error('Error loading point activities:', err);
-            setError('Failed to load point activities');
+            setError(t("leaderboard:failedToLoadPointActivities"));
         } finally {
             setLoading(false);
             setLoadingMore(false);
@@ -98,11 +104,11 @@ export default function PointActivityFeed({ userId, limit = ITEMS_PER_PAGE }: Po
         const hours = Math.floor(diff / 3600000);
         const days = Math.floor(diff / 86400000);
 
-        if (minutes < 1) return 'Just now';
-        if (minutes < 60) return `${minutes}m ago`;
-        if (hours < 24) return `${hours}h ago`;
-        if (days < 7) return `${days}d ago`;
-        return date.toLocaleDateString();
+        if (minutes < 1) return t("leaderboard:justNow");
+        if (minutes < 60) return t("leaderboard:mAgo", { value1: minutes });
+        if (hours < 24) return t("leaderboard:hAgo", { value1: hours });
+        if (days < 7) return t("leaderboard:dAgo", { value1: days });
+        return date.toLocaleDateString(activeLanguage());
     };
 
     if (loading) {
@@ -124,7 +130,7 @@ export default function PointActivityFeed({ userId, limit = ITEMS_PER_PAGE }: Po
     if (error) {
         return (
             <div className="text-center py-8 text-red-600 dark:text-red-400">
-                <p>{error}</p>
+                <p>{localizeError(error)}</p>
             </div>
         );
     }
@@ -133,14 +139,14 @@ export default function PointActivityFeed({ userId, limit = ITEMS_PER_PAGE }: Po
         return (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 <Award size={48} className="mx-auto mb-2 opacity-20" />
-                <p>No point activities yet</p>
-                <p className="text-sm mt-1">Start earning points by creating posts and engaging!</p>
+                <p>{t("leaderboard:noPointActivitiesYet")}</p>
+                <p className="text-sm mt-1">{t("leaderboard:startEarningPointsByCreatingPostsAndEngaging")}</p>
             </div>
         );
     }
 
     // Default config for unknown action types
-    const DEFAULT_CONFIG = { icon: Award, label: 'Activity', color: 'text-gray-500' };
+    const DEFAULT_CONFIG = { icon: Award, label: t("leaderboard:activity"), color: 'text-gray-500' };
 
     return (
         <div className="space-y-3">
@@ -162,7 +168,7 @@ export default function PointActivityFeed({ userId, limit = ITEMS_PER_PAGE }: Po
                                     {activity.description || config.label}
                                 </p>
                                 <span className={`text-sm font-semibold ${activity.points > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                                    {activity.points > 0 ? '+' : ''}{activity.points}
+                                    {activity.points > 0 ? '+' : ''}{formatNumber(activity.points)}
                                 </span>
                             </div>
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -179,10 +185,10 @@ export default function PointActivityFeed({ userId, limit = ITEMS_PER_PAGE }: Po
                     {loadingMore ? (
                         <div className="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400">
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            <span className="text-xs">Loading more...</span>
+                            <span className="text-xs">{t("leaderboard:loadingMore")}</span>
                         </div>
                     ) : (
-                        <span className="text-xs text-gray-400 dark:text-gray-500">Scroll for more</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500">{t("leaderboard:scrollForMore")}</span>
                     )}
                 </div>
             )}

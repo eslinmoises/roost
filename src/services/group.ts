@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { supabase } from './supabase';
 import { cached, cacheInvalidate } from '@/lib/cache';
 import type { Group, GroupInsert, GroupUpdate, GroupMember, GroupRole, Profile } from '@/types';
@@ -263,7 +264,7 @@ export async function createGroup(group: GroupInsert): Promise<Group> {
     // Verify slug is available
     const slugAvailable = await isSlugAvailable(slug);
     if (!slugAvailable) {
-        throw new Error('Group slug is already taken. Please choose a different name.');
+        throw new Error(t("errors:groupSlugIsAlreadyTakenPleaseChooseADifferent"));
     }
 
     const { data, error } = await supabase
@@ -297,7 +298,7 @@ export async function updateGroup(groupId: string, updates: GroupUpdate): Promis
         slug = generateSlug(updates.name);
         const slugAvailable = await isSlugAvailable(slug, groupId);
         if (!slugAvailable) {
-            throw new Error('Group slug is already taken. Please choose a different name.');
+            throw new Error(t("errors:groupSlugIsAlreadyTakenPleaseChooseADifferent"));
         }
     }
 
@@ -377,7 +378,7 @@ export async function leaveGroup(groupId: string, userId: string): Promise<void>
             .eq('role', 'admin');
 
         if (count === 1) {
-            throw new Error('Cannot leave group as the only admin. Transfer ownership or delete the group.');
+            throw new Error(t("errors:cannotLeaveGroupAsTheOnlyAdminTransferOwnership"));
         }
     }
 
@@ -452,7 +453,7 @@ export async function updateMemberRole(
             .neq('user_id', userId);
 
         if (count === 0) {
-            throw new Error('Cannot demote the only admin. Promote another member first.');
+            throw new Error(t("errors:cannotDemoteTheOnlyAdminPromoteAnotherMemberFirst"));
         }
     }
 
@@ -482,7 +483,7 @@ export async function removeMember(groupId: string, userId: string): Promise<voi
             .eq('role', 'admin');
 
         if (count === 1) {
-            throw new Error('Cannot remove the only admin. Transfer ownership first.');
+            throw new Error(t("errors:cannotRemoveTheOnlyAdminTransferOwnershipFirst"));
         }
     }
 

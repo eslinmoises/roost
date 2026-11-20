@@ -1,3 +1,7 @@
+import { Trans } from 'react-i18next';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useState } from 'react';
 import { Star, Send, Loader2, Edit2, Trash2, MessageSquare } from 'lucide-react';
@@ -31,6 +35,7 @@ function StarRating({
     readonly?: boolean;
     size?: 'sm' | 'md' | 'lg';
 }) {
+    useTranslation();
     const [hoverRating, setHoverRating] = useState(0);
 
     const sizeClasses = {
@@ -79,6 +84,7 @@ function ReviewItem({
     onDelete: (reviewId: string) => Promise<void>;
     onMakerReply: (reviewId: string, reply: string) => Promise<void>;
 }) {
+    useTranslation();
     const [isEditing, setIsEditing] = useState(false);
     const [isReplying, setIsReplying] = useState(false);
     const [editContent, setEditContent] = useState(review.content);
@@ -102,7 +108,7 @@ function ReviewItem({
     };
 
     const handleDelete = async () => {
-        if (!confirm('Are you sure you want to delete this review?')) return;
+        if (!confirm(t("showcase:areYouSureYouWantToDeleteThisReview"))) return;
 
         setIsSubmitting(true);
         try {
@@ -154,10 +160,10 @@ function ReviewItem({
                         </Link>
                         <StarRating rating={isEditing ? editRating : review.rating} onChange={isEditing ? setEditRating : undefined} readonly={!isEditing} size="sm" />
                         <span className="text-xs text-surface-500 dark:text-surface-400">
-                            {new Date(review.created_at ?? Date.now()).toLocaleDateString()}
+                            {new Date(review.created_at ?? Date.now()).toLocaleDateString(activeLanguage())}
                         </span>
                         {review.is_edited && (
-                            <span className="text-xs text-surface-400">(edited)</span>
+                            <span className="text-xs text-surface-400">{t("showcase:edited")}</span>
                         )}
                     </div>
 
@@ -176,7 +182,7 @@ function ReviewItem({
                                     disabled={isSubmitting}
                                     className="px-3 py-1.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
                                 >
-                                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
+                                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : t("common:uiSave")}
                                 </button>
                                 <button
                                     onClick={() => {
@@ -186,8 +192,7 @@ function ReviewItem({
                                     }}
                                     className="px-3 py-1.5 text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg text-sm"
                                 >
-                                    Cancel
-                                </button>
+                                    {t("showcase:cancel")}</button>
                             </div>
                         </div>
                     ) : (
@@ -206,16 +211,14 @@ function ReviewItem({
                                         className="flex items-center gap-1 text-xs text-surface-500 hover:text-surface-700 dark:hover:text-surface-300"
                                     >
                                         <Edit2 className="w-3 h-3" />
-                                        Edit
-                                    </button>
+                                        {t("showcase:edit")}</button>
                                     <button
                                         onClick={handleDelete}
                                         disabled={isSubmitting}
                                         className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600"
                                     >
                                         <Trash2 className="w-3 h-3" />
-                                        Delete
-                                    </button>
+                                        {t("showcase:delete")}</button>
                                 </>
                             )}
                             {isMaker && !review.maker_reply && (
@@ -224,8 +227,7 @@ function ReviewItem({
                                     className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700"
                                 >
                                     <MessageSquare className="w-3 h-3" />
-                                    Reply
-                                </button>
+                                    {t("showcase:reply")}</button>
                             )}
                         </div>
                     )}
@@ -234,8 +236,7 @@ function ReviewItem({
                     {review.maker_reply && (
                         <div className="mt-4 ml-4 pl-4 border-l-2 border-primary-200 dark:border-primary-800">
                             <p className="text-xs font-medium text-primary-600 dark:text-primary-400 mb-1">
-                                Maker Response
-                            </p>
+                                {t("showcase:makerResponse")}</p>
                             <p className="text-sm text-surface-700 dark:text-surface-300">
                                 {review.maker_reply}
                             </p>
@@ -248,7 +249,7 @@ function ReviewItem({
                             <textarea
                                 value={replyContent}
                                 onChange={(e) => setReplyContent(e.target.value)}
-                                placeholder="Write your reply..."
+                                placeholder={t("showcase:writeYourReply")}
                                 rows={2}
                                 className="w-full px-3 py-2 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                             />
@@ -258,7 +259,7 @@ function ReviewItem({
                                     disabled={isSubmitting || !replyContent.trim()}
                                     className="px-3 py-1.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
                                 >
-                                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Reply'}
+                                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : t("common:uiReply")}
                                 </button>
                                 <button
                                     onClick={() => {
@@ -267,8 +268,7 @@ function ReviewItem({
                                     }}
                                     className="px-3 py-1.5 text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg text-sm"
                                 >
-                                    Cancel
-                                </button>
+                                    {t("showcase:cancel")}</button>
                             </div>
                         </div>
                     )}
@@ -286,6 +286,7 @@ export default function ShowcaseReviews({
     onReviewUpdated,
     onReviewDeleted,
 }: ShowcaseReviewsProps) {
+    useTranslation();
     const { user, profile } = useAuth();
     const [newReviewContent, setNewReviewContent] = useState('');
     const [newReviewRating, setNewReviewRating] = useState(5);
@@ -357,28 +358,24 @@ export default function ShowcaseReviews({
 
     return (
         <div className="card shadow-none p-6">
-            <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-6">
-                Reviews ({reviews.length})
-            </h2>
+            <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-6">{t("showcase:reviews", { value1: reviews.length })}</h2>
 
             {/* New review form */}
             {canReview && (
                 <form onSubmit={handleSubmitReview} className="mb-8 pb-8 border-b border-surface-100 dark:border-surface-800">
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Your Rating
-                        </label>
+                            {t("showcase:yourRating")}</label>
                         <StarRating rating={newReviewRating} onChange={setNewReviewRating} size="lg" />
                     </div>
 
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Your Review
-                        </label>
+                            {t("showcase:yourReview")}</label>
                         <textarea
                             value={newReviewContent}
                             onChange={(e) => setNewReviewContent(e.target.value)}
-                            placeholder="Share your experience with this project..."
+                            placeholder={t("showcase:shareYourExperienceWithThisProject")}
                             rows={4}
                             className="w-full px-4 py-3 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
@@ -394,37 +391,28 @@ export default function ShowcaseReviews({
                         ) : (
                             <Send className="w-4 h-4" />
                         )}
-                        Submit Review
-                    </button>
+                        {t("showcase:submitReview")}</button>
                 </form>
             )}
 
             {!user && (
-                <p className="text-sm text-surface-500 dark:text-surface-400 mb-6">
-                    <Link to="/login" className="text-primary-600 hover:text-primary-700">
-                        Sign in
-                    </Link>{' '}
-                    to leave a review.
-                </p>
+                <p className="text-sm text-surface-500 dark:text-surface-400 mb-6"><Trans i18nKey="showcase:sentence2" components={{ part0: <Link to="/login" className="text-primary-600 hover:text-primary-700" /> }} values={{ value0: ' ' }} /></p>
             )}
 
             {user && user.id === makerId && (
                 <p className="text-sm text-surface-500 dark:text-surface-400 mb-6">
-                    You cannot review your own project.
-                </p>
+                    {t("showcase:youCannotReviewYourOwnProject")}</p>
             )}
 
             {user && userHasReviewed && (
                 <p className="text-sm text-surface-500 dark:text-surface-400 mb-6">
-                    You've already reviewed this project.
-                </p>
+                    {t("showcase:youVeAlreadyReviewedThisProject")}</p>
             )}
 
             {/* Reviews list */}
             {reviews.length === 0 ? (
                 <p className="text-center text-surface-500 dark:text-surface-400 py-8">
-                    No reviews yet. Be the first to review!
-                </p>
+                    {t("showcase:noReviewsYetBeTheFirstToReview")}</p>
             ) : (
                 <div>
                     {reviews.map((review) => (

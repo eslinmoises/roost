@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useMemo } from 'react';
 import { Search, Loader2, X } from 'lucide-react';
 import { searchUsers } from '../../services/message';
@@ -10,7 +12,8 @@ interface UserSearchInputProps {
   placeholder?: string;
 }
 
-export default function UserSearchInput({ onUserSelect, placeholder = 'Search users...' }: UserSearchInputProps) {
+export default function UserSearchInput({ onUserSelect, placeholder = t("messages:searchUsers") }: UserSearchInputProps) {
+    useTranslation();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url' | 'is_online' | 'membership_type'>[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -101,7 +104,7 @@ export default function UserSearchInput({ onUserSelect, placeholder = 'Search us
               </div>
             ) : results.length === 0 ? (
               <div className="p-8 text-center text-sm text-surface-500">
-                {query.length < 2 ? 'Type at least 2 characters to search' : 'No users found'}
+                {query.length < 2 ? t("messages:typeAtLeast2CharactersToSearch") : t("messages:noUsersFound")}
               </div>
             ) : (
               <div className="py-1">

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import type { Profile } from '@/types/database';
 import { MemberCard } from './MemberCard';
 
@@ -7,6 +9,7 @@ interface MembersGridProps {
 }
 
 export function MembersGrid({ members, loading }: MembersGridProps) {
+    useTranslation();
     if (loading && members.length === 0) {
         return (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -32,8 +35,8 @@ export function MembersGrid({ members, loading }: MembersGridProps) {
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-100 dark:bg-surface-800 mb-4">
                     <span className="text-2xl">👥</span>
                 </div>
-                <h3 className="text-lg font-medium text-surface-900 dark:text-surface-100 mb-1">No members found</h3>
-                <p className="text-surface-500 dark:text-surface-400">Try adjusting your filters or search query.</p>
+                <h3 className="text-lg font-medium text-surface-900 dark:text-surface-100 mb-1">{t("profile:noMembersFound2")}</h3>
+                <p className="text-surface-500 dark:text-surface-400">{t("profile:tryAdjustingYourFiltersOrSearchQuery")}</p>
             </div>
         );
     }

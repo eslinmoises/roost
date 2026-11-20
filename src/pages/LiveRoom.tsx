@@ -1,3 +1,7 @@
+import { localizeError } from '@/i18n/errors';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { Radio, Clock, Play, VideoOff, CalendarCheck, CalendarX, MessageSquare, ExternalLink, Lock, ChevronLeft } from 'lucide-react';
 import { liveRoomService, type LiveStatus, type Recording, type UpcomingSession, type RsvpInfo } from '@/services/live-room';
@@ -16,6 +20,7 @@ let cachedUpcoming: UpcomingSession[] = [];
 let cachedRsvpStatuses: Record<string, RsvpInfo> = {};
 
 export default function LiveRoom() {
+    useTranslation();
     const [showChat, setShowChat] = useState(() => window.innerWidth >= 1024);
     const [status, setStatus] = useState<LiveStatus | null>(cachedStatus);
     const [recordings, setRecordings] = useState<Recording[]>(cachedRecordings);
@@ -110,7 +115,7 @@ export default function LiveRoom() {
                 [sessionId]: { hasRsvp: true, rsvp: { id: '', created_at: new Date().toISOString() } },
             }));
         } catch (error) {
-            alert(error instanceof Error ? error.message : 'Failed to RSVP');
+            alert(error instanceof Error ? localizeError(error.message) : t("live:failedToRSVP"));
         } finally {
             setRsvpLoading(null);
         }
@@ -139,7 +144,7 @@ export default function LiveRoom() {
 
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return '';
-        return new Date(dateStr).toLocaleDateString('en-US', {
+        return new Date(dateStr).toLocaleDateString(activeLanguage(), {
             month: 'short',
             day: 'numeric',
             year: 'numeric',
@@ -160,13 +165,13 @@ export default function LiveRoom() {
 
     const formatTimeUntil = (dateStr: string) => {
         const ms = new Date(dateStr).getTime() - Date.now();
-        if (ms < 0) return 'Starting soon';
+        if (ms < 0) return t("live:startingSoon");
         const hours = Math.floor(ms / (1000 * 60 * 60));
         const days = Math.floor(hours / 24);
-        if (days > 0) return `in ${days}d ${hours % 24}h`;
-        if (hours > 0) return `in ${hours}h`;
+        if (days > 0) return t("live:inDH", { value1: days, value2: hours % 24 });
+        if (hours > 0) return t("live:inH", { value1: hours });
         const minutes = Math.floor(ms / (1000 * 60));
-        return `in ${minutes}m`;
+        return t("live:inM", { value1: minutes });
     };
 
     // Only show full-page spinner on true first load (no cached data)
@@ -187,11 +192,9 @@ export default function LiveRoom() {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">
-                                Live Room
-                            </h1>
+                                {t("live:liveRoom")}</h1>
                             <p className="mt-1 text-surface-500 dark:text-surface-400">
-                                Watch live sessions and past recordings
-                            </p>
+                                {t("live:watchLiveSessionsAndPastRecordings")}</p>
                         </div>
                         <div className="flex items-center gap-3">
                             {status?.isLive && (
@@ -201,16 +204,14 @@ export default function LiveRoom() {
                                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
                                         </span>
-                                        LIVE NOW
-                                    </span>
+                                        {t("live:lIVENOW")}</span>
                                     {/* Mobile chat toggle */}
                                     <button
                                         onClick={() => setShowChat(!showChat)}
                                         className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800"
                                     >
                                         <MessageSquare className="w-4 h-4" />
-                                        Chat
-                                    </button>
+                                        {t("live:chat")}</button>
                                 </>
                             )}
                         </div>
@@ -226,7 +227,7 @@ export default function LiveRoom() {
                                     </div>
                                     <div>
                                         <h2 className="font-semibold text-surface-900 dark:text-surface-50">
-                                            {status.session?.title || 'Live Session'}
+                                            {status.session?.title || t("live:liveSession")}
                                         </h2>
                                         {status.session?.description && (
                                             <p className="text-sm text-surface-500 dark:text-surface-400 mt-0.5">
@@ -236,7 +237,7 @@ export default function LiveRoom() {
                                         {status.session?.started_at && (
                                             <p className="text-xs text-surface-400 dark:text-surface-500 mt-1 flex items-center gap-1">
                                                 <Clock className="w-3 h-3" />
-                                                Started {formatDate(status.session.started_at)}
+                                                {t("live:started")} {formatDate(status.session.started_at)}
                                             </p>
                                         )}
                                     </div>
@@ -246,11 +247,9 @@ export default function LiveRoom() {
                                 <div className="p-8 text-center flex flex-col items-center justify-center min-h-[300px]">
                                     <Lock className="w-12 h-12 text-amber-400 dark:text-amber-500 mb-4" />
                                     <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-50 mb-2">
-                                        Private Stream
-                                    </h3>
+                                        {t("live:privateStream")}</h3>
                                     <p className="text-surface-500 dark:text-surface-400 mb-6 max-w-md">
-                                        This session is a private YouTube stream. Click below to watch on YouTube. Make sure you're signed in with the email you used to RSVP.
-                                    </p>
+                                        {t("live:thisSessionIsAPrivateYouTubeStreamClickBelow")}</p>
                                     <a
                                         href={`https://www.youtube.com/watch?v=${extractVideoId(status.playerUrl)}`}
                                         target="_blank"
@@ -258,8 +257,7 @@ export default function LiveRoom() {
                                         className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
                                     >
                                         <ExternalLink className="w-4 h-4" />
-                                        Watch on YouTube
-                                    </a>
+                                        {t("live:watchOnYouTube")}</a>
                                 </div>
                             ) : (
                                 <div className="relative aspect-video bg-black overflow-hidden">
@@ -268,7 +266,7 @@ export default function LiveRoom() {
                                         className="absolute inset-0 w-full h-full"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                         allowFullScreen
-                                        title="Live stream"
+                                        title={t("live:liveStream")}
                                     />
                                 </div>
                             )}
@@ -277,11 +275,9 @@ export default function LiveRoom() {
                         <div className="bg-white dark:bg-surface-900 rounded-2xl border border-surface-200 dark:border-surface-700 p-12 text-center">
                             <VideoOff className="w-16 h-16 mx-auto text-surface-300 dark:text-surface-600" />
                             <h2 className="mt-4 text-xl font-semibold text-surface-900 dark:text-surface-50">
-                                No Live Session
-                            </h2>
+                                {t("live:noLiveSession")}</h2>
                             <p className="mt-2 text-surface-500 dark:text-surface-400 max-w-md mx-auto">
-                                There's no live session right now. Check back later or browse past recordings below.
-                            </p>
+                                {t("live:thereSNoLiveSessionRightNowCheckBack")}</p>
                         </div>
                     )}
 
@@ -289,8 +285,7 @@ export default function LiveRoom() {
                     {upcoming.length > 0 && (
                         <div>
                             <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50 mb-4">
-                                Upcoming Sessions
-                            </h2>
+                                {t("live:upcomingSessions")}</h2>
                             <div className="space-y-3">
                                 {upcoming.map((session) => {
                                     const rsvpStatus = rsvpStatuses[session.id];
@@ -336,8 +331,8 @@ export default function LiveRoom() {
                                                         >
                                                             <CalendarCheck className="w-4 h-4 group-hover:hidden" />
                                                             <CalendarX className="w-4 h-4 hidden group-hover:block" />
-                                                            <span className="group-hover:hidden">RSVP'd</span>
-                                                            <span className="hidden group-hover:inline">Cancel</span>
+                                                            <span className="group-hover:hidden">{t("live:rSVPD")}</span>
+                                                            <span className="hidden group-hover:inline">{t("live:cancel")}</span>
                                                         </button>
                                                     ) : rsvpOpen ? (
                                                         <button
@@ -346,12 +341,11 @@ export default function LiveRoom() {
                                                             className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
                                                         >
                                                             <CalendarCheck className="w-4 h-4" />
-                                                            {rsvpLoading === session.id ? 'Saving...' : 'RSVP'}
+                                                            {rsvpLoading === session.id ? t("common:uiSaving") : t("common:uiRSVP")}
                                                         </button>
                                                     ) : (
                                                         <span className="text-xs text-surface-400 dark:text-surface-500 px-3 py-1.5">
-                                                            RSVP Closed
-                                                        </span>
+                                                            {t("live:rSVPClosed")}</span>
                                                     )}
                                                 </div>
                                             </div>
@@ -377,7 +371,7 @@ export default function LiveRoom() {
                                         <p className="text-xs text-surface-400 dark:text-surface-500 mt-0.5">
                                             {formatDate(activeRecording.started_at)}
                                             {activeRecording.started_at && activeRecording.ended_at && (
-                                                <> &middot; {formatDuration(activeRecording.started_at, activeRecording.ended_at)}</>
+                                                <>{t("live:text", { value1: formatDuration(activeRecording.started_at, activeRecording.ended_at) })}</>
                                             )}
                                         </p>
                                     </div>
@@ -386,15 +380,13 @@ export default function LiveRoom() {
                                     onClick={() => setActiveRecording(null)}
                                     className="text-sm text-surface-500 hover:text-surface-700 dark:hover:text-surface-300"
                                 >
-                                    Close
-                                </button>
+                                    {t("live:close")}</button>
                             </div>
                             {activeRecording.visibility === 'private' ? (
                                 <div className="p-8 text-center">
                                     <Lock className="w-10 h-10 mx-auto text-amber-400 dark:text-amber-500 mb-3" />
                                     <p className="text-surface-500 dark:text-surface-400 mb-4">
-                                        This recording is private. Watch it on YouTube with your RSVP email.
-                                    </p>
+                                        {t("live:thisRecordingIsPrivateWatchItOnYouTubeWith")}</p>
                                     <a
                                         href={`https://www.youtube.com/watch?v=${extractVideoId(activeRecording.playerUrl)}`}
                                         target="_blank"
@@ -402,8 +394,7 @@ export default function LiveRoom() {
                                         className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
                                     >
                                         <ExternalLink className="w-4 h-4" />
-                                        Watch on YouTube
-                                    </a>
+                                        {t("live:watchOnYouTube")}</a>
                                 </div>
                             ) : (
                                 <div className="relative aspect-video bg-black overflow-hidden">
@@ -423,8 +414,7 @@ export default function LiveRoom() {
                     {recordings.length > 0 && (
                         <div>
                             <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50 mb-4">
-                                Past Recordings
-                            </h2>
+                                {t("live:pastRecordings")}</h2>
                             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 {recordings.map((recording) => (
                                     <button
@@ -454,7 +444,7 @@ export default function LiveRoom() {
                                                     <Clock className="w-3 h-3" />
                                                     <span>{formatDate(recording.started_at)}</span>
                                                     {recording.started_at && recording.ended_at && (
-                                                        <span>&middot; {formatDuration(recording.started_at, recording.ended_at)}</span>
+                                                        <span>{t("live:text", { value1: formatDuration(recording.started_at, recording.ended_at) })}</span>
                                                     )}
                                                 </div>
                                             </div>
@@ -468,8 +458,7 @@ export default function LiveRoom() {
                     {/* Empty state */}
                     {!isLoading && recordings.length === 0 && !status?.isLive && upcoming.length === 0 && (
                         <p className="text-center text-surface-400 dark:text-surface-500 py-8">
-                            No past recordings available yet.
-                        </p>
+                            {t("live:noPastRecordingsAvailableYet")}</p>
                     )}
                 </div>
             </div>
@@ -500,7 +489,7 @@ export default function LiveRoom() {
                                 <button
                                     onClick={() => setShowChat(true)}
                                     className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 text-surface-600 dark:text-surface-400"
-                                    title="Show chat"
+                                    title={t("live:showChat")}
                                 >
                                     <MessageSquare className="w-5 h-5" />
                                 </button>
@@ -515,13 +504,12 @@ export default function LiveRoom() {
                                     <div className="flex items-center gap-2">
                                         <MessageSquare className="w-4 h-4 text-primary-500" />
                                         <span className="text-sm font-medium text-surface-900 dark:text-surface-50">
-                                            Live Chat
-                                        </span>
+                                            {t("live:liveChat")}</span>
                                     </div>
                                     <button
                                         onClick={() => setShowChat(false)}
                                         className="p-1 hover:bg-surface-100 dark:hover:bg-surface-800 rounded"
-                                        title="Hide chat"
+                                        title={t("live:hideChat")}
                                     >
                                         <ChevronLeft className="w-5 h-5 text-surface-500 rotate-180" />
                                     </button>

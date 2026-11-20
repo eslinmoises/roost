@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +21,7 @@ interface NotificationCenterProps {
 const NOTIFICATIONS_PER_PAGE = 20;
 
 export default function NotificationCenter({ isOpen, onClose, onNavigate, onUnreadCountChange }: NotificationCenterProps) {
+    useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -45,7 +49,7 @@ export default function NotificationCenter({ isOpen, onClose, onNavigate, onUnre
       setHasMore(data.length >= NOTIFICATIONS_PER_PAGE);
     } catch (err) {
       console.error('Error loading notifications:', err);
-      setError('Failed to load notifications');
+      setError(t("notifications:failedToLoadNotifications"));
     } finally {
       if (showLoading) {
         setIsLoading(false);
@@ -184,22 +188,21 @@ export default function NotificationCenter({ isOpen, onClose, onNavigate, onUnre
       ">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-surface-200 dark:border-surface-700">
-          <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-100">Notifications</h3>
+          <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-100">{t("notifications:notifications")}</h3>
           <div className="flex items-center gap-2">
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
                 disabled={APP_CONFIG.demo.enabled}
-                title={APP_CONFIG.demo.enabled ? 'Read-only demo' : undefined}
+                title={APP_CONFIG.demo.enabled ? t("notifications:readOnlyDemo") : undefined}
                 className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium flex items-center gap-1"
               >
                 <CheckCheck className="w-4 h-4" />
-                Mark all read
-              </button>
+                {t("notifications:markAllRead")}</button>
             )}
             <button
               onClick={onClose}
-              aria-label="Close notifications"
+              aria-label={t("notifications:closeNotifications")}
               className="p-1 text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
             >
               <X className="w-5 h-5" />
@@ -215,18 +218,16 @@ export default function NotificationCenter({ isOpen, onClose, onNavigate, onUnre
             </div>
           ) : error ? (
             <div className="flex flex-col items-center justify-center p-8 text-center">
-              <p className="text-sm text-error mb-2">{error}</p>
+              <p className="text-sm text-error mb-2">{localizeError(error)}</p>
               <button onClick={() => void loadNotifications(true)} className="btn btn-secondary btn-sm">
-                Retry
-              </button>
+                {t("notifications:retry")}</button>
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center">
               <Bell className="w-12 h-12 text-surface-300 dark:text-surface-600 mb-3" />
-              <p className="text-sm text-surface-500 dark:text-surface-400">No notifications yet</p>
+              <p className="text-sm text-surface-500 dark:text-surface-400">{t("notifications:noNotificationsYet")}</p>
               <p className="text-xs text-surface-400 dark:text-surface-500 mt-1">
-                You'll be notified about comments, reactions, and messages
-              </p>
+                {t("notifications:youLlBeNotifiedAboutCommentsReactionsAndMessages")}</p>
             </div>
           ) : (
             <div className="divide-y divide-surface-100 dark:divide-surface-800">
@@ -244,10 +245,10 @@ export default function NotificationCenter({ isOpen, onClose, onNavigate, onUnre
                   {loadingMore ? (
                     <div className="flex items-center justify-center gap-2 text-surface-500 dark:text-surface-400">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="text-xs">Loading more...</span>
+                      <span className="text-xs">{t("notifications:loadingMore")}</span>
                     </div>
                   ) : (
-                    <span className="text-xs text-surface-400 dark:text-surface-500">Scroll for more</span>
+                    <span className="text-xs text-surface-400 dark:text-surface-500">{t("notifications:scrollForMore")}</span>
                   )}
                 </div>
               )}

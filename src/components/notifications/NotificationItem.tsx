@@ -1,4 +1,6 @@
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+
 import { MessageSquare, Heart, Mail, UserPlus, Users, AtSign, UserCheck, Bell, Reply } from 'lucide-react';
 import type { Notification } from '../../types/database';
 import { getNotificationIconInfo } from '../../services/notification';
@@ -22,6 +24,7 @@ const iconMap = {
 };
 
 export default function NotificationItem({ notification, onClick }: NotificationItemProps) {
+    useTranslation();
   const { icon: iconName, color } = getNotificationIconInfo(notification.type);
   const Icon = iconMap[iconName as keyof typeof iconMap] || Bell;
 

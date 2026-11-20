@@ -1,7 +1,10 @@
+import { formatDistanceToNow } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Calendar, MessageCircle, Users } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+
 import { getPostById, PostWithDetails, getUserReactionsForItems } from '@/services';
 import { useAuth } from '@/contexts/AuthContext';
 import PostCard from '@/components/feed/PostCard';
@@ -10,6 +13,7 @@ import { CommunityMembersWidget } from '@/components/members/CommunityMembersWid
 import { ReactionType } from '@/types';
 
 export default function PostDetail() {
+    useTranslation();
     const { postId } = useParams<{ postId: string }>();
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -21,7 +25,7 @@ export default function PostDetail() {
 
     const fetchPost = useCallback(async () => {
         if (!postId) {
-            setError('Post not found');
+            setError(t("posts:postNotFound"));
             setLoading(false);
             return;
         }
@@ -34,7 +38,7 @@ export default function PostDetail() {
             ]);
 
             if (!fetchedPost) {
-                setError('Post not found');
+                setError(t("posts:postNotFound"));
                 return;
             }
 
@@ -42,7 +46,7 @@ export default function PostDetail() {
             setUserReaction(reactions.get(postId) || null);
         } catch (err) {
             console.error('Error fetching post:', err);
-            setError('Failed to load post');
+            setError(t("posts:failedToLoadPost"));
         } finally {
             setLoading(false);
         }
@@ -93,18 +97,17 @@ export default function PostDetail() {
                         className="flex items-center gap-2 text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100 mb-6 transition-colors"
                     >
                         <ArrowLeft className="w-5 h-5" />
-                        <span>Go back</span>
+                        <span>{t("posts:goBack")}</span>
                     </button>
                     <div className="card p-8 shadow-none text-center">
                         <p className="text-surface-500 dark:text-surface-400 text-lg">
-                            {error || 'Post not found'}
+                            {error || t("posts:postNotFound")}
                         </p>
                         <button
                             onClick={() => navigate('/')}
                             className="mt-4 text-primary-600 dark:text-primary-400 hover:underline"
                         >
-                            Return to feed
-                        </button>
+                            {t("posts:returnToFeed")}</button>
                     </div>
                 </div>
             </div>
@@ -117,7 +120,7 @@ export default function PostDetail() {
             <div className="hidden lg:block fixed top-16 right-0 w-80 h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin p-4 space-y-6 bg-white dark:bg-surface-900 border-l border-surface-200 dark:border-surface-800">
                 {/* Author card */}
                 <div className="card p-6 shadow-none">
-                    <h3 className="font-semibold text-surface-900 dark:text-surface-100 mb-4">Posted by</h3>
+                    <h3 className="font-semibold text-surface-900 dark:text-surface-100 mb-4">{t("posts:postedBy")}</h3>
                     <Link
                         to={`/profile/${post.author.username}`}
                         className="flex items-center gap-3 group"
@@ -146,13 +149,12 @@ export default function PostDetail() {
                         to={`/profile/${post.author.username}`}
                         className="mt-4 block w-full text-center px-4 py-2 bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 rounded-lg hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors text-sm font-medium"
                     >
-                        View Profile
-                    </Link>
+                        {t("posts:viewProfile")}</Link>
                 </div>
 
                 {/* Post info card */}
                 <div className="card p-6 shadow-none">
-                    <h3 className="font-semibold text-surface-900 dark:text-surface-100 mb-4">Post Info</h3>
+                    <h3 className="font-semibold text-surface-900 dark:text-surface-100 mb-4">{t("posts:postInfo")}</h3>
                     <div className="space-y-3 text-sm">
                         <div className="flex items-center gap-2 text-surface-600 dark:text-surface-400">
                             <Calendar className="w-4 h-4" />
@@ -172,17 +174,17 @@ export default function PostDetail() {
                         )}
                         <div className="flex items-center gap-2 text-surface-600 dark:text-surface-400">
                             <MessageCircle className="w-4 h-4" />
-                            <span>{post.comment_count} {post.comment_count === 1 ? 'comment' : 'comments'}</span>
+                            <span>{t('common:countCommentsLower', { count: post.comment_count })}</span>
                         </div>
                         <div className="flex items-center gap-2 text-surface-600 dark:text-surface-400">
                             <Users className="w-4 h-4" />
-                            <span>{post.reaction_counts.total} {post.reaction_counts.total === 1 ? 'reaction' : 'reactions'}</span>
+                            <span>{t('common:countReactions', { count: post.reaction_counts.total })}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Leaderboard card */}
-                <LeaderboardCard period={30} limit={5} title="Top Contributors" />
+                <LeaderboardCard period={30} limit={5} title={t("posts:topContributors")} />
 
                 {/* Community Members Widget */}
                 <CommunityMembersWidget />
@@ -197,7 +199,7 @@ export default function PostDetail() {
                         className="flex items-center gap-2 text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100 transition-colors"
                     >
                         <ArrowLeft className="w-5 h-5" />
-                        <span>Back</span>
+                        <span>{t("posts:back")}</span>
                     </button>
 
                     {/* Post card with comments expanded by default */}

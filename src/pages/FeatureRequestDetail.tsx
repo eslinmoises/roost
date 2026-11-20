@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
@@ -15,6 +17,7 @@ import type { Asset } from '@/services/asset';
 import type { FeatureRequestWithDetails, FeatureRequestCommentWithAuthor } from '@/types/feature-request';
 
 export default function FeatureRequestDetailPage() {
+    useTranslation();
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -103,15 +106,12 @@ export default function FeatureRequestDetailPage() {
                     className="inline-flex items-center gap-2 text-sm text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 mb-6 transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    Back to Roadmap
-                </button>
+                    {t("roadmap:backToRoadmap")}</button>
                 <div className="text-center py-20">
                     <h2 className="text-lg font-medium text-surface-900 dark:text-surface-100 mb-2">
-                        Feature request not found
-                    </h2>
+                        {t("roadmap:featureRequestNotFound")}</h2>
                     <p className="text-surface-500">
-                        The feature request you're looking for doesn't exist or was deleted.
-                    </p>
+                        {t("roadmap:theFeatureRequestYouReLookingForDoesnT")}</p>
                 </div>
             </div>
         );
@@ -125,8 +125,7 @@ export default function FeatureRequestDetailPage() {
                 className="inline-flex items-center gap-2 text-sm text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 mb-6 transition-colors"
             >
                 <ArrowLeft className="w-4 h-4" />
-                Back to Roadmap
-            </button>
+                {t("roadmap:backToRoadmap")}</button>
 
             {/* Detail view */}
             <div className="card p-6 shadow-none mb-6">

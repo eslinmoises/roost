@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { getConversationMessages, sendMessage, markConversationAsRead, getMessageById } from '../../services/message';
@@ -17,6 +20,7 @@ interface ChatViewProps {
 const MESSAGES_PER_PAGE = 50;
 
 export default function ChatView({ conversation, onBack }: ChatViewProps) {
+    useTranslation();
   const { user } = useAuth();
   const [messages, setMessages] = useState<MessageWithSender[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +57,7 @@ export default function ChatView({ conversation, onBack }: ChatViewProps) {
       }
     } catch (err) {
       console.error('Error loading messages:', err);
-      setError('Failed to load messages');
+      setError(t("messages:failedToLoadMessages"));
     } finally {
       if (showLoading) {
         setIsLoading(false);
@@ -200,7 +204,7 @@ export default function ChatView({ conversation, onBack }: ChatViewProps) {
       console.error('Error sending message:', err);
       // Remove optimistic message on error
       setMessages(prev => prev.filter(m => m.id !== optimisticMessage.id));
-      setError('Failed to send message. Please try again.');
+      setError(t("messages:failedToSendMessagePleaseTryAgain"));
     }
   };
 
@@ -214,7 +218,7 @@ export default function ChatView({ conversation, onBack }: ChatViewProps) {
       <div className="flex items-center gap-3 p-4 bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-700">
         {onBack && (
           <button
-            aria-label="Back to conversations"
+            aria-label={t("messages:backToConversations")}
             onClick={onBack}
             className="md:hidden p-2 -ml-2 text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg"
           >
@@ -259,7 +263,7 @@ export default function ChatView({ conversation, onBack }: ChatViewProps) {
       {error && (
         <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800 text-error text-sm">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          <span>{error}</span>
+          <span>{localizeError(error)}</span>
         </div>
       )}
 
@@ -278,8 +282,7 @@ export default function ChatView({ conversation, onBack }: ChatViewProps) {
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-center">
             <p className="text-sm text-surface-500 dark:text-surface-400">
-              No messages yet. Start the conversation!
-            </p>
+              {t("messages:noMessagesYetStartTheConversation")}</p>
           </div>
         ) : (
           <>

@@ -1,6 +1,9 @@
+import { formatDistanceToNow } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useState } from 'react';
-import { formatDistanceToNow } from 'date-fns';
+
 import DOMPurify from 'dompurify';
 import {
     ChevronUp,
@@ -36,6 +39,7 @@ export default function FeatureRequestDetailView({
     isVoting,
     onUpdate,
 }: FeatureRequestDetailProps) {
+    useTranslation();
     const { isPlatformAdmin, isPlatformModerator } = useAuth();
     const isAdmin = isPlatformAdmin || isPlatformModerator;
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
@@ -161,8 +165,7 @@ export default function FeatureRequestDetailView({
                     <div className="flex items-center gap-2 mb-2">
                         <Shield className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                         <span className="text-sm font-medium text-primary-700 dark:text-primary-300">
-                            Official Response
-                        </span>
+                            {t("roadmap:officialResponse")}</span>
                     </div>
                     <p className="text-sm text-primary-800 dark:text-primary-200 whitespace-pre-wrap">
                         {request.admin_response}
@@ -176,15 +179,13 @@ export default function FeatureRequestDetailView({
                     <div className="flex items-center gap-2 mb-2">
                         <Shield className="w-4 h-4 text-primary-600" />
                         <span className="text-sm font-semibold text-surface-900 dark:text-surface-100">
-                            Admin Controls
-                        </span>
+                            {t("roadmap:adminControls")}</span>
                     </div>
 
                     {/* Status change */}
                     <div>
                         <label className="block text-xs font-medium text-surface-600 dark:text-surface-400 mb-1.5">
-                            Status
-                        </label>
+                            {t("roadmap:status")}</label>
                         <div className="flex flex-wrap gap-2">
                             {ALL_STATUSES.map((s) => {
                                 const info = FEATURE_REQUEST_STATUS_INFO[s];
@@ -218,18 +219,17 @@ export default function FeatureRequestDetailView({
                         }`}
                     >
                         <Star className={`w-3.5 h-3.5 ${request.is_pinned ? 'fill-yellow-500 text-yellow-500' : ''}`} />
-                        {request.is_pinned ? 'Unpin' : 'Pin'}
+                        {request.is_pinned ? t("common:uiUnpin") : t("common:uiPin")}
                     </button>
 
                     {/* Admin response */}
                     <div>
                         <label className="block text-xs font-medium text-surface-600 dark:text-surface-400 mb-1.5">
-                            Official Response
-                        </label>
+                            {t("roadmap:officialResponse")}</label>
                         <textarea
                             value={adminResponse}
                             onChange={(e) => setAdminResponse(e.target.value)}
-                            placeholder="Add an official response..."
+                            placeholder={t("roadmap:addAnOfficialResponse")}
                             className="w-full px-3 py-2 rounded-lg border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100 text-sm resize-none placeholder-surface-400"
                             rows={3}
                         />
@@ -239,8 +239,7 @@ export default function FeatureRequestDetailView({
                             className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 transition-colors"
                         >
                             {isSavingResponse ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
-                            Save Response
-                        </button>
+                            {t("roadmap:saveResponse")}</button>
                     </div>
                 </div>
             )}

@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
 import { ReactNode } from 'react';
 import { LucideIcon } from 'lucide-react';
 
@@ -31,13 +34,14 @@ export default function StatsCard({
     color = 'blue',
     children,
 }: StatsCardProps) {
+    useTranslation();
     return (
         <div className="bg-white dark:bg-surface-900 rounded-xl shadow-sm border border-gray-100 dark:border-surface-700 p-6">
             <div className="flex items-start justify-between">
                 <div className="flex-1">
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
                     <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
-                        {typeof value === 'number' ? value.toLocaleString() : value}
+                        {typeof value === 'number' ? value.toLocaleString(activeLanguage()) : value}
                     </p>
                     {trend && (
                         <p className="mt-2 text-sm">
@@ -45,7 +49,7 @@ export default function StatsCard({
                                 className={`font-medium ${trend.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                                     }`}
                             >
-                                {trend.isPositive ? '+' : ''}{trend.value}
+                                {trend.isPositive ? '+' : ''}{formatNumber(trend.value)}
                             </span>
                             <span className="text-gray-500 dark:text-gray-400 ml-1">{trend.label}</span>
                         </p>

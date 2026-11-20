@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 /**
  * Activation Service
  * Handles product activation requests for premium products like Elementor, Bricks Builder, themes, etc.
@@ -42,9 +43,9 @@ export interface ActivationStats {
 }
 
 export const PRODUCT_TYPES = [
-    { value: 'plugin', label: 'Plugin' },
-    { value: 'theme', label: 'Theme' },
-    { value: 'other', label: 'Other' },
+    { value: 'plugin', get label() { return t("errors:plugin"); } },
+    { value: 'theme', get label() { return t("errors:theme"); } },
+    { value: 'other', get label() { return t("errors:other"); } },
 ] as const;
 
 export type ProductType = (typeof PRODUCT_TYPES)[number]['value'];
@@ -53,7 +54,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 async function adminProductRequest<T>(path = '', init?: RequestInit): Promise<T> {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw new Error('Authentication required');
+    if (!session) throw new Error(t("errors:authenticationRequired"));
     const response = await fetch(`${API_URL}/api/activations/products${path}`, {
         ...init,
         headers: {
@@ -64,7 +65,7 @@ async function adminProductRequest<T>(path = '', init?: RequestInit): Promise<T>
     });
     if (!response.ok) {
         const body = await response.json().catch(() => ({}));
-        throw new Error(body.error || 'Activation product request failed');
+        throw new Error(body.error || t("errors:activationProductRequestFailed"));
     }
     if (response.status === 204) return undefined as T;
     return response.json() as Promise<T>;

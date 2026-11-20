@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 // ============================================================
 // Roost - Supabase Database Adapter
 // Works for both Supabase Cloud and Self-hosted (same API, different URL)
@@ -82,7 +83,7 @@ const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
 function toResult<T>(data: T | null, error: unknown): DbResult<T> {
   if (error) {
     const e = error as { message?: string; code?: string; details?: string };
-    return { data: null, error: { message: e.message ?? 'Unknown error', code: e.code, details: e.details } };
+    return { data: null, error: { message: e.message ?? t("errors:unknownError"), code: e.code, details: e.details } };
   }
   return { data: data as T, error: null };
 }
@@ -91,7 +92,7 @@ function toResult<T>(data: T | null, error: unknown): DbResult<T> {
 function toListResult<T>(data: T[] | null, error: unknown, count?: number | null): DbListResult<T> {
   if (error) {
     const e = error as { message?: string; code?: string; details?: string };
-    return { data: [], error: { message: e.message ?? 'Unknown error', code: e.code, details: e.details } };
+    return { data: [], error: { message: e.message ?? t("errors:unknownError"), code: e.code, details: e.details } };
   }
   return { data: (data ?? []) as T[], error: null, count: count ?? undefined };
 }
@@ -1623,7 +1624,7 @@ export class SupabaseAdapter implements DatabaseAdapter {
     adminNotes?: string,
   ): Promise<DbResult<ActivationRequest>> {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return toResult<ActivationRequest>(null, { message: 'Authentication required' });
+    if (!user) return toResult<ActivationRequest>(null, { message: t("errors:authenticationRequired") });
     const { error: processError } = await supabase.rpc('process_activation_request', {
       p_request_id: requestId,
       p_processor_id: user.id,

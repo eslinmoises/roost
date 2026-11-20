@@ -1,3 +1,6 @@
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, Trash2 } from 'lucide-react';
 import { useAuth } from '@/contexts';
@@ -14,6 +17,7 @@ interface LiveRoomChatProps {
 }
 
 export default function LiveRoomChat({ sessionId }: LiveRoomChatProps) {
+    useTranslation();
   const { user, profile, isPlatformAdmin } = useAuth();
   const [messages, setMessages] = useState<LiveChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -166,7 +170,7 @@ export default function LiveRoomChat({ sessionId }: LiveRoomChatProps) {
   };
 
   const formatTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleTimeString('en-US', {
+    return new Date(dateStr).toLocaleTimeString(activeLanguage(), {
       hour: 'numeric',
       minute: '2-digit',
     });
@@ -186,8 +190,7 @@ export default function LiveRoomChat({ sessionId }: LiveRoomChatProps) {
           </div>
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-surface-400 dark:text-surface-500 text-sm">
-            No messages yet. Say hello!
-          </div>
+            {t("live:noMessagesYetSayHello")}</div>
         ) : (
           messages.map((msg) => {
             const isOwn = msg.user_id === user?.id;
@@ -215,7 +218,7 @@ export default function LiveRoomChat({ sessionId }: LiveRoomChatProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2">
                     <span className={`text-xs font-semibold truncate ${isOwn ? 'text-primary-600 dark:text-primary-400' : 'text-surface-900 dark:text-surface-100'}`}>
-                      {msg.profiles?.display_name || 'Unknown'}
+                      {msg.profiles?.display_name || t("common:uiUnknown")}
                     </span>
                     <span className="text-[10px] text-surface-400 dark:text-surface-500 flex-shrink-0">
                       {formatTime(msg.created_at)}
@@ -231,7 +234,7 @@ export default function LiveRoomChat({ sessionId }: LiveRoomChatProps) {
                   <button
                     onClick={() => handleDelete(msg.id)}
                     className="opacity-0 group-hover:opacity-100 p-1 text-surface-400 hover:text-red-500 transition-all flex-shrink-0"
-                    title="Delete message"
+                    title={t("live:deleteMessage")}
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -251,7 +254,7 @@ export default function LiveRoomChat({ sessionId }: LiveRoomChatProps) {
             value={input}
             onChange={(e) => setInput(e.target.value.slice(0, 500))}
             onKeyDown={handleKeyDown}
-            placeholder="Send a message..."
+            placeholder={t("live:sendAMessage")}
             maxLength={500}
             className="flex-1 px-3 py-2 text-sm rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 text-surface-900 dark:text-surface-100 placeholder-surface-400 dark:placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />

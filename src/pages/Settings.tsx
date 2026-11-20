@@ -1,3 +1,7 @@
+import { formatNumber } from '@/lib/locale';
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -38,13 +42,14 @@ import {
 type SettingsTab = 'profile' | 'account' | 'subscription' | 'notifications';
 
 const TABS: { id: SettingsTab; label: string; icon: typeof User }[] = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'account', label: 'Account', icon: Shield },
-    { id: 'subscription', label: 'Subscription', icon: CreditCard },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'profile', get label() { return t("settings:profile"); }, icon: User },
+    { id: 'account', get label() { return t("settings:account"); }, icon: Shield },
+    { id: 'subscription', get label() { return t("settings:subscription"); }, icon: CreditCard },
+    { id: 'notifications', get label() { return t("settings:notifications"); }, icon: Bell },
 ];
 
 export default function Settings() {
+    useTranslation();
     const { user, profile, refreshProfile, signOut } = useAuth();
     const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
@@ -107,14 +112,14 @@ export default function Settings() {
     }, [user]);
 
     const handleDeleteAccount = async () => {
-        const confirmation = window.prompt('This permanently deletes your account and content. Type DELETE to continue.');
+        const confirmation = window.prompt(t("settings:thisPermanentlyDeletesYourAccountAndContentTypeDELETE"));
         if (confirmation !== 'DELETE') return;
 
         setIsDeletingAccount(true);
         setError(null);
         try {
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) throw new Error('You must be signed in to delete your account.');
+            if (!session) throw new Error(t("settings:youMustBeSignedInToDeleteYourAccount"));
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
             const response = await fetch(`${apiUrl}/api/auth/account`, {
                 method: 'DELETE',
@@ -126,12 +131,12 @@ export default function Settings() {
             });
             if (!response.ok) {
                 const body = await response.json().catch(() => ({}));
-                throw new Error(body.error || 'Account deletion failed.');
+                throw new Error(body.error || t("settings:accountDeletionFailed"));
             }
             await signOut();
             window.location.assign('/login');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Account deletion failed.');
+            setError(err instanceof Error ? localizeError(err.message) : t("settings:accountDeletionFailed"));
         } finally {
             setIsDeletingAccount(false);
         }
@@ -167,7 +172,7 @@ export default function Settings() {
                 setNotificationPrefs(prefs);
             } catch (err) {
                 console.error('Failed to load notification preferences:', err);
-                setPrefsError('Failed to load notification preferences');
+                setPrefsError(t("settings:failedToLoadNotificationPreferences"));
             } finally {
                 setIsPrefsLoading(false);
             }
@@ -196,7 +201,7 @@ export default function Settings() {
             setTimeout(() => setPrefsSaved(false), 3000);
         } catch (err) {
             console.error('Failed to save notification preferences:', err);
-            setPrefsError('Failed to save preferences. Please try again.');
+            setPrefsError(t("settings:failedToSavePreferencesPleaseTryAgain"));
         } finally {
             setIsPrefsSaving(false);
         }
@@ -269,7 +274,7 @@ export default function Settings() {
             await refreshProfile();
         } catch (err) {
             console.error('Failed to upload cover photo:', err);
-            setError(err instanceof Error ? err.message : 'Failed to upload cover photo');
+            setError(err instanceof Error ? localizeError(err.message) : t("settings:failedToUploadCoverPhoto"));
         } finally {
             setIsCoverUploading(false);
         }
@@ -297,27 +302,27 @@ export default function Settings() {
 
         // Validate
         if (!formData.display_name.trim()) {
-            setError('Display name is required');
+            setError(t("settings:displayNameIsRequired"));
             return;
         }
 
         if (!isValidUsername(formData.username)) {
-            setError('Username must be 3-30 characters, letters, numbers, underscores, or hyphens only');
+            setError(t("settings:usernameMustBe330CharactersLettersNumbersUnderscores"));
             return;
         }
 
         if (usernameStatus === 'taken') {
-            setError('Username is already taken');
+            setError(t("settings:usernameIsAlreadyTaken"));
             return;
         }
 
         if (formData.website && !isValidWebsite(formData.website)) {
-            setError('Please enter a valid website URL');
+            setError(t("settings:pleaseEnterAValidWebsiteURL"));
             return;
         }
 
         if (formData.bio.length > 500) {
-            setError('Bio must be 500 characters or less');
+            setError(t("settings:bioMustBe500CharactersOrLess"));
             return;
         }
 
@@ -338,7 +343,7 @@ export default function Settings() {
             // Clear saved indicator after 3 seconds
             setTimeout(() => setIsSaved(false), 3000);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to update profile');
+            setError(err instanceof Error ? localizeError(err.message) : t("settings:failedToUpdateProfile"));
         } finally {
             setIsLoading(false);
         }
@@ -358,14 +363,12 @@ export default function Settings() {
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 flex items-center gap-3">
                     <SettingsIcon className="w-7 h-7 text-primary-600" />
-                    Settings
-                </h1>
+                    {t("settings:settings")}</h1>
                 <p className="text-surface-500 dark:text-surface-400 mt-1">
-                    Manage your account settings and preferences
-                </p>
+                    {t("settings:manageYourAccountSettingsAndPreferences")}</p>
             </div>
 
-            {APP_CONFIG.demo.enabled && <p className="mb-6 text-sm text-surface-600 dark:text-surface-300">Settings are read-only in this shared demo. Explore the tabs to preview profile, security, and notification options.</p>}
+            {APP_CONFIG.demo.enabled && <p className="mb-6 text-sm text-surface-600 dark:text-surface-300">{t("settings:settingsAreReadOnlyInThisSharedDemoExplore")}</p>}
 
             {/* Main Layout */}
             <div className="flex flex-col lg:flex-row gap-8">
@@ -401,19 +404,17 @@ export default function Settings() {
                     {activeTab === 'profile' && (
                         <div className="card shadow-none p-6 sm:p-8">
                             <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-6">
-                                Profile Information
-                            </h2>
+                                {t("settings:profileInformation")}</h2>
 
                             {/* Cover Photo */}
                             <div className="mb-8 pb-8 border-b border-surface-200 dark:border-surface-700">
                                 <h3 className="font-medium text-surface-900 dark:text-surface-100 mb-3">
-                                    Cover Photo
-                                </h3>
+                                    {t("settings:coverPhoto")}</h3>
                                 <div className="relative w-full h-48 rounded-xl overflow-hidden bg-gradient-to-br from-primary-400 to-primary-600">
                                     {coverUrl && (
                                         <img
                                             src={coverUrl}
-                                            alt="Cover"
+                                            alt={t("settings:cover")}
                                             className="w-full h-full object-cover"
                                         />
                                     )}
@@ -425,7 +426,7 @@ export default function Settings() {
                                     <div className="absolute bottom-3 right-3 flex gap-2">
                                         <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 bg-white/90 dark:bg-surface-800/90 text-surface-700 dark:text-surface-200 text-sm font-medium rounded-lg hover:bg-white dark:hover:bg-surface-800 transition-colors">
                                             <ImageIcon className="w-4 h-4" />
-                                            <span>{coverUrl ? 'Change' : 'Upload'}</span>
+                                            <span>{coverUrl ? t("common:uiChange") : t("common:uiUpload")}</span>
                                             <input
                                                 type="file"
                                                 accept="image/jpeg,image/png,image/gif,image/webp"
@@ -441,14 +442,13 @@ export default function Settings() {
                                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-500/90 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors"
                                             >
                                                 <Trash2 className="w-4 h-4" />
-                                                <span>Remove</span>
+                                                <span>{t("settings:remove")}</span>
                                             </button>
                                         )}
                                     </div>
                                 </div>
                                 <p className="text-sm text-surface-500 dark:text-surface-400 mt-2">
-                                    Recommended size: 1200x400px. JPG, PNG, GIF or WebP.
-                                </p>
+                                    {t("settings:recommendedSize1200x400pxJPGPNGGIFOrWebP")}</p>
                             </div>
 
                             {/* Avatar */}
@@ -462,11 +462,9 @@ export default function Settings() {
                                 />
                                 <div>
                                     <h3 className="font-medium text-surface-900 dark:text-surface-100">
-                                        Profile Photo
-                                    </h3>
+                                        {t("settings:profilePhoto")}</h3>
                                     <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                                        Click to upload a new photo. JPG, PNG or GIF, max 5MB.
-                                    </p>
+                                        {t("settings:clickToUploadANewPhotoJPGPNGOr")}</p>
                                 </div>
                             </div>
 
@@ -476,7 +474,7 @@ export default function Settings() {
                                 {error && (
                                     <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                        <span>{error}</span>
+                                        <span>{localizeError(error)}</span>
                                     </div>
                                 )}
 
@@ -484,7 +482,7 @@ export default function Settings() {
                                 {isSaved && (
                                     <div className="p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 rounded-lg text-sm flex items-center gap-2">
                                         <Check className="w-4 h-4" />
-                                        <span>Profile saved successfully!</span>
+                                        <span>{t("settings:profileSavedSuccessfully")}</span>
                                     </div>
                                 )}
 
@@ -493,8 +491,7 @@ export default function Settings() {
                                     {/* Display Name */}
                                     <div>
                                         <label htmlFor="display_name" className="label">
-                                            Display Name
-                                        </label>
+                                            {t("settings:displayName")}</label>
                                         <div className="relative">
                                             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
                                             <input
@@ -503,7 +500,7 @@ export default function Settings() {
                                                 type="text"
                                                 value={formData.display_name}
                                                 onChange={handleChange}
-                                                placeholder="Your name"
+                                                placeholder={t("settings:yourName")}
                                                 required
                                                 maxLength={100}
                                                 className="input pl-10"
@@ -514,8 +511,7 @@ export default function Settings() {
                                     {/* Username */}
                                     <div>
                                         <label htmlFor="username" className="label">
-                                            Username
-                                        </label>
+                                            {t("settings:username")}</label>
                                         <div className="relative">
                                             <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
                                             <input
@@ -524,7 +520,7 @@ export default function Settings() {
                                                 type="text"
                                                 value={formData.username}
                                                 onChange={handleChange}
-                                                placeholder="username"
+                                                placeholder={t('common:usernamePlaceholder')}
                                                 required
                                                 pattern="^[a-zA-Z0-9_\-]+$"
                                                 maxLength={30}
@@ -547,16 +543,14 @@ export default function Settings() {
                                             </div>
                                         </div>
                                         <p className="text-xs text-surface-400 dark:text-surface-500 mt-1">
-                                            3-30 characters. Letters, numbers, underscores, and hyphens only.
-                                        </p>
+                                            {t("settings:330CharactersLettersNumbersUnderscoresAndHyphensOnly")}</p>
                                     </div>
                                 </div>
 
                                 {/* Bio */}
                                 <div>
                                     <label htmlFor="bio" className="label">
-                                        Bio
-                                    </label>
+                                        {t("settings:bio")}</label>
                                     <div className="relative">
                                         <FileText className="absolute left-3 top-3 w-4 h-4 text-surface-400" />
                                         <textarea
@@ -564,14 +558,14 @@ export default function Settings() {
                                             name="bio"
                                             value={formData.bio}
                                             onChange={handleChange}
-                                            placeholder="Tell us about yourself..."
+                                            placeholder={t("settings:tellUsAboutYourself")}
                                             rows={4}
                                             maxLength={500}
                                             className="input pl-10 resize-none"
                                         />
                                     </div>
                                     <p className="text-xs text-surface-400 dark:text-surface-500 mt-1 text-right">
-                                        {formData.bio.length}/500
+                                        {formatNumber(formData.bio.length)}/500
                                     </p>
                                 </div>
 
@@ -580,8 +574,7 @@ export default function Settings() {
                                     {/* Location */}
                                     <div>
                                         <label htmlFor="location" className="label">
-                                            Location
-                                        </label>
+                                            {t("settings:location")}</label>
                                         <div className="relative">
                                             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
                                             <input
@@ -590,7 +583,7 @@ export default function Settings() {
                                                 type="text"
                                                 value={formData.location}
                                                 onChange={handleChange}
-                                                placeholder="City, Country"
+                                                placeholder={t("settings:cityCountry")}
                                                 maxLength={100}
                                                 className="input pl-10"
                                             />
@@ -600,8 +593,7 @@ export default function Settings() {
                                     {/* Website */}
                                     <div>
                                         <label htmlFor="website" className="label">
-                                            Website
-                                        </label>
+                                            {t("settings:website")}</label>
                                         <div className="relative">
                                             <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
                                             <input
@@ -627,10 +619,10 @@ export default function Settings() {
                                         {isLoading ? (
                                             <>
                                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                                <span>Saving...</span>
+                                                <span>{t("settings:saving")}</span>
                                             </>
                                         ) : (
-                                            <span>Save Changes</span>
+                                            <span>{t("settings:saveChanges")}</span>
                                         )}
                                     </button>
                                 </div>
@@ -644,10 +636,9 @@ export default function Settings() {
                             {/* Email Section */}
                             <div className="card shadow-none p-6 sm:p-8">
                                 <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-6">
-                                    Email Address
-                                </h2>
+                                    {t("settings:emailAddress")}</h2>
                                 <div>
-                                    <label className="label">Email</label>
+                                    <label className="label">{t("settings:email")}</label>
                                     <input
                                         type="email"
                                         value={user.email || ''}
@@ -655,32 +646,27 @@ export default function Settings() {
                                         className="input bg-surface-50 dark:bg-surface-800 text-surface-500 dark:text-surface-400 cursor-not-allowed"
                                     />
                                     <p className="text-sm text-surface-500 dark:text-surface-400 mt-2">
-                                        Contact support to change your email address.
-                                    </p>
+                                        {t("settings:contactSupportToChangeYourEmailAddress")}</p>
                                 </div>
                             </div>
 
                             {/* Security Section */}
                             <div className="card shadow-none p-6 sm:p-8">
                                 <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-6">
-                                    Security
-                                </h2>
+                                    {t("settings:security")}</h2>
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-lg">
                                         <div>
                                             <h3 className="font-medium text-surface-900 dark:text-surface-100">
-                                                Password
-                                            </h3>
+                                                {t("settings:password")}</h3>
                                             <p className="text-sm text-surface-500 dark:text-surface-400">
-                                                Keep your account secure with a strong password
-                                            </p>
+                                                {t("settings:keepYourAccountSecureWithAStrongPassword")}</p>
                                         </div>
                                         <button
                                             onClick={() => setIsChangePasswordModalOpen(true)}
                                             className="btn-secondary px-4 py-2 text-sm"
                                         >
-                                            Change Password
-                                        </button>
+                                            {t("settings:changePassword")}</button>
                                     </div>
                                     <div className="flex items-center justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-lg">
                                         <div className="flex items-center gap-3">
@@ -695,12 +681,11 @@ export default function Settings() {
                                             )}
                                             <div>
                                                 <h3 className="font-medium text-surface-900 dark:text-surface-100">
-                                                    Two-Factor Authentication
-                                                </h3>
+                                                    {t("settings:twoFactorAuthentication")}</h3>
                                                 <p className="text-sm text-surface-500 dark:text-surface-400">
                                                     {is2FAEnabled
-                                                        ? 'Your account is protected with 2FA'
-                                                        : 'Add an extra layer of security to your account'
+                                                        ? t("settings:yourAccountIsProtectedWith2FA")
+                                                        : t("settings:addAnExtraLayerOfSecurityToYourAccount")
                                                     }
                                                 </p>
                                             </div>
@@ -712,15 +697,13 @@ export default function Settings() {
                                                 onClick={() => setIs2FADisableModalOpen(true)}
                                                 className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-300 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                                             >
-                                                Disable 2FA
-                                            </button>
+                                                {t("settings:disable2FA")}</button>
                                         ) : (
                                             <button
                                                 onClick={() => setIs2FASetupModalOpen(true)}
                                                 className="px-4 py-2 text-sm font-medium text-green-600 dark:text-green-400 border border-green-300 dark:border-green-800 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
                                             >
-                                                Enable 2FA
-                                            </button>
+                                                {t("settings:enable2FA")}</button>
                                         )}
                                     </div>
                                 </div>
@@ -729,17 +712,15 @@ export default function Settings() {
                             {/* Danger Zone */}
                             <div className="card shadow-none p-6 sm:p-8 border-red-200 dark:border-red-900">
                                 <h2 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-4">
-                                    Danger Zone
-                                </h2>
+                                    {t("settings:dangerZone")}</h2>
                                 <p className="text-sm text-surface-500 dark:text-surface-400 mb-4">
-                                    Once you delete your account, there is no going back. Please be certain.
-                                </p>
+                                    {t("settings:onceYouDeleteYourAccountThereIsNoGoing")}</p>
                                 <button
                                     onClick={handleDeleteAccount}
                                     disabled={isDeletingAccount}
                                     className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
                                 >
-                                    {isDeletingAccount ? 'Deleting…' : 'Delete Account'}
+                                    {isDeletingAccount ? t("common:uiDeleting") : t("settings:deleteAccount")}
                                 </button>
                             </div>
                         </div>
@@ -749,8 +730,7 @@ export default function Settings() {
                     {activeTab === 'subscription' && (
                         <div className="card shadow-none p-6 sm:p-8">
                             <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-6">
-                                Subscription Status
-                            </h2>
+                                {t("settings:subscriptionStatus")}</h2>
 
                             <div className="mb-6">
                                 <SubscriptionBadge showDetails />
@@ -758,15 +738,14 @@ export default function Settings() {
 
                             <div className="bg-surface-50 dark:bg-surface-800 rounded-xl p-6 space-y-4">
                                 <h3 className="font-medium text-surface-900 dark:text-surface-100">
-                                    Membership Benefits
-                                </h3>
+                                    {t("settings:membershipBenefits")}</h3>
                                 <ul className="space-y-3">
                                     {[
-                                        'Access to all community features',
-                                        'Participate in exclusive groups',
-                                        'Submit projects to showcase',
-                                        'Direct messaging with members',
-                                        'Priority support',
+                                        t("settings:accessToAllCommunityFeatures"),
+                                        t("settings:participateInExclusiveGroups"),
+                                        t("settings:submitProjectsToShowcase"),
+                                        t("settings:directMessagingWithMembers"),
+                                        t("settings:prioritySupport"),
                                     ].map((benefit, index) => (
                                         <li key={index} className="flex items-center gap-3 text-sm text-surface-600 dark:text-surface-400">
                                             <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
@@ -788,12 +767,10 @@ export default function Settings() {
                                 }}
                                 className="mt-6 inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors"
                             >
-                                Manage Subscription
-                            </button>
+                                {t("settings:manageSubscription")}</button>
                             <p className="text-sm text-surface-500 dark:text-surface-400 mt-3">
-                                Manage your subscription via Stripe. Changes may take a few minutes to reflect here.
-                            </p>
-                            </> : <p className="mt-6 text-sm text-surface-500 dark:text-surface-400">Paid billing is not enabled for this community.</p>}
+                                {t("settings:manageYourSubscriptionViaStripeChangesMayTakeA")}</p>
+                            </> : <p className="mt-6 text-sm text-surface-500 dark:text-surface-400">{t("settings:paidBillingIsNotEnabledForThisCommunity")}</p>}
                         </div>
                     )}
 
@@ -803,11 +780,9 @@ export default function Settings() {
                             {/* Email Notifications */}
                             <div className="card shadow-none p-6 sm:p-8">
                                 <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-2">
-                                    Email Notifications
-                                </h2>
+                                    {t("settings:emailNotifications")}</h2>
                                 <p className="text-sm text-surface-500 dark:text-surface-400 mb-6">
-                                    Choose which notifications you want to receive via email.
-                                </p>
+                                    {t("settings:chooseWhichNotificationsYouWantToReceiveViaEmail")}</p>
 
                                 {isPrefsLoading ? (
                                     <div className="flex items-center justify-center py-8">
@@ -819,7 +794,7 @@ export default function Settings() {
                                         {prefsError && (
                                             <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm flex items-center gap-2">
                                                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                                <span>{prefsError}</span>
+                                                <span>{localizeError(prefsError)}</span>
                                             </div>
                                         )}
 
@@ -827,17 +802,17 @@ export default function Settings() {
                                         {prefsSaved && (
                                             <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 rounded-lg text-sm flex items-center gap-2">
                                                 <Check className="w-4 h-4" />
-                                                <span>Notification preferences saved successfully!</span>
+                                                <span>{t("settings:notificationPreferencesSavedSuccessfully")}</span>
                                             </div>
                                         )}
 
                                         <div className="space-y-1">
                                             {[
-                                                { id: 'email_comments' as const, label: 'Comments on your posts', description: 'Get an email when someone comments on your posts' },
-                                                { id: 'email_replies' as const, label: 'Replies to your comments', description: 'Get an email when someone replies to your comments' },
-                                                { id: 'email_mentions' as const, label: 'Mentions', description: 'Get an email when someone @mentions you in a comment' },
-                                                { id: 'email_messages' as const, label: 'Direct messages', description: 'Get an email when you receive a new direct message' },
-                                                { id: 'email_announcements' as const, label: 'Community announcements', description: 'Receive important updates about the community' },
+                                                { id: 'email_comments' as const, label: t("settings:commentsOnYourPosts"), description: t("settings:getAnEmailWhenSomeoneCommentsOnYourPosts") },
+                                                { id: 'email_replies' as const, label: t("settings:repliesToYourComments"), description: t("settings:getAnEmailWhenSomeoneRepliesToYourComments") },
+                                                { id: 'email_mentions' as const, label: t("settings:mentions"), description: t("settings:getAnEmailWhenSomeoneMentionsYouInA") },
+                                                { id: 'email_messages' as const, label: t("settings:directMessages"), description: t("settings:getAnEmailWhenYouReceiveANewDirect") },
+                                                { id: 'email_announcements' as const, label: t("settings:communityAnnouncements"), description: t("settings:receiveImportantUpdatesAboutTheCommunity") },
                                             ].map((item) => (
                                                 <div key={item.id} className="flex items-center justify-between py-4 border-b border-surface-100 dark:border-surface-800 last:border-0">
                                                     <div>
@@ -867,11 +842,9 @@ export default function Settings() {
                             {/* In-App Notifications */}
                             <div className="card shadow-none p-6 sm:p-8">
                                 <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-2">
-                                    In-App Notifications
-                                </h2>
+                                    {t("settings:inAppNotifications")}</h2>
                                 <p className="text-sm text-surface-500 dark:text-surface-400 mb-6">
-                                    Choose which notifications appear in your notification center.
-                                </p>
+                                    {t("settings:chooseWhichNotificationsAppearInYourNotificationCenter")}</p>
 
                                 {isPrefsLoading ? (
                                     <div className="flex items-center justify-center py-8">
@@ -880,11 +853,11 @@ export default function Settings() {
                                 ) : (
                                     <div className="space-y-1">
                                         {[
-                                            { id: 'notify_comments' as const, label: 'Comments', description: 'When someone comments on your posts' },
-                                            { id: 'notify_replies' as const, label: 'Replies', description: 'When someone replies to your comments' },
-                                            { id: 'notify_mentions' as const, label: 'Mentions', description: 'When someone @mentions you' },
-                                            { id: 'notify_messages' as const, label: 'Messages', description: 'When you receive a direct message' },
-                                            { id: 'notify_reactions' as const, label: 'Reactions', description: 'When someone reacts to your content' },
+                                            { id: 'notify_comments' as const, label: t("settings:comments"), description: t("settings:whenSomeoneCommentsOnYourPosts") },
+                                            { id: 'notify_replies' as const, label: t("settings:replies"), description: t("settings:whenSomeoneRepliesToYourComments") },
+                                            { id: 'notify_mentions' as const, label: t("settings:mentions"), description: t("settings:whenSomeoneMentionsYou") },
+                                            { id: 'notify_messages' as const, label: t("settings:messages"), description: t("settings:whenYouReceiveADirectMessage") },
+                                            { id: 'notify_reactions' as const, label: t("settings:reactions"), description: t("settings:whenSomeoneReactsToYourContent") },
                                         ].map((item) => (
                                             <div key={item.id} className="flex items-center justify-between py-4 border-b border-surface-100 dark:border-surface-800 last:border-0">
                                                 <div>
@@ -921,10 +894,10 @@ export default function Settings() {
                                         {isPrefsSaving ? (
                                             <>
                                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                                <span>Saving...</span>
+                                                <span>{t("settings:saving")}</span>
                                             </>
                                         ) : (
-                                            <span>Save Preferences</span>
+                                            <span>{t("settings:savePreferences")}</span>
                                         )}
                                     </button>
                                 </div>

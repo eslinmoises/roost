@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useEffect, useState } from 'react';
 import {
     Plus,
@@ -28,6 +30,7 @@ const PRESET_COLORS = [
 ];
 
 export default function AdminCategories() {
+    useTranslation();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -74,7 +77,7 @@ export default function AdminCategories() {
             loadCategories();
         } catch (err) {
             console.error('Failed to create category:', err);
-            alert('Failed to create category');
+            alert(t("admin:failedToCreateCategory"));
         } finally {
             setSaving(false);
         }
@@ -103,14 +106,14 @@ export default function AdminCategories() {
             loadCategories();
         } catch (err) {
             console.error('Failed to update category:', err);
-            alert('Failed to update category');
+            alert(t("admin:failedToUpdateCategory"));
         } finally {
             setSaving(false);
         }
     };
 
     const handleDelete = async (categoryId: string) => {
-        if (!confirm('Are you sure you want to delete this category? Posts using it will become uncategorized.')) {
+        if (!confirm(t("admin:areYouSureYouWantToDeleteThisCategory"))) {
             return;
         }
         try {
@@ -118,7 +121,7 @@ export default function AdminCategories() {
             loadCategories();
         } catch (err) {
             console.error('Failed to delete category:', err);
-            alert('Failed to delete category');
+            alert(t("admin:failedToDeleteCategory"));
         }
     };
 
@@ -127,8 +130,8 @@ export default function AdminCategories() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Category Management</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1">Manage post categories</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t("admin:categoryManagement")}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1">{t("admin:managePostCategories")}</p>
                 </div>
                 {!isCreating && (
                     <button
@@ -136,28 +139,27 @@ export default function AdminCategories() {
                         className="flex items-center gap-2 px-4 py-2.5 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors"
                     >
                         <Plus className="w-5 h-5" />
-                        Add Category
-                    </button>
+                        {t("admin:addCategory")}</button>
                 )}
             </div>
 
             {/* Create Form */}
             {isCreating && (
                 <div className="bg-white dark:bg-surface-900 rounded-xl shadow-sm border border-gray-100 dark:border-surface-700 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">New Category</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t("admin:newCategory")}</h3>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t("admin:name")}</label>
                             <input
                                 type="text"
                                 value={newCategory.name}
                                 onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-                                placeholder="Category name"
+                                placeholder={t("admin:categoryName")}
                                 className="w-full px-4 py-2 border border-gray-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t("admin:color")}</label>
                             <div className="flex gap-2">
                                 {PRESET_COLORS.map((color) => (
                                     <button
@@ -177,12 +179,12 @@ export default function AdminCategories() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Icon (optional)</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t("admin:iconOptional")}</label>
                             <input
                                 type="text"
                                 value={newCategory.icon}
                                 onChange={(e) => setNewCategory({ ...newCategory, icon: e.target.value })}
-                                placeholder="e.g., 📚 or icon name"
+                                placeholder={t("admin:eGOrIconName")}
                                 className="w-full px-4 py-2 border border-gray-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             />
                         </div>
@@ -193,7 +195,7 @@ export default function AdminCategories() {
                                 className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors disabled:opacity-50"
                             >
                                 <Check className="w-4 h-4" />
-                                {saving ? 'Creating...' : 'Create'}
+                                {saving ? t("common:uiCreating") : t("common:uiCreate")}
                             </button>
                             <button
                                 onClick={() => {
@@ -203,8 +205,7 @@ export default function AdminCategories() {
                                 className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-surface-800 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-surface-700 transition-colors"
                             >
                                 <X className="w-4 h-4" />
-                                Cancel
-                            </button>
+                                {t("admin:cancel")}</button>
                         </div>
                     </div>
                 </div>
@@ -213,12 +214,12 @@ export default function AdminCategories() {
             {/* Categories List */}
             <div className="bg-white dark:bg-surface-900 rounded-xl shadow-sm border border-gray-100 dark:border-surface-700 overflow-hidden">
                 {loading ? (
-                    <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading...</div>
+                    <div className="p-8 text-center text-gray-500 dark:text-gray-400">{t("admin:loading")}</div>
                 ) : categories.length === 0 ? (
                     <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                         <Tag className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-                        <p>No categories yet</p>
-                        <p className="text-sm mt-1">Create your first category to organize posts</p>
+                        <p>{t("admin:noCategoriesYet")}</p>
+                        <p className="text-sm mt-1">{t("admin:createYourFirstCategoryToOrganizePosts")}</p>
                     </div>
                 ) : (
                     <ul className="divide-y divide-gray-100 dark:divide-surface-700">
@@ -246,14 +247,12 @@ export default function AdminCategories() {
                                                 disabled={saving}
                                                 className="px-3 py-1.5 bg-primary-500 text-white text-sm rounded-lg hover:bg-primary-600"
                                             >
-                                                Save
-                                            </button>
+                                                {t("admin:save")}</button>
                                             <button
                                                 onClick={() => setEditingId(null)}
                                                 className="px-3 py-1.5 bg-gray-100 dark:bg-surface-800 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-surface-700"
                                             >
-                                                Cancel
-                                            </button>
+                                                {t("admin:cancel")}</button>
                                         </div>
                                     </div>
                                 ) : (
@@ -274,14 +273,14 @@ export default function AdminCategories() {
                                             <button
                                                 onClick={() => handleEdit(category)}
                                                 className="p-2 hover:bg-gray-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
-                                                title="Edit"
+                                                title={t("admin:edit")}
                                             >
                                                 <Edit2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(category.id)}
                                                 className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                                                title="Delete"
+                                                title={t("admin:delete")}
                                             >
                                                 <Trash2 className="w-4 h-4 text-red-500 dark:text-red-400" />
                                             </button>

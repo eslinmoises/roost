@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -16,6 +19,7 @@ import type { Showcase } from '@/types/database';
 import { SHOWCASE_STATUS_INFO } from '@/types/showcase';
 
 export default function Showcase() {
+    useTranslation();
     const { user } = useAuth();
     const location = useLocation();
     const [showcases, setShowcases] = useState<ShowcaseCardData[]>([]);
@@ -199,8 +203,7 @@ export default function Showcase() {
                             <div className="flex items-center gap-3">
                                 <CheckCircle className="w-5 h-5 text-green-600" />
                                 <p className="text-sm text-green-700 dark:text-green-400">
-                                    Your project has been submitted and is pending review. We'll notify you when it's approved!
-                                </p>
+                                    {t("showcase:yourProjectHasBeenSubmittedAndIsPendingReview")}</p>
                             </div>
                             <button
                                 onClick={() => setShowSubmitSuccess(false)}
@@ -216,11 +219,9 @@ export default function Showcase() {
                         <div>
                             <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50 flex items-center gap-3">
                                 <Rocket className="w-7 h-7 text-primary-600" />
-                                Showcase
-                            </h1>
+                                {t("showcase:showcase")}</h1>
                             <p className="text-surface-500 dark:text-surface-400 mt-1">
-                                Discover amazing projects built by community members
-                            </p>
+                                {t("showcase:discoverAmazingProjectsBuiltByCommunityMembers")}</p>
                         </div>
                         <div className="flex items-center gap-3">
                             {/* Mobile filter toggle */}
@@ -229,17 +230,15 @@ export default function Showcase() {
                                 className="md:hidden inline-flex items-center gap-2 px-4 py-2.5 border border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-300 rounded-lg font-medium hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
                             >
                                 <SlidersHorizontal className="w-5 h-5" />
-                                Filters
-                            </button>
+                                {t("showcase:filters")}</button>
                             {userShowcases.length > 0 && (
                                 <button
                                     onClick={() => setIsSubmissionsSidebarOpen(true)}
                                     className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 border border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-300 rounded-lg font-medium hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
                                 >
                                     <FolderOpen className="w-5 h-5" />
-                                    My Submissions
-                                    <span className="px-1.5 py-0.5 bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400 text-xs rounded-full">
-                                        {userShowcases.length}
+                                    {t("showcase:mySubmissions")}<span className="px-1.5 py-0.5 bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400 text-xs rounded-full">
+                                        {formatNumber(userShowcases.length)}
                                     </span>
                                 </button>
                             )}
@@ -248,7 +247,7 @@ export default function Showcase() {
                                 className="inline-flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
                             >
                                 <Plus className="w-5 h-5" />
-                                <span className="hidden sm:inline">Submit Project</span>
+                                <span className="hidden sm:inline">{t("showcase:submitProject")}</span>
                             </Link>}
                         </div>
                     </div>
@@ -264,8 +263,7 @@ export default function Showcase() {
                                 <div className="p-4">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="font-semibold text-surface-900 dark:text-surface-100">
-                                            My Submissions
-                                        </h3>
+                                            {t("showcase:mySubmissions")}</h3>
                                         <button
                                             onClick={() => setIsSubmissionsSidebarOpen(false)}
                                             className="p-1 hover:bg-surface-100 dark:hover:bg-surface-800 rounded"
@@ -320,8 +318,7 @@ export default function Showcase() {
                                         className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
                                     >
                                         <Plus className="w-4 h-4" />
-                                        Submit New Project
-                                    </Link>}
+                                        {t("showcase:submitNewProject")}</Link>}
                                 </div>
                             </aside>
                         </>
@@ -331,8 +328,7 @@ export default function Showcase() {
                     {featuredShowcases.length > 0 && (
                         <div className="mb-10">
                             <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">
-                                Featured Projects
-                            </h2>
+                                {t("showcase:featuredProjects")}</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {featuredShowcases.map((showcase) => (
                                     <ShowcaseCard
@@ -348,9 +344,7 @@ export default function Showcase() {
 
                     {/* Results count */}
                     {!isLoading && (
-                        <p className="text-sm text-surface-500 dark:text-surface-400 mb-6">
-                            {total} project{total !== 1 ? 's' : ''} found
-                        </p>
+                        <p className="text-sm text-surface-500 dark:text-surface-400 mb-6">{t("showcase:projectFound", { count: total })}</p>
                     )}
 
                     {/* Grid */}
@@ -362,20 +356,18 @@ export default function Showcase() {
                         <div className="text-center py-20">
                             <Rocket className="w-16 h-16 mx-auto text-surface-300 dark:text-surface-600 mb-4" />
                             <h3 className="text-lg font-medium text-surface-900 dark:text-surface-100 mb-2">
-                                No projects found
-                            </h3>
+                                {t("showcase:noProjectsFound")}</h3>
                             <p className="text-surface-500 dark:text-surface-400 mb-6">
                                 {filters.category || filters.search || filters.tagIds
-                                    ? 'Try adjusting your filters'
-                                    : 'Be the first to submit a project!'}
+                                    ? t("showcase:tryAdjustingYourFilters")
+                                    : t("showcase:beTheFirstToSubmitAProject")}
                             </p>
                             {!APP_CONFIG.demo.enabled && <Link
                                 to="/showcase/submit"
                                 className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
                             >
                                 <Plus className="w-5 h-5" />
-                                Submit Project
-                            </Link>}
+                                {t("showcase:submitProject")}</Link>}
                         </div>
                     ) : (
                         <>
@@ -401,10 +393,9 @@ export default function Showcase() {
                                         {isLoadingMore ? (
                                             <>
                                                 <Loader2 className="w-5 h-5 animate-spin" />
-                                                Loading...
-                                            </>
+                                                {t("showcase:loading")}</>
                                         ) : (
-                                            'Load More'
+                                            t("showcase:loadMore")
                                         )}
                                     </button>
                                 </div>

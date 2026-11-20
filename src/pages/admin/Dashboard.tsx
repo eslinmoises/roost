@@ -1,3 +1,8 @@
+import { formatNumber } from '@/lib/locale';
+import { localizeError } from '@/i18n/errors';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useEffect, useState } from 'react';
 import {
     Users,
@@ -20,6 +25,7 @@ import type { AdminStats, UserGrowthData, ActivityStatsData } from '../../servic
 import { MemberAvatar } from '../../components/common/MemberAvatar';
 
 export default function AdminDashboard() {
+    useTranslation();
     const [stats, setStats] = useState<AdminStats | null>(null);
     const [userGrowth, setUserGrowth] = useState<UserGrowthData[]>([]);
     const [activityStats, setActivityStats] = useState<ActivityStatsData[]>([]);
@@ -42,7 +48,7 @@ export default function AdminDashboard() {
             setActivityStats(activity);
             setTopContributors(contributors);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
+            setError(err instanceof Error ? localizeError(err.message) : t("admin:failedToLoadDashboardData"));
         } finally {
             setLoading(false);
         }
@@ -63,14 +69,13 @@ export default function AdminDashboard() {
     if (error) {
         return (
             <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 p-4 rounded-lg">
-                <p className="font-medium">Error loading dashboard</p>
-                <p className="text-sm mt-1">{error}</p>
+                <p className="font-medium">{t("admin:errorLoadingDashboard")}</p>
+                <p className="text-sm mt-1">{localizeError(error)}</p>
                 <button
                     onClick={loadData}
                     className="mt-3 text-sm font-medium underline hover:no-underline"
                 >
-                    Try again
-                </button>
+                    {t("admin:tryAgain")}</button>
             </div>
         );
     }
@@ -80,55 +85,54 @@ export default function AdminDashboard() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1">Overview of your community</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t("admin:dashboard")}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1">{t("admin:overviewOfYourCommunity")}</p>
                 </div>
                 <button
                     onClick={loadData}
                     className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-surface-800 border border-gray-200 dark:border-surface-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-surface-700 transition-colors"
                 >
                     <RefreshCw className="w-4 h-4" />
-                    Refresh
-                </button>
+                    {t("admin:refresh")}</button>
             </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatsCard
-                    title="Total Members"
+                    title={t("admin:totalMembers")}
                     value={stats?.total_members || 0}
                     icon={Users}
                     color="blue"
                     trend={{
                         value: stats?.new_members_30d || 0,
-                        label: 'new this month',
+                        label: t("admin:newThisMonth"),
                         isPositive: true,
                     }}
                 />
                 <StatsCard
-                    title="Total Posts"
+                    title={t("admin:totalPosts")}
                     value={stats?.total_posts || 0}
                     icon={FileText}
                     color="purple"
                     trend={{
                         value: stats?.posts_30d || 0,
-                        label: 'this month',
+                        label: t("admin:thisMonth2"),
                         isPositive: true,
                     }}
                 />
                 <StatsCard
-                    title="Total Comments"
+                    title={t("admin:totalComments")}
                     value={stats?.total_comments || 0}
                     icon={MessageSquare}
                     color="green"
                     trend={{
                         value: stats?.comments_30d || 0,
-                        label: 'this month',
+                        label: t("admin:thisMonth2"),
                         isPositive: true,
                     }}
                 />
                 <StatsCard
-                    title="Upcoming Events"
+                    title={t("admin:upcomingEvents")}
                     value={stats?.upcoming_events || 0}
                     icon={Calendar}
                     color="orange"
@@ -138,19 +142,19 @@ export default function AdminDashboard() {
             {/* Secondary Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatsCard
-                    title="Active Groups"
+                    title={t("admin:activeGroups")}
                     value={`${stats?.active_groups || 0} / ${stats?.total_groups || 0}`}
                     icon={TrendingUp}
                     color="indigo"
                 />
                 <StatsCard
-                    title="Active Announcements"
+                    title={t("admin:activeAnnouncements")}
                     value={stats?.active_announcements || 0}
                     icon={Megaphone}
                     color="orange"
                 />
                 <StatsCard
-                    title="Banned Users"
+                    title={t("admin:bannedUsers")}
                     value={stats?.banned_members || 0}
                     icon={Users}
                     color="red"
@@ -161,23 +165,23 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Activity Chart Placeholder */}
                 <div className="bg-white dark:bg-surface-900 rounded-xl shadow-sm border border-gray-100 dark:border-surface-700 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Activity (Last 30 Days)</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t("admin:activityLast30Days")}</h3>
                     <div className="space-y-3">
                         {activityStats.slice(-7).map((day) => (
                             <div key={day.date} className="flex items-center gap-4">
                                 <span className="text-sm text-gray-500 dark:text-gray-400 w-24">
-                                    {new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                                    {new Date(day.date).toLocaleDateString(activeLanguage(), { weekday: 'short', month: 'short', day: 'numeric' })}
                                 </span>
                                 <div className="flex-1 flex gap-2">
                                     <div
                                         className="h-6 bg-primary-500 rounded"
                                         style={{ width: `${Math.min(day.posts * 10, 100)}%` }}
-                                        title={`${day.posts} posts`}
+                                        title={t("admin:posts", { value1: day.posts })}
                                     />
                                     <div
                                         className="h-6 bg-green-500 rounded"
                                         style={{ width: `${Math.min(day.comments * 5, 100)}%` }}
-                                        title={`${day.comments} comments`}
+                                        title={t("admin:comments", { value1: day.comments })}
                                     />
                                 </div>
                             </div>
@@ -185,11 +189,11 @@ export default function AdminDashboard() {
                         <div className="flex gap-4 text-sm mt-4">
                             <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 bg-primary-500 rounded" />
-                                <span className="text-gray-600 dark:text-gray-400">Posts</span>
+                                <span className="text-gray-600 dark:text-gray-400">{t("admin:posts2")}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 bg-green-500 rounded" />
-                                <span className="text-gray-600 dark:text-gray-400">Comments</span>
+                                <span className="text-gray-600 dark:text-gray-400">{t("admin:comments2")}</span>
                             </div>
                         </div>
                     </div>
@@ -199,7 +203,7 @@ export default function AdminDashboard() {
                 <div className="bg-white dark:bg-surface-900 rounded-xl shadow-sm border border-gray-100 dark:border-surface-700 p-6">
                     <div className="flex items-center gap-2 mb-4">
                         <Award className="w-5 h-5 text-yellow-500" />
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Top Contributors</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("admin:topContributors")}</h3>
                     </div>
                     <div className="space-y-4">
                         {topContributors.map((contributor, index) => (
@@ -215,13 +219,13 @@ export default function AdminDashboard() {
                                     <p className="text-sm text-gray-500 dark:text-gray-400">@{contributor.user.username}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="font-semibold text-primary-600 dark:text-primary-400">{contributor.total_points}</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">points</p>
+                                    <p className="font-semibold text-primary-600 dark:text-primary-400">{formatNumber(contributor.total_points)}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">{t("admin:points")}</p>
                                 </div>
                             </div>
                         ))}
                         {topContributors.length === 0 && (
-                            <p className="text-gray-500 dark:text-gray-400 text-center py-4">No contributors yet</p>
+                            <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t("admin:noContributorsYet")}</p>
                         )}
                     </div>
                 </div>
@@ -229,7 +233,7 @@ export default function AdminDashboard() {
 
             {/* User Growth */}
             <div className="bg-white dark:bg-surface-900 rounded-xl shadow-sm border border-gray-100 dark:border-surface-700 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">New Members (Last 30 Days)</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t("admin:newMembersLast30Days")}</h3>
                 <div className="flex items-end gap-1 h-32">
                     {userGrowth.map((day) => {
                         const maxCount = Math.max(...userGrowth.map((d) => d.count), 1);
@@ -239,14 +243,14 @@ export default function AdminDashboard() {
                                 key={day.date}
                                 className="flex-1 bg-primary-500 rounded-t hover:bg-primary-600 transition-colors cursor-pointer"
                                 style={{ height: `${Math.max(height, 4)}%` }}
-                                title={`${new Date(day.date).toLocaleDateString()}: ${day.count} new members`}
+                                title={t("admin:newMembers", { value1: new Date(day.date).toLocaleDateString(activeLanguage()), value2: day.count })}
                             />
                         );
                     })}
                 </div>
                 <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
-                    <span>30 days ago</span>
-                    <span>Today</span>
+                    <span>{t("admin:30DaysAgo")}</span>
+                    <span>{t("admin:today")}</span>
                 </div>
             </div>
         </div>

@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Users } from 'lucide-react';
@@ -7,6 +10,7 @@ import { MembersGrid } from '@/components/members/MembersGrid';
 import type { Profile } from '@/types/database';
 
 export function Members() {
+    useTranslation();
     const [members, setMembers] = useState<Profile[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -88,12 +92,12 @@ export function Members() {
                     <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg text-primary-600 dark:text-primary-400">
                         <Users className="w-6 h-6" />
                     </div>
-                    <h1 className="text-3xl font-bold text-surface-900 dark:text-surface-50">Members Directory</h1>
+                    <h1 className="text-3xl font-bold text-surface-900 dark:text-surface-50">{t("profile:membersDirectory")}</h1>
                 </div>
                 <div className="flex gap-4 text-surface-500 dark:text-surface-400 text-sm">
-                    <p>Total Members: <span className="font-medium text-surface-900 dark:text-surface-100">{totalCount}</span></p>
+                    <p>{t("profile:totalMembers")} <span className="font-medium text-surface-900 dark:text-surface-100">{formatNumber(totalCount)}</span></p>
                     <p>•</p>
-                    <p>Online Now: <span className="font-medium text-green-500">{onlineCount}</span></p>
+                    <p>{t("profile:onlineNow2")} <span className="font-medium text-green-500">{formatNumber(onlineCount)}</span></p>
                 </div>
             </div>
 

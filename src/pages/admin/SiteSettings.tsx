@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useRef } from 'react';
 import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 import {
@@ -19,19 +22,20 @@ import {
 import type { FeatureAccess } from '@/contexts/SiteSettingsContext';
 
 const COLOR_PRESETS = [
-    { name: 'Sky Blue', value: '#0ea5e9' },
-    { name: 'Indigo', value: '#6366f1' },
-    { name: 'Emerald', value: '#10b981' },
-    { name: 'Rose', value: '#f43f5e' },
-    { name: 'Amber', value: '#f59e0b' },
-    { name: 'Purple', value: '#8b5cf6' },
-    { name: 'Teal', value: '#14b8a6' },
-    { name: 'Orange', value: '#f97316' },
-    { name: 'Cyan', value: '#06b6d4' },
-    { name: 'Slate', value: '#64748b' },
+    { get name() { return t("admin:skyBlue"); }, value: '#0ea5e9' },
+    { get name() { return t("admin:indigo"); }, value: '#6366f1' },
+    { get name() { return t("admin:emerald"); }, value: '#10b981' },
+    { get name() { return t("admin:rose"); }, value: '#f43f5e' },
+    { get name() { return t("admin:amber"); }, value: '#f59e0b' },
+    { get name() { return t("admin:purple"); }, value: '#8b5cf6' },
+    { get name() { return t("admin:teal"); }, value: '#14b8a6' },
+    { get name() { return t("admin:orange"); }, value: '#f97316' },
+    { get name() { return t("admin:cyan"); }, value: '#06b6d4' },
+    { get name() { return t("admin:slate"); }, value: '#64748b' },
 ];
 
 export default function AdminSiteSettings() {
+    useTranslation();
     const { settings, updateSettings, uploadBrandingAsset } = useSiteSettings();
     const [form, setForm] = useState(settings);
     const [isSaving, setIsSaving] = useState(false);
@@ -58,9 +62,9 @@ export default function AdminSiteSettings() {
                 feature_roadmap: form.feature_roadmap,
                 feature_showcase: form.feature_showcase,
             });
-            setMessage({ type: 'success', text: 'Settings saved successfully!' });
+            setMessage({ type: 'success', text: t("admin:settingsSavedSuccessfully") });
         } catch (err) {
-            setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to save settings' });
+            setMessage({ type: 'error', text: err instanceof Error ? localizeError(err.message) : t("admin:failedToSaveSettings") });
         } finally {
             setIsSaving(false);
         }
@@ -73,9 +77,9 @@ export default function AdminSiteSettings() {
             const url = await uploadBrandingAsset(file, type);
             const key = type === 'logo' ? 'logo_url' : type === 'logo_dark' ? 'logo_dark_url' : 'favicon_url';
             setForm(prev => ({ ...prev, [key]: url }));
-            setMessage({ type: 'success', text: `${type === 'favicon' ? 'Favicon' : 'Logo'} uploaded!` });
+            setMessage({ type: 'success', text: t("admin:uploaded", { value1: type === 'favicon' ? 'Favicon' : 'Logo' }) });
         } catch (err) {
-            setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Upload failed' });
+            setMessage({ type: 'error', text: err instanceof Error ? localizeError(err.message) : t("admin:uploadFailed") });
         } finally {
             setIsUploading(null);
         }
@@ -92,10 +96,9 @@ export default function AdminSiteSettings() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">Site Settings</h1>
+                    <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">{t("admin:siteSettings")}</h1>
                     <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                        Customize your community's branding and appearance
-                    </p>
+                        {t("admin:customizeYourCommunitySBrandingAndAppearance")}</p>
                 </div>
                 <button
                     onClick={handleSave}
@@ -103,8 +106,7 @@ export default function AdminSiteSettings() {
                     className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
                 >
                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    Save Changes
-                </button>
+                    {t("admin:saveChanges")}</button>
             </div>
 
             {/* Status message */}
@@ -123,46 +125,43 @@ export default function AdminSiteSettings() {
             <div className="card p-6">
                 <div className="flex items-center gap-2 mb-4">
                     <Type className="w-5 h-5 text-primary-500" />
-                    <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">Site Identity</h2>
+                    <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">{t("admin:siteIdentity")}</h2>
                 </div>
 
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                            Site Name
-                        </label>
+                            {t("admin:siteName")}</label>
                         <input
                             type="text"
                             value={form.site_name}
                             onChange={e => setForm(prev => ({ ...prev, site_name: e.target.value }))}
                             className="w-full px-3 py-2 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            placeholder="My Community"
+                            placeholder={t("admin:myCommunity")}
                         />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                            Tagline
-                        </label>
+                            {t("admin:tagline")}</label>
                         <input
                             type="text"
                             value={form.site_tagline}
                             onChange={e => setForm(prev => ({ ...prev, site_tagline: e.target.value }))}
                             className="w-full px-3 py-2 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            placeholder="Learn, Build, Grow Together"
+                            placeholder={t("admin:learnBuildGrowTogether")}
                         />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                            Description
-                        </label>
+                            {t("admin:description")}</label>
                         <textarea
                             value={form.site_description}
                             onChange={e => setForm(prev => ({ ...prev, site_description: e.target.value }))}
                             rows={2}
                             className="w-full px-3 py-2 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-                            placeholder="A community platform for learning and growing together."
+                            placeholder={t("admin:aCommunityPlatformForLearningAndGrowingTogether")}
                         />
                     </div>
                 </div>
@@ -172,18 +171,17 @@ export default function AdminSiteSettings() {
             <div className="card p-6">
                 <div className="flex items-center gap-2 mb-4">
                     <Image className="w-5 h-5 text-primary-500" />
-                    <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">Logos</h2>
+                    <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">{t("admin:logos")}</h2>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-6">
                     {/* Light Logo */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Logo (Light Theme)
-                        </label>
+                            {t("admin:logoLightTheme")}</label>
                         <div className="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded-lg p-4 text-center">
                             {form.logo_url ? (
-                                <img src={form.logo_url} alt="Logo" className="h-16 mx-auto mb-2 object-contain" />
+                                <img src={form.logo_url} alt={t("admin:logo")} className="h-16 mx-auto mb-2 object-contain" />
                             ) : (
                                 <div className="h-16 flex items-center justify-center text-surface-400">
                                     <Image className="w-8 h-8" />
@@ -196,19 +194,17 @@ export default function AdminSiteSettings() {
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 text-surface-700 dark:text-surface-300 rounded-md transition-colors disabled:opacity-50"
                             >
                                 {isUploading === 'logo' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
-                                Upload
-                            </button>
+                                {t("admin:upload")}</button>
                         </div>
                     </div>
 
                     {/* Dark Logo */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Logo (Dark Theme)
-                        </label>
+                            {t("admin:logoDarkTheme")}</label>
                         <div className="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded-lg p-4 text-center bg-surface-900 dark:bg-surface-800">
                             {form.logo_dark_url ? (
-                                <img src={form.logo_dark_url} alt="Dark Logo" className="h-16 mx-auto mb-2 object-contain" />
+                                <img src={form.logo_dark_url} alt={t("admin:darkLogo")} className="h-16 mx-auto mb-2 object-contain" />
                             ) : (
                                 <div className="h-16 flex items-center justify-center text-surface-500">
                                     <Image className="w-8 h-8" />
@@ -221,19 +217,17 @@ export default function AdminSiteSettings() {
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-surface-700 hover:bg-surface-600 text-surface-200 rounded-md transition-colors disabled:opacity-50"
                             >
                                 {isUploading === 'logo_dark' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
-                                Upload
-                            </button>
+                                {t("admin:upload")}</button>
                         </div>
                     </div>
 
                     {/* Favicon */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Favicon
-                        </label>
+                            {t("admin:favicon")}</label>
                         <div className="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded-lg p-4 text-center">
                             {form.favicon_url ? (
-                                <img src={form.favicon_url} alt="Favicon" className="h-16 w-16 mx-auto mb-2 object-contain" />
+                                <img src={form.favicon_url} alt={t("admin:favicon")} className="h-16 w-16 mx-auto mb-2 object-contain" />
                             ) : (
                                 <div className="h-16 flex items-center justify-center text-surface-400">
                                     <Globe className="w-8 h-8" />
@@ -246,10 +240,9 @@ export default function AdminSiteSettings() {
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 text-surface-700 dark:text-surface-300 rounded-md transition-colors disabled:opacity-50"
                             >
                                 {isUploading === 'favicon' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
-                                Upload
-                            </button>
+                                {t("admin:upload")}</button>
                         </div>
-                        <p className="text-xs text-surface-400 mt-1">Recommended: 32x32 or 64x64 PNG</p>
+                        <p className="text-xs text-surface-400 mt-1">{t("admin:recommended32x32Or64x64PNG")}</p>
                     </div>
                 </div>
             </div>
@@ -258,15 +251,14 @@ export default function AdminSiteSettings() {
             <div className="card p-6">
                 <div className="flex items-center gap-2 mb-4">
                     <Palette className="w-5 h-5 text-primary-500" />
-                    <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">Brand Color</h2>
+                    <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">{t("admin:brandColor")}</h2>
                 </div>
 
                 <div className="space-y-4">
                     {/* Color presets */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Presets
-                        </label>
+                            {t("admin:presets")}</label>
                         <div className="flex flex-wrap gap-2">
                             {COLOR_PRESETS.map(preset => (
                                 <button
@@ -292,8 +284,7 @@ export default function AdminSiteSettings() {
                     {/* Custom color */}
                     <div className="flex items-center gap-3">
                         <label className="text-sm font-medium text-surface-700 dark:text-surface-300">
-                            Custom
-                        </label>
+                            {t("admin:custom")}</label>
                         <input
                             type="color"
                             value={form.primary_color}
@@ -314,19 +305,17 @@ export default function AdminSiteSettings() {
                         />
                         {/* Preview */}
                         <div className="flex items-center gap-2 ml-4">
-                            <span className="text-xs text-surface-500">Preview:</span>
+                            <span className="text-xs text-surface-500">{t("admin:preview")}</span>
                             <button
                                 className="px-4 py-1.5 rounded-lg text-white text-xs font-medium"
                                 style={{ backgroundColor: form.primary_color }}
                             >
-                                Button
-                            </button>
+                                {t("admin:button")}</button>
                             <span
                                 className="text-sm font-medium"
                                 style={{ color: form.primary_color }}
                             >
-                                Link text
-                            </span>
+                                {t("admin:linkText")}</span>
                         </div>
                     </div>
                 </div>
@@ -336,14 +325,13 @@ export default function AdminSiteSettings() {
             <div className="card p-6">
                 <div className="flex items-center gap-2 mb-4">
                     <Globe className="w-5 h-5 text-primary-500" />
-                    <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">Support</h2>
+                    <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">{t("admin:support")}</h2>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                            Support Email
-                        </label>
+                            {t("admin:supportEmail")}</label>
                         <input
                             type="email"
                             value={form.support_email}
@@ -355,8 +343,7 @@ export default function AdminSiteSettings() {
 
                     <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                            Support URL
-                        </label>
+                            {t("admin:supportURL")}</label>
                         <input
                             type="url"
                             value={form.support_url}
@@ -372,18 +359,17 @@ export default function AdminSiteSettings() {
             <div className="card p-6">
                 <div className="flex items-center gap-2 mb-4">
                     <Puzzle className="w-5 h-5 text-primary-500" />
-                    <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">Feature Modules</h2>
+                    <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-100">{t("admin:featureModules")}</h2>
                 </div>
                 <p className="text-sm text-surface-500 dark:text-surface-400 mb-4">
-                    Enable or disable features and control who can access them.
-                </p>
+                    {t("admin:enableOrDisableFeaturesAndControlWhoCanAccess")}</p>
 
                 <div className="space-y-3">
                     {([
-                        { key: 'feature_live_room' as const, name: 'Live Room', description: 'Live streaming sessions with chat', icon: Radio },
-                        { key: 'feature_activations' as const, name: 'Activations', description: 'Product activation and license management', icon: Key },
-                        { key: 'feature_roadmap' as const, name: 'Roadmap & Issues', description: 'Feature requests and bug reports from users', icon: Lightbulb },
-                        { key: 'feature_showcase' as const, name: 'Showcase', description: 'Member project gallery with reviews and voting', icon: Rocket },
+                        { key: 'feature_live_room' as const, name: t("admin:liveRoom"), description: t("admin:liveStreamingSessionsWithChat"), icon: Radio },
+                        { key: 'feature_activations' as const, name: t("admin:activations"), description: t("admin:productActivationAndLicenseManagement"), icon: Key },
+                        { key: 'feature_roadmap' as const, name: t("admin:roadmapIssues"), description: t("admin:featureRequestsAndBugReportsFromUsers"), icon: Lightbulb },
+                        { key: 'feature_showcase' as const, name: t("admin:showcase"), description: t("admin:memberProjectGalleryWithReviewsAndVoting"), icon: Rocket },
                     ]).map(feature => {
                         const Icon = feature.icon;
                         const value = (form[feature.key] || 'all') as FeatureAccess;
@@ -403,9 +389,9 @@ export default function AdminSiteSettings() {
                                     onChange={e => setForm(prev => ({ ...prev, [feature.key]: e.target.value as FeatureAccess }))}
                                     className="px-3 py-1.5 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                 >
-                                    <option value="all">Everyone</option>
-                                    <option value="premium_only">Premium Only</option>
-                                    <option value="disabled">Disabled</option>
+                                    <option value="all">{t("admin:everyone")}</option>
+                                    <option value="premium_only">{t("admin:premiumOnly")}</option>
+                                    <option value="disabled">{t("admin:disabled")}</option>
                                 </select>
                             </div>
                         );

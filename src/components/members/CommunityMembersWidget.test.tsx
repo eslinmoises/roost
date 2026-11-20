@@ -1,6 +1,8 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import i18n from '@/i18n';
+beforeAll(async () => { await i18n.changeLanguage('en'); });
 import { CommunityMembersWidget } from './CommunityMembersWidget';
 import { searchMembers } from '@/services/profile';
 import type { Profile } from '@/types/database';

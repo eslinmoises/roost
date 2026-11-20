@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { getCurrentSession } from './supabase';
 
 // Backend API URL for pre-signed URL generation
@@ -23,7 +24,7 @@ export interface UploadResult {
 async function getAuthToken(): Promise<string> {
     const session = await getCurrentSession();
     if (!session?.access_token) {
-        throw new Error('Authentication required for file uploads');
+        throw new Error(t("errors:authenticationRequiredForFileUploads"));
     }
     return session.access_token;
 }
@@ -44,8 +45,8 @@ async function uploadViaPresignedUrl(file: File, folder: string): Promise<Upload
     });
 
     if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: 'Upload failed' }));
-        throw new Error(error.error || 'Failed to upload file');
+        const error = await response.json().catch(() => ({ error: t("errors:uploadFailed") }));
+        throw new Error(error.error || t("errors:failedToUploadFile"));
     }
 
     const { key, publicUrl } = await response.json();
@@ -65,7 +66,7 @@ export async function uploadFile(
     folder: string = 'uploads'
 ): Promise<UploadResult> {
     if (file.size > MAX_FILE_SIZE) {
-        throw new Error(`File size exceeds maximum allowed (${MAX_FILE_SIZE / 1024 / 1024}MB)`);
+        throw new Error(t("errors:fileSizeExceedsMaximumAllowedMB", { value1: MAX_FILE_SIZE / 1024 / 1024 }));
     }
 
     return uploadViaPresignedUrl(file, folder);
@@ -74,11 +75,11 @@ export async function uploadFile(
 // Upload image with validation
 export async function uploadImage(file: File): Promise<UploadResult> {
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        throw new Error('Invalid image type. Allowed types: JPEG, PNG, GIF, WebP');
+        throw new Error(t("errors:invalidImageTypeAllowedTypesJPEGPNGGIFWebP"));
     }
 
     if (file.size > MAX_IMAGE_SIZE) {
-        throw new Error(`Image size exceeds maximum allowed (${MAX_IMAGE_SIZE / 1024 / 1024}MB)`);
+        throw new Error(t("errors:imageSizeExceedsMaximumAllowedMB", { value1: MAX_IMAGE_SIZE / 1024 / 1024 }));
     }
 
     return uploadViaPresignedUrl(file, 'images');
@@ -87,11 +88,11 @@ export async function uploadImage(file: File): Promise<UploadResult> {
 // Upload avatar with validation
 export async function uploadAvatar(file: File, userId: string): Promise<UploadResult> {
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        throw new Error('Invalid image type. Allowed types: JPEG, PNG, GIF, WebP');
+        throw new Error(t("errors:invalidImageTypeAllowedTypesJPEGPNGGIFWebP"));
     }
 
     if (file.size > 5 * 1024 * 1024) {
-        throw new Error('Avatar size exceeds maximum allowed (5MB)');
+        throw new Error(t("errors:avatarSizeExceedsMaximumAllowed5MB"));
     }
 
     return uploadViaPresignedUrl(file, `avatars/${userId}`);
@@ -100,7 +101,7 @@ export async function uploadAvatar(file: File, userId: string): Promise<UploadRe
 // Upload video
 export async function uploadVideo(file: File): Promise<UploadResult> {
     if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
-        throw new Error('Invalid video type. Allowed types: MP4, WebM, MOV');
+        throw new Error(t("errors:invalidVideoTypeAllowedTypesMP4WebMMOV"));
     }
 
     return uploadViaPresignedUrl(file, 'videos');
@@ -109,7 +110,7 @@ export async function uploadVideo(file: File): Promise<UploadResult> {
 // Upload document
 export async function uploadDocument(file: File): Promise<UploadResult> {
     if (!ALLOWED_DOCUMENT_TYPES.includes(file.type)) {
-        throw new Error('Invalid document type. Allowed types: PDF, DOC, DOCX');
+        throw new Error(t("errors:invalidDocumentTypeAllowedTypesPDFDOCDOCX"));
     }
 
     return uploadViaPresignedUrl(file, 'documents');
@@ -129,7 +130,7 @@ export async function deleteFile(key: string): Promise<void> {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to delete file');
+        throw new Error(t("errors:failedToDeleteFile"));
     }
 }
 
@@ -143,7 +144,7 @@ export async function getSignedDownloadUrl(keyOrUrl: string, _expiresIn: number 
     const response = await fetch(`${API_URL}/api/upload/content/${encodedKey}`, {
         headers: { Authorization: `Bearer ${token}` },
     });
-    if (!response.ok) throw new Error('File access denied');
+    if (!response.ok) throw new Error(t("errors:fileAccessDenied"));
     return URL.createObjectURL(await response.blob());
 }
 

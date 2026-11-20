@@ -1,3 +1,6 @@
+import { Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2, Loader2, AlertTriangle, LayoutGrid, Sidebar as SidebarIcon, GraduationCap, Crown, Users } from 'lucide-react';
@@ -8,6 +11,7 @@ import { GroupMembers, CreateGroupModal } from '@/components/groups';
 import type { Group } from '@/types';
 
 export default function GroupSettings() {
+    useTranslation();
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -29,15 +33,15 @@ export default function GroupSettings() {
             setError(null);
             const data = await getGroupBySlug(slug, user?.id);
             if (!data) {
-                setError('Classroom not found');
+                setError(t("groups:classroomNotFound"));
             } else if (!hasPermission(data.user_role, 'edit_settings')) {
-                setError('You do not have permission to edit this classroom');
+                setError(t("groups:youDoNotHavePermissionToEditThisClassroom"));
             } else {
                 setGroup(data);
             }
         } catch (err) {
             console.error('Error fetching group:', err);
-            setError('Failed to load classroom');
+            setError(t("groups:failedToLoadClassroom"));
         } finally {
             setIsLoading(false);
         }
@@ -64,7 +68,7 @@ export default function GroupSettings() {
             fetchGroup();
         } catch (err) {
             console.error('Error updating layout:', err);
-            alert('Failed to update layout');
+            alert(t("groups:failedToUpdateLayout"));
         } finally {
             setIsUpdatingLayout(false);
         }
@@ -79,7 +83,7 @@ export default function GroupSettings() {
             fetchGroup();
         } catch (err) {
             console.error('Error updating access type:', err);
-            alert('Failed to update access type');
+            alert(t("groups:failedToUpdateAccessType"));
         } finally {
             setIsUpdatingAccess(false);
         }
@@ -94,7 +98,7 @@ export default function GroupSettings() {
             navigate('/classrooms', { replace: true });
         } catch (err) {
             console.error('Error deleting group:', err);
-            alert('Failed to delete classroom');
+            alert(t("groups:failedToDeleteClassroom"));
         } finally {
             setIsDeleting(false);
         }
@@ -113,14 +117,13 @@ export default function GroupSettings() {
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="text-center py-12">
                     <h2 className="text-xl font-semibold text-surface-900 mb-2">
-                        {error || 'Classroom not found'}
+                        {error || t("groups:classroomNotFound")}
                     </h2>
                     <button
                         onClick={() => navigate('/classrooms')}
                         className="mt-4 px-4 py-2 text-primary-600 font-medium hover:bg-primary-50 rounded-lg transition-colors"
                     >
-                        Browse Classrooms
-                    </button>
+                        {t("groups:browseClassrooms")}</button>
                 </div>
             </div>
         );
@@ -139,7 +142,7 @@ export default function GroupSettings() {
                     <ArrowLeft className="w-5 h-5 text-surface-600" />
                 </button>
                 <div>
-                    <h1 className="text-2xl font-bold text-surface-900">Classroom Settings</h1>
+                    <h1 className="text-2xl font-bold text-surface-900">{t("groups:classroomSettings")}</h1>
                     <p className="text-surface-500">{group.name}</p>
                 </div>
             </div>
@@ -148,10 +151,9 @@ export default function GroupSettings() {
                 {/* General Settings */}
                 <section className="card">
                     <div className="p-6 border-b border-surface-100 dark:border-surface-700">
-                        <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">General</h2>
+                        <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">{t("groups:general")}</h2>
                         <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                            Manage your classroom's basic information
-                        </p>
+                            {t("groups:manageYourClassroomSBasicInformation")}</p>
                     </div>
                     <div className="p-6">
                         <div className="flex items-start gap-4">
@@ -170,7 +172,7 @@ export default function GroupSettings() {
                             <div className="flex-1">
                                 <h3 className="font-medium text-surface-900 dark:text-surface-100">{group.name}</h3>
                                 <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                                    {group.description || 'No description'}
+                                    {group.description || t("groups:noDescription")}
                                 </p>
                                 <p className="text-sm text-surface-400 dark:text-surface-500 mt-2">
                                     /classrooms/{group.slug}
@@ -180,8 +182,7 @@ export default function GroupSettings() {
                                 onClick={() => setShowEditModal(true)}
                                 className="px-4 py-2 bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-200 rounded-lg font-medium hover:bg-surface-200 dark:hover:bg-surface-600 transition-colors"
                             >
-                                Edit
-                            </button>
+                                {t("groups:edit")}</button>
                         </div>
                     </div>
                 </section>
@@ -189,10 +190,9 @@ export default function GroupSettings() {
                 {/* Layout Settings */}
                 <section className="card">
                     <div className="p-6 border-b border-surface-100 dark:border-surface-700">
-                        <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">Layout</h2>
+                        <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">{t("groups:layout")}</h2>
                         <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                            Choose the classroom detail page layout
-                        </p>
+                            {t("groups:chooseTheClassroomDetailPageLayout")}</p>
                     </div>
                     <div className="p-6">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -213,11 +213,9 @@ export default function GroupSettings() {
                                     <LayoutGrid className={`w-5 h-5 mt-0.5 ${group.layout_mode === 'default' ? 'text-primary-600 dark:text-primary-400' : 'text-surface-400 dark:text-surface-500'}`} />
                                     <div>
                                         <h3 className={`font-medium ${group.layout_mode === 'default' ? 'text-primary-900 dark:text-primary-100' : 'text-surface-900 dark:text-surface-100'}`}>
-                                            Default Layout
-                                        </h3>
+                                            {t("groups:defaultLayout")}</h3>
                                         <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                                            Header at top, tabs below, content in grid
-                                        </p>
+                                            {t("groups:headerAtTopTabsBelowContentInGrid")}</p>
                                     </div>
                                 </div>
                                 {group.layout_mode === 'default' && (
@@ -246,11 +244,9 @@ export default function GroupSettings() {
                                     <SidebarIcon className={`w-5 h-5 mt-0.5 ${group.layout_mode === 'sidebar' ? 'text-primary-600 dark:text-primary-400' : 'text-surface-400 dark:text-surface-500'}`} />
                                     <div>
                                         <h3 className={`font-medium ${group.layout_mode === 'sidebar' ? 'text-primary-900 dark:text-primary-100' : 'text-surface-900 dark:text-surface-100'}`}>
-                                            Sidebar Layout
-                                        </h3>
+                                            {t("groups:sidebarLayout")}</h3>
                                         <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                                            Header in right sidebar, tabs inline with content
-                                        </p>
+                                            {t("groups:headerInRightSidebarTabsInlineWithContent")}</p>
                                     </div>
                                 </div>
                                 {group.layout_mode === 'sidebar' && (
@@ -279,11 +275,9 @@ export default function GroupSettings() {
                                     <GraduationCap className={`w-5 h-5 mt-0.5 ${group.layout_mode === 'learn' ? 'text-primary-600 dark:text-primary-400' : 'text-surface-400 dark:text-surface-500'}`} />
                                     <div>
                                         <h3 className={`font-medium ${group.layout_mode === 'learn' ? 'text-primary-900 dark:text-primary-100' : 'text-surface-900 dark:text-surface-100'}`}>
-                                            Learn Mode
-                                        </h3>
+                                            {t("groups:learnMode")}</h3>
                                         <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                                            Course-like layout with modules, lessons, and progress tracking
-                                        </p>
+                                            {t("groups:courseLikeLayoutWithModulesLessonsAndProgressTracking")}</p>
                                     </div>
                                 </div>
                                 {group.layout_mode === 'learn' && (
@@ -301,10 +295,9 @@ export default function GroupSettings() {
                 {/* Access Type Settings */}
                 <section className="card">
                     <div className="p-6 border-b border-surface-100 dark:border-surface-700">
-                        <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">Access Type</h2>
+                        <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">{t("groups:accessType")}</h2>
                         <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                            Control who can access this classroom
-                        </p>
+                            {t("groups:controlWhoCanAccessThisClassroom")}</p>
                     </div>
                     <div className="p-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -325,11 +318,9 @@ export default function GroupSettings() {
                                     <Users className={`w-5 h-5 mt-0.5 ${!group.is_premium ? 'text-primary-600 dark:text-primary-400' : 'text-surface-400 dark:text-surface-500'}`} />
                                     <div>
                                         <h3 className={`font-medium ${!group.is_premium ? 'text-primary-900 dark:text-primary-100' : 'text-surface-900 dark:text-surface-100'}`}>
-                                            Free Access
-                                        </h3>
+                                            {t("groups:freeAccess")}</h3>
                                         <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                                            All members can join this classroom
-                                        </p>
+                                            {t("groups:allMembersCanJoinThisClassroom")}</p>
                                     </div>
                                 </div>
                                 {!group.is_premium && (
@@ -358,11 +349,9 @@ export default function GroupSettings() {
                                     <Crown className={`w-5 h-5 mt-0.5 ${group.is_premium ? 'text-amber-600 dark:text-amber-400' : 'text-surface-400 dark:text-surface-500'}`} />
                                     <div>
                                         <h3 className={`font-medium ${group.is_premium ? 'text-amber-900 dark:text-amber-100' : 'text-surface-900 dark:text-surface-100'}`}>
-                                            Premium Only
-                                        </h3>
+                                            {t("groups:premiumOnly")}</h3>
                                         <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                                            Only premium members can access
-                                        </p>
+                                            {t("groups:onlyPremiumMembersCanAccess")}</p>
                                     </div>
                                 </div>
                                 {group.is_premium && (
@@ -380,10 +369,9 @@ export default function GroupSettings() {
                 {/* Members Management */}
                 <section>
                     <div className="mb-4">
-                        <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">Members</h2>
+                        <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">{t("groups:members2")}</h2>
                         <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                            Manage classroom members and their roles
-                        </p>
+                            {t("groups:manageClassroomMembersAndTheirRoles")}</p>
                     </div>
                     <GroupMembers
                         groupId={group.id}
@@ -400,24 +388,21 @@ export default function GroupSettings() {
                         <div className="p-6 border-b border-red-100 dark:border-red-900 bg-red-50/50 dark:bg-red-900/20">
                             <h2 className="text-lg font-semibold text-red-900 dark:text-red-400 flex items-center gap-2">
                                 <AlertTriangle className="w-5 h-5" />
-                                Danger Zone
-                            </h2>
+                                {t("groups:dangerZone")}</h2>
                         </div>
                         <div className="p-6">
                             <div className="flex items-start justify-between gap-4">
                                 <div>
-                                    <h3 className="font-medium text-surface-900 dark:text-surface-100">Delete this classroom</h3>
+                                    <h3 className="font-medium text-surface-900 dark:text-surface-100">{t("groups:deleteThisClassroom")}</h3>
                                     <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                                        Once you delete a classroom, there is no going back. All posts, comments, and member data will be permanently deleted.
-                                    </p>
+                                        {t("groups:onceYouDeleteAClassroomThereIsNoGoing")}</p>
                                 </div>
                                 <button
                                     onClick={() => setShowDeleteConfirm(true)}
                                     className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center gap-2 flex-shrink-0"
                                 >
                                     <Trash2 className="w-4 h-4" />
-                                    Delete Classroom
-                                </button>
+                                    {t("groups:deleteClassroom")}</button>
                             </div>
                         </div>
                     </section>
@@ -438,16 +423,10 @@ export default function GroupSettings() {
                     <div className="bg-white rounded-xl w-full max-w-md p-6">
                         <div className="flex items-center gap-3 text-red-600 mb-4">
                             <AlertTriangle className="w-6 h-6" />
-                            <h2 className="text-xl font-semibold">Delete Classroom</h2>
+                            <h2 className="text-xl font-semibold">{t("groups:deleteClassroom")}</h2>
                         </div>
-                        <p className="text-surface-600 mb-4">
-                            This action cannot be undone. This will permanently delete the
-                            <strong> {group.name} </strong>
-                            classroom and all of its content.
-                        </p>
-                        <p className="text-surface-600 mb-4">
-                            Please type <strong>{group.name}</strong> to confirm.
-                        </p>
+                        <p className="text-surface-600 mb-4"><Trans i18nKey="groups:sentence13" components={{ part0: <strong /> }} values={{ value0: group.name }} /></p>
+                        <p className="text-surface-600 mb-4"><Trans i18nKey="groups:sentence14" components={{ part0: <strong /> }} values={{ value0: group.name }} /></p>
                         <input
                             type="text"
                             value={deleteConfirmText}
@@ -463,16 +442,14 @@ export default function GroupSettings() {
                                 }}
                                 className="flex-1 px-4 py-2.5 border border-surface-200 rounded-lg text-surface-700 font-medium hover:bg-surface-50 transition-colors"
                             >
-                                Cancel
-                            </button>
+                                {t("groups:cancel")}</button>
                             <button
                                 onClick={handleDelete}
                                 disabled={deleteConfirmText !== group.name || isDeleting}
                                 className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                                 {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                Delete Classroom
-                            </button>
+                                {t("groups:deleteClassroom")}</button>
                         </div>
                     </div>
                 </div>

@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
@@ -23,29 +26,30 @@ import type { FeatureRequestStatus, FeatureRequestType } from '@/types/database'
 const PAGE_SIZE = 20;
 
 const STATUS_TABS: { value: FeatureRequestStatus | ''; label: string }[] = [
-    { value: '', label: 'All' },
-    { value: 'under_review', label: 'Under Review' },
-    { value: 'planned', label: 'Planned' },
-    { value: 'in_progress', label: 'In Progress' },
-    { value: 'released', label: 'Released' },
-    { value: 'declined', label: 'Declined' },
+    { value: '', get label() { return t("roadmap:all"); } },
+    { value: 'under_review', get label() { return t("roadmap:underReview"); } },
+    { value: 'planned', get label() { return t("roadmap:planned"); } },
+    { value: 'in_progress', get label() { return t("roadmap:inProgress"); } },
+    { value: 'released', get label() { return t("roadmap:released"); } },
+    { value: 'declined', get label() { return t("roadmap:declined"); } },
 ];
 
 const SORT_OPTIONS = [
-    { value: 'most_votes', label: 'Most Voted' },
-    { value: 'newest', label: 'Latest' },
-    { value: 'oldest', label: 'Oldest' },
-    { value: 'most_comments', label: 'Most Discussed' },
+    { value: 'most_votes', get label() { return t("roadmap:mostVoted"); } },
+    { value: 'newest', get label() { return t("roadmap:latest"); } },
+    { value: 'oldest', get label() { return t("roadmap:oldest"); } },
+    { value: 'most_comments', get label() { return t("roadmap:mostDiscussed"); } },
 ] as const;
 
 const TYPE_FILTER_OPTIONS: { value: string; label: string }[] = [
-    { value: '', label: 'All Types' },
-    { value: 'feature_request', label: 'Feature Request' },
-    { value: 'bug_report', label: 'Bug Report' },
-    { value: 'improvement', label: 'Improvement' },
+    { value: '', get label() { return t("roadmap:allTypes"); } },
+    { value: 'feature_request', get label() { return t("roadmap:featureRequest"); } },
+    { value: 'bug_report', get label() { return t("roadmap:bugReport"); } },
+    { value: 'improvement', get label() { return t("roadmap:improvement"); } },
 ];
 
 export default function FeatureRequestList() {
+    useTranslation();
     const { user } = useAuth();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -244,14 +248,11 @@ export default function FeatureRequestList() {
                     className="inline-flex items-center gap-1.5 text-sm text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-200 transition-colors mb-3"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    Back to Roadmap
-                </Link>
+                    {t("roadmap:backToRoadmap")}</Link>
                 <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">
-                    All Feature Requests
-                </h1>
+                    {t("roadmap:allFeatureRequests")}</h1>
                 <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                    Browse, filter, and vote on all feature requests, bug reports, and improvements.
-                </p>
+                    {t("roadmap:browseFilterAndVoteOnAllFeatureRequestsBug")}</p>
             </div>
 
             {/* Status Tabs */}
@@ -277,7 +278,7 @@ export default function FeatureRequestList() {
                                             ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
                                             : 'bg-surface-100 dark:bg-surface-800 text-surface-500 dark:text-surface-400'
                                     }`}>
-                                        {count}
+                                        {formatNumber(count)}
                                     </span>
                                 )}
                             </button>
@@ -295,7 +296,7 @@ export default function FeatureRequestList() {
                         type="text"
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
-                        placeholder="Search requests..."
+                        placeholder={t("roadmap:searchRequests")}
                         className="w-full pl-9 pr-3 py-2 rounded-lg border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100 placeholder-surface-400 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                     />
                 </div>
@@ -351,8 +352,8 @@ export default function FeatureRequestList() {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 transition-colors"
                 >
                     <Plus className="w-4 h-4" />
-                    <span className="hidden sm:inline">Submit Request</span>
-                    <span className="sm:hidden">Submit</span>
+                    <span className="hidden sm:inline">{t("roadmap:submitRequest")}</span>
+                    <span className="sm:hidden">{t("roadmap:submit")}</span>
                 </button>
             </div>
 
@@ -365,12 +366,11 @@ export default function FeatureRequestList() {
                 <div className="text-center py-20">
                     <Lightbulb className="w-16 h-16 mx-auto text-surface-300 dark:text-surface-600 mb-4" />
                     <h3 className="text-lg font-medium text-surface-900 dark:text-surface-100 mb-2">
-                        No requests found
-                    </h3>
+                        {t("roadmap:noRequestsFound")}</h3>
                     <p className="text-surface-500 dark:text-surface-400 mb-6">
                         {filters.search || filters.type || filters.status
-                            ? 'Try adjusting your filters or search term.'
-                            : 'Be the first to submit a feature request or bug report!'}
+                            ? t("roadmap:tryAdjustingYourFiltersOrSearchTerm")
+                            : t("roadmap:beTheFirstToSubmitAFeatureRequestOr")}
                     </p>
                     {!filters.search && !filters.type && !filters.status && (
                         <button
@@ -379,8 +379,7 @@ export default function FeatureRequestList() {
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 transition-colors"
                         >
                             <Plus className="w-4 h-4" />
-                            Submit Request
-                        </button>
+                            {t("roadmap:submitRequest")}</button>
                     )}
                 </div>
             ) : (
@@ -403,12 +402,11 @@ export default function FeatureRequestList() {
                     {isLoadingMore ? (
                         <div className="flex items-center justify-center gap-2 text-surface-500 dark:text-surface-400">
                             <Loader2 className="w-5 h-5 animate-spin" />
-                            <span className="text-sm">Loading more...</span>
+                            <span className="text-sm">{t("roadmap:loadingMore")}</span>
                         </div>
                     ) : (
                         <span className="text-sm text-surface-400 dark:text-surface-500">
-                            Scroll for more
-                        </span>
+                            {t("roadmap:scrollForMore")}</span>
                     )}
                 </div>
             )}

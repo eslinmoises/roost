@@ -1,4 +1,6 @@
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+
 import type { Conversation } from '../../services/message';
 import OnlineIndicator from '../common/OnlineIndicator';
 import { ProBadge } from '../common/ProBadge';
@@ -10,6 +12,7 @@ interface ConversationItemProps {
 }
 
 export default function ConversationItem({ conversation, isSelected, onClick }: ConversationItemProps) {
+    useTranslation();
   const { otherUser, lastMessage, unreadCount, lastMessageAt } = conversation;
 
   // Truncate last message content

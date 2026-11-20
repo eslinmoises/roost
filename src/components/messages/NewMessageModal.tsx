@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import UserSearchInput from './UserSearchInput';
@@ -10,6 +12,7 @@ interface NewMessageModalProps {
 }
 
 export default function NewMessageModal({ isOpen, onClose, onUserSelect }: NewMessageModalProps) {
+    useTranslation();
   if (!isOpen) return null;
 
   const handleUserSelect = (user: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url' | 'is_online' | 'membership_type'>) => {
@@ -29,7 +32,7 @@ export default function NewMessageModal({ isOpen, onClose, onUserSelect }: NewMe
       <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-surface-200">
-          <h2 className="text-lg font-semibold text-surface-900">New Message</h2>
+          <h2 className="text-lg font-semibold text-surface-900">{t("messages:newMessage2")}</h2>
           <button
             onClick={onClose}
             className="p-1 text-surface-400 hover:text-surface-600 hover:bg-surface-100 rounded-lg transition-colors"
@@ -41,19 +44,17 @@ export default function NewMessageModal({ isOpen, onClose, onUserSelect }: NewMe
         {/* Content */}
         <div className="p-4">
           <label className="block text-sm font-medium text-surface-700 mb-2">
-            Search for a user to message
-          </label>
+            {t("messages:searchForAUserToMessage")}</label>
           <UserSearchInput
             onUserSelect={handleUserSelect}
-            placeholder="Search by name or username..."
+            placeholder={t("messages:searchByNameOrUsername")}
           />
         </div>
 
         {/* Footer */}
         <div className="p-4 border-t border-surface-200 bg-surface-50 rounded-b-2xl">
           <p className="text-xs text-surface-500 text-center">
-            Start typing to search for users in the community
-          </p>
+            {t("messages:startTypingToSearchForUsersInTheCommunity")}</p>
         </div>
       </div>
     </div>,

@@ -1,3 +1,7 @@
+import { Trans } from 'react-i18next';
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState } from 'react';
 import { X, Loader2, AlertCircle, ShieldOff } from 'lucide-react';
 import { supabase } from '@/services/supabase';
@@ -9,6 +13,7 @@ interface TwoFactorDisableModalProps {
 }
 
 export default function TwoFactorDisableModal({ isOpen, onClose, onSuccess }: TwoFactorDisableModalProps) {
+    useTranslation();
     const [verificationCode, setVerificationCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -23,7 +28,7 @@ export default function TwoFactorDisableModal({ isOpen, onClose, onSuccess }: Tw
 
     const handleDisable = async () => {
         if (verificationCode.length !== 6) {
-            setError('Please enter a 6-digit code');
+            setError(t("settings:pleaseEnterA6DigitCode"));
             return;
         }
 
@@ -34,7 +39,7 @@ export default function TwoFactorDisableModal({ isOpen, onClose, onSuccess }: Tw
             const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
             if (factorsError) throw factorsError;
             const factor = factors.totp.find((item) => item.status === 'verified');
-            if (!factor) throw new Error('No verified authenticator was found.');
+            if (!factor) throw new Error(t("settings:noVerifiedAuthenticatorWasFound"));
 
             const { error: verifyError } = await supabase.auth.mfa.challengeAndVerify({
                 factorId: factor.id,
@@ -51,13 +56,13 @@ export default function TwoFactorDisableModal({ isOpen, onClose, onSuccess }: Tw
                 const response = await fetch(`${apiUrl}/api/auth/mfa/status`, {
                     headers: { Authorization: `Bearer ${session.access_token}` },
                 });
-                if (!response.ok) throw new Error('2FA was disabled but the account status could not be synchronized.');
+                if (!response.ok) throw new Error(t("settings:2FAWasDisabledButTheAccountStatusCouldNot"));
             }
 
             onSuccess();
             onClose();
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to disable 2FA');
+            setError(err instanceof Error ? localizeError(err.message) : t("settings:failedToDisable2FA"));
         } finally {
             setIsLoading(false);
         }
@@ -87,13 +92,12 @@ export default function TwoFactorDisableModal({ isOpen, onClose, onSuccess }: Tw
                             <ShieldOff className="w-5 h-5 text-red-600 dark:text-red-400" />
                         </div>
                         <h2 id="two-factor-disable-title" className="text-lg font-semibold text-surface-900 dark:text-surface-100">
-                            Disable Two-Factor Authentication
-                        </h2>
+                            {t("settings:disableTwoFactorAuthentication")}</h2>
                     </div>
                     <button
                         onClick={handleClose}
                         disabled={isLoading}
-                        aria-label="Close two-factor authentication dialog"
+                        aria-label={t("settings:closeTwoFactorAuthenticationDialog")}
                         className="p-2 text-surface-500 hover:text-surface-700 dark:text-surface-400 dark:hover:text-surface-200 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
                     >
                         <X className="w-5 h-5" />
@@ -104,25 +108,21 @@ export default function TwoFactorDisableModal({ isOpen, onClose, onSuccess }: Tw
                 <div className="p-6 space-y-5">
                     {/* Warning */}
                     <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                        <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                            <strong>Warning:</strong> Disabling 2FA will make your account less secure.
-                            You will only need your password to sign in.
-                        </p>
+                        <p className="text-sm text-yellow-700 dark:text-yellow-400"><Trans i18nKey="common:sentence1" components={{ part0: <strong /> }} /></p>
                     </div>
 
                     {/* Error message */}
                     {error && (
                         <div className="p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg flex items-center gap-3">
                             <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                            <span>{error}</span>
+                            <span>{localizeError(error)}</span>
                         </div>
                     )}
 
                     {/* Verification code */}
                     <div>
                         <label htmlFor="disable-two-factor-code" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                            Enter your 2FA code to confirm
-                        </label>
+                            {t("settings:enterYour2FACodeToConfirm")}</label>
                         <input
                             id="disable-two-factor-code"
                             type="text"
@@ -148,8 +148,7 @@ export default function TwoFactorDisableModal({ isOpen, onClose, onSuccess }: Tw
                             disabled={isLoading}
                             className="flex-1 px-4 py-2.5 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 rounded-lg font-medium hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors disabled:opacity-50"
                         >
-                            Cancel
-                        </button>
+                            {t("settings:cancel")}</button>
                         <button
                             onClick={handleDisable}
                             disabled={isLoading || verificationCode.length !== 6}
@@ -158,10 +157,10 @@ export default function TwoFactorDisableModal({ isOpen, onClose, onSuccess }: Tw
                             {isLoading ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    <span>Disabling...</span>
+                                    <span>{t("settings:disabling")}</span>
                                 </>
                             ) : (
-                                <span>Disable 2FA</span>
+                                <span>{t("settings:disable2FA")}</span>
                             )}
                         </button>
                     </div>

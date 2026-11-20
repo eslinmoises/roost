@@ -1,3 +1,7 @@
+import { formatNumber } from '@/lib/locale';
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy } from 'lucide-react';
@@ -8,6 +12,7 @@ import type { UserRankInfo } from '../types';
 import UserRankBadge from '../components/leaderboard/UserRankBadge';
 
 export default function Leaderboard() {
+    useTranslation();
     const { slug } = useParams<{ slug?: string }>();
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -47,7 +52,7 @@ export default function Leaderboard() {
                             className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4 transition-colors"
                         >
                             <ArrowLeft size={20} />
-                            <span>Back to Group</span>
+                            <span>{t("leaderboard:backToGroup")}</span>
                         </button>
                     )}
 
@@ -55,10 +60,9 @@ export default function Leaderboard() {
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-3">
                                 <Trophy size={32} className="text-purple-600 dark:text-purple-400" />
-                                Leaderboard
-                            </h1>
+                                {t("leaderboard:leaderboard")}</h1>
                             <p className="text-gray-600 dark:text-gray-400 mt-1">
-                                {groupId ? 'Top contributors in this group' : 'Top contributors across the platform'}
+                                {groupId ? t("leaderboard:topContributorsInThisGroup") : t("leaderboard:topContributorsAcrossThePlatform")}
                             </p>
                         </div>
                     </div>
@@ -67,7 +71,7 @@ export default function Leaderboard() {
                 {/* Period Selector */}
                 <div className="bg-white dark:bg-surface-900 rounded-lg border border-gray-200 dark:border-surface-700 p-4 mb-6">
                     <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Time Period:</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">{t("leaderboard:timePeriod")}</span>
                         <button
                             onClick={() => setPeriod(7)}
                             className={`
@@ -78,8 +82,7 @@ export default function Leaderboard() {
                                 }
                             `}
                         >
-                            7 Days
-                        </button>
+                            {t("leaderboard:7Days")}</button>
                         <button
                             onClick={() => setPeriod(30)}
                             className={`
@@ -90,8 +93,7 @@ export default function Leaderboard() {
                                 }
                             `}
                         >
-                            30 Days
-                        </button>
+                            {t("leaderboard:30Days")}</button>
                         <button
                             onClick={() => setPeriod(365)}
                             className={`
@@ -102,8 +104,7 @@ export default function Leaderboard() {
                                 }
                             `}
                         >
-                            All Time
-                        </button>
+                            {t("leaderboard:allTime")}</button>
                     </div>
                 </div>
 
@@ -112,19 +113,19 @@ export default function Leaderboard() {
                     <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-6 mb-6 text-white shadow-lg">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-purple-100 text-sm font-medium mb-1">Your Rank</p>
+                                <p className="text-purple-100 text-sm font-medium mb-1">{t("leaderboard:yourRank")}</p>
                                 <div className="flex items-center gap-4">
                                     <UserRankBadge rank={userRank.rank} size="lg" />
                                     <div>
-                                        <p className="text-3xl font-bold">#{userRank.rank}</p>
-                                        <p className="text-purple-100">out of {userRank.totalUsers.toLocaleString()} users</p>
+                                        <p className="text-3xl font-bold">#{formatNumber(userRank.rank)}</p>
+                                        <p className="text-purple-100">{t("leaderboard:outOfUsers", { value1: userRank.totalUsers.toLocaleString(activeLanguage()) })}</p>
                                     </div>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-purple-100 text-sm font-medium mb-1">Your Points</p>
-                                <p className="text-4xl font-bold">{userRank.points.toLocaleString()}</p>
-                                <p className="text-purple-100">points</p>
+                                <p className="text-purple-100 text-sm font-medium mb-1">{t("leaderboard:yourPoints")}</p>
+                                <p className="text-4xl font-bold">{userRank.points.toLocaleString(activeLanguage())}</p>
+                                <p className="text-purple-100">{t("leaderboard:points2")}</p>
                             </div>
                         </div>
                     </div>
@@ -135,15 +136,15 @@ export default function Leaderboard() {
 
                 {/* Point Earning Guide */}
                 <div className="mt-8 bg-white dark:bg-surface-900 rounded-lg border border-gray-200 dark:border-surface-700 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">How to Earn Points</h2>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t("leaderboard:howToEarnPoints")}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="flex items-start gap-3">
                             <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
                                 <span className="text-blue-600 dark:text-blue-400 font-bold">+10</span>
                             </div>
                             <div>
-                                <p className="font-medium text-gray-900 dark:text-gray-100">Create a Post</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Share your knowledge and insights</p>
+                                <p className="font-medium text-gray-900 dark:text-gray-100">{t("leaderboard:createAPost")}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{t("leaderboard:shareYourKnowledgeAndInsights")}</p>
                             </div>
                         </div>
 
@@ -152,8 +153,8 @@ export default function Leaderboard() {
                                 <span className="text-green-600 dark:text-green-400 font-bold">+5</span>
                             </div>
                             <div>
-                                <p className="font-medium text-gray-900 dark:text-gray-100">Write a Comment</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Engage in discussions</p>
+                                <p className="font-medium text-gray-900 dark:text-gray-100">{t("leaderboard:writeAComment")}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{t("leaderboard:engageInDiscussions")}</p>
                             </div>
                         </div>
 
@@ -162,8 +163,8 @@ export default function Leaderboard() {
                                 <span className="text-purple-600 dark:text-purple-400 font-bold">+1</span>
                             </div>
                             <div>
-                                <p className="font-medium text-gray-900 dark:text-gray-100">React to Content</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Show appreciation</p>
+                                <p className="font-medium text-gray-900 dark:text-gray-100">{t("leaderboard:reactToContent")}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{t("leaderboard:showAppreciation")}</p>
                             </div>
                         </div>
 
@@ -172,8 +173,8 @@ export default function Leaderboard() {
                                 <span className="text-yellow-600 dark:text-yellow-400 font-bold">+2</span>
                             </div>
                             <div>
-                                <p className="font-medium text-gray-900 dark:text-gray-100">Receive a Reaction</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Get recognized for your content</p>
+                                <p className="font-medium text-gray-900 dark:text-gray-100">{t("leaderboard:receiveAReaction")}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{t("leaderboard:getRecognizedForYourContent")}</p>
                             </div>
                         </div>
 
@@ -182,8 +183,8 @@ export default function Leaderboard() {
                                 <span className="text-pink-600 dark:text-pink-400 font-bold">+15</span>
                             </div>
                             <div>
-                                <p className="font-medium text-gray-900 dark:text-gray-100">Attend an Event</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">RSVP and join community events</p>
+                                <p className="font-medium text-gray-900 dark:text-gray-100">{t("leaderboard:attendAnEvent")}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{t("leaderboard:rSVPAndJoinCommunityEvents")}</p>
                             </div>
                         </div>
 
@@ -192,8 +193,8 @@ export default function Leaderboard() {
                                 <span className="text-teal-600 dark:text-teal-400 font-bold">+20</span>
                             </div>
                             <div>
-                                <p className="font-medium text-gray-900 dark:text-gray-100">Complete Your Profile</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">One-time bonus for a complete profile</p>
+                                <p className="font-medium text-gray-900 dark:text-gray-100">{t("leaderboard:completeYourProfile")}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{t("leaderboard:oneTimeBonusForACompleteProfile")}</p>
                             </div>
                         </div>
                     </div>

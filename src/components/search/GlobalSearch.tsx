@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, User, FileText, Users, Crown, Loader2 } from 'lucide-react';
@@ -25,6 +27,7 @@ export default function GlobalSearch({
     onClose,
     autoFocus = false,
 }: GlobalSearchProps) {
+    useTranslation();
     const { user, isPremium } = useAuth();
     const navigate = useNavigate();
     const inputRef = useRef<HTMLInputElement>(null);
@@ -176,7 +179,7 @@ export default function GlobalSearch({
                     <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400 animate-spin" />
                 ) : query.length > 0 ? (
                     <button
-                        aria-label="Clear search"
+                        aria-label={t("common:clearSearch")}
                         onClick={handleClear}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300"
                     >
@@ -194,20 +197,17 @@ export default function GlobalSearch({
                     {isSearching && !hasResults ? (
                         <div className="p-4 text-center text-surface-500">
                             <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
-                            <span className="text-sm">Searching...</span>
+                            <span className="text-sm">{t("common:searching")}</span>
                         </div>
                     ) : !hasResults ? (
-                        <div className="p-4 text-center text-surface-500 text-sm">
-                            No results found for "{query}"
-                        </div>
+                        <div className="p-4 text-center text-surface-500 text-sm">{t("common:noResultsFoundFor", { value1: query })}</div>
                     ) : (
                         <div className="py-2">
                             {/* Users Section */}
                             {results.users.length > 0 && (
                                 <div>
                                     <div className="px-3 py-1.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wide">
-                                        Members
-                                    </div>
+                                        {t("common:members2")}</div>
                                     {results.users.map((user) => (
                                         <UserResult
                                             key={user.id}
@@ -225,8 +225,7 @@ export default function GlobalSearch({
                                         <div className="border-t border-surface-100 dark:border-surface-700 my-1" />
                                     )}
                                     <div className="px-3 py-1.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wide">
-                                        Posts
-                                    </div>
+                                        {t("common:posts")}</div>
                                     {results.posts.map((post) => (
                                         <PostResult
                                             key={post.id}
@@ -244,8 +243,7 @@ export default function GlobalSearch({
                                         <div className="border-t border-surface-100 dark:border-surface-700 my-1" />
                                     )}
                                     <div className="px-3 py-1.5 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wide">
-                                        Classrooms
-                                    </div>
+                                        {t("common:classrooms")}</div>
                                     {results.groups.map((group) => (
                                         <GroupResult
                                             key={group.id}
@@ -272,6 +270,7 @@ function UserResult({
     user: SearchResultUser;
     onClick: () => void;
 }) {
+    useTranslation();
     return (
         <button
             onClick={onClick}
@@ -313,6 +312,7 @@ function PostResult({
     post: SearchResultPost;
     onClick: () => void;
 }) {
+    useTranslation();
     return (
         <button
             onClick={onClick}
@@ -326,10 +326,10 @@ function PostResult({
                     {post.title || truncateText(post.content, 50)}
                 </div>
                 <div className="text-xs text-surface-500 dark:text-surface-400 truncate flex items-center gap-1">
-                    <span>by {post.author.display_name}</span>
+                    <span>{t("common:by", { value1: post.author.display_name })}</span>
                     {post.group_name && (
                         <>
-                            <span>in</span>
+                            <span>{t("common:in")}</span>
                             <span className="font-medium">{post.group_name}</span>
                             {post.group_is_premium && (
                                 <Crown className="w-3 h-3 text-amber-500" />
@@ -352,6 +352,7 @@ function GroupResult({
     isPremium: boolean;
     onClick: () => void;
 }) {
+    useTranslation();
     const isLocked = group.is_premium && !isPremium;
 
     return (
@@ -382,12 +383,11 @@ function GroupResult({
                     {group.name}
                     {isLocked && (
                         <span className="text-xs font-normal text-amber-600 dark:text-amber-400">
-                            (Premium)
-                        </span>
+                            {t("common:premium")}</span>
                     )}
                 </div>
                 <div className="text-xs text-surface-500 dark:text-surface-400 truncate">
-                    {group.member_count} {group.member_count === 1 ? 'member' : 'members'}
+                    {t('common:countMembers', { count: group.member_count })}
                     {group.description && ` • ${truncateText(group.description, 40)}`}
                 </div>
             </div>

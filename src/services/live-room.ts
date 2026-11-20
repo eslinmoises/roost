@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { supabase } from './supabase';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -74,7 +75,7 @@ async function getAuthToken(): Promise<string | null> {
 
 async function authFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const token = await getAuthToken();
-  if (!token) throw new Error('Not authenticated');
+  if (!token) throw new Error(t("live:notAuthenticated"));
 
   return fetch(`${API_URL}${path}`, {
     ...options,
@@ -91,20 +92,20 @@ async function authFetch(path: string, options: RequestInit = {}): Promise<Respo
 export const liveRoomService = {
   async getStatus(): Promise<LiveStatus> {
     const response = await authFetch('/api/live-room/status');
-    if (!response.ok) throw new Error('Failed to get live status');
+    if (!response.ok) throw new Error(t("live:failedToGetLiveStatus"));
     return response.json();
   },
 
   async getRecordings(): Promise<Recording[]> {
     const response = await authFetch('/api/live-room/recordings');
-    if (!response.ok) throw new Error('Failed to get recordings');
+    if (!response.ok) throw new Error(t("live:failedToGetRecordings"));
     const data = await response.json();
     return data.recordings;
   },
 
   async getUpcoming(): Promise<UpcomingSession[]> {
     const response = await authFetch('/api/live-room/upcoming');
-    if (!response.ok) throw new Error('Failed to get upcoming sessions');
+    if (!response.ok) throw new Error(t("live:failedToGetUpcomingSessions"));
     const data = await response.json();
     return data.sessions;
   },
@@ -115,7 +116,7 @@ export const liveRoomService = {
     });
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || 'Failed to RSVP');
+      throw new Error(err.error || t("live:failedToRSVP"));
     }
   },
 
@@ -123,12 +124,12 @@ export const liveRoomService = {
     const response = await authFetch(`/api/live-room/sessions/${sessionId}/rsvp`, {
       method: 'DELETE',
     });
-    if (!response.ok) throw new Error('Failed to cancel RSVP');
+    if (!response.ok) throw new Error(t("live:failedToCancelRSVP"));
   },
 
   async getRsvpStatus(sessionId: string): Promise<RsvpInfo> {
     const response = await authFetch(`/api/live-room/sessions/${sessionId}/rsvp`);
-    if (!response.ok) throw new Error('Failed to check RSVP');
+    if (!response.ok) throw new Error(t("live:failedToCheckRSVP"));
     return response.json();
   },
 };
@@ -149,7 +150,7 @@ export const liveRoomAdminService = {
     });
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || 'Failed to create session');
+      throw new Error(err.error || t("live:failedToCreateSession"));
     }
     return response.json();
   },
@@ -166,7 +167,7 @@ export const liveRoomAdminService = {
       method: 'PUT',
       body: JSON.stringify(updates),
     });
-    if (!response.ok) throw new Error('Failed to update session');
+    if (!response.ok) throw new Error(t("live:failedToUpdateSession"));
     const data = await response.json();
     return data.session;
   },
@@ -175,19 +176,19 @@ export const liveRoomAdminService = {
     const response = await authFetch(`/api/live-room/sessions/${sessionId}`, {
       method: 'DELETE',
     });
-    if (!response.ok) throw new Error('Failed to delete session');
+    if (!response.ok) throw new Error(t("live:failedToDeleteSession"));
   },
 
   async listSessions(): Promise<LiveSession[]> {
     const response = await authFetch('/api/live-room/sessions');
-    if (!response.ok) throw new Error('Failed to list sessions');
+    if (!response.ok) throw new Error(t("live:failedToListSessions"));
     const data = await response.json();
     return data.sessions;
   },
 
   async getRsvpList(sessionId: string): Promise<RsvpEntry[]> {
     const response = await authFetch(`/api/live-room/sessions/${sessionId}/rsvp-list`);
-    if (!response.ok) throw new Error('Failed to get RSVP list');
+    if (!response.ok) throw new Error(t("live:failedToGetRSVPList"));
     const data = await response.json();
     return data.rsvps;
   },

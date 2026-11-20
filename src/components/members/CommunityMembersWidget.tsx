@@ -1,9 +1,12 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { searchMembers } from '@/services/profile';
 import type { Profile } from '@/types/database';
 
 export function CommunityMembersWidget() {
+    useTranslation();
     const [activeTab, setActiveTab] = useState<'active' | 'newest'>('active');
     const [members, setMembers] = useState<Profile[]>([]);
     const [loading, setLoading] = useState(true);
@@ -32,10 +35,9 @@ export function CommunityMembersWidget() {
     return (
         <div className="card bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-xl overflow-hidden shadow-none">
             <div className="p-4 border-b border-surface-200 dark:border-surface-700 flex items-center justify-between">
-                <h3 className="font-semibold text-surface-900 dark:text-surface-100">Community Members</h3>
+                <h3 className="font-semibold text-surface-900 dark:text-surface-100">{t("profile:communityMembers")}</h3>
                 <Link to="/members" className="text-xs text-primary-600 dark:text-primary-400 hover:underline">
-                    View All
-                </Link>
+                    {t("profile:viewAll")}</Link>
             </div>
 
             {/* Tabs */}
@@ -47,8 +49,7 @@ export function CommunityMembersWidget() {
                         : 'text-surface-500 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800/50'
                         }`}
                 >
-                    Active
-                </button>
+                    {t("profile:active")}</button>
                 <button
                     onClick={() => setActiveTab('newest')}
                     className={`flex-1 py-3 text-sm font-medium transition-colors ${activeTab === 'newest'
@@ -56,8 +57,7 @@ export function CommunityMembersWidget() {
                         : 'text-surface-500 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800/50'
                         }`}
                 >
-                    Newest
-                </button>
+                    {t("profile:newest")}</button>
             </div>
 
             {/* List */}
@@ -113,8 +113,7 @@ export function CommunityMembersWidget() {
 
                 {!loading && members.length === 0 && (
                     <div className="text-center py-4 text-surface-500 dark:text-surface-400 text-sm">
-                        No members found.
-                    </div>
+                        {t("profile:noMembersFound")}</div>
                 )}
             </div>
         </div>

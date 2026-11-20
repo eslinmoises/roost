@@ -1,3 +1,6 @@
+import { formatNumber } from '@/lib/locale';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useState } from 'react';
 import { ChevronUp } from 'lucide-react';
@@ -21,6 +24,7 @@ export default function ShowcaseVoteButton({
     size = 'md',
     className = '',
 }: ShowcaseVoteButtonProps) {
+    useTranslation();
     const { user } = useAuth();
     const [isVoting, setIsVoting] = useState(false);
     const [localVoteCount, setLocalVoteCount] = useState(voteCount);
@@ -69,12 +73,12 @@ export default function ShowcaseVoteButton({
                     ${!user ? 'opacity-50 cursor-not-allowed' : ''}
                     ${className}
                 `}
-                title={!user ? 'Sign in to vote' : localHasVoted ? 'Remove vote' : 'Upvote'}
+                title={!user ? t("showcase:signInToVote") : localHasVoted ? t("showcase:removeVote") : t("common:uiUpvote")}
             >
                 <ChevronUp className="w-5 h-5 flex-shrink-0" />
-                <span className="font-semibold">{localHasVoted ? 'Upvoted' : 'Upvote'}</span>
+                <span className="font-semibold">{localHasVoted ? t("common:uiUpvoted") : t("common:uiUpvote")}</span>
                 <span className="font-semibold">·</span>
-                <span className="font-semibold">{localVoteCount}</span>
+                <span className="font-semibold">{formatNumber(localVoteCount)}</span>
             </button>
         );
     }
@@ -105,10 +109,10 @@ export default function ShowcaseVoteButton({
                 ${!user ? 'opacity-50 cursor-not-allowed' : ''}
                 ${className}
             `}
-            title={!user ? 'Sign in to vote' : localHasVoted ? 'Remove vote' : 'Upvote'}
+            title={!user ? t("showcase:signInToVote") : localHasVoted ? t("showcase:removeVote") : t("common:uiUpvote")}
         >
             <ChevronUp className={`${iconSizes[size]} ${localHasVoted ? 'text-primary-600 dark:text-primary-400' : ''}`} />
-            <span className="font-semibold">{localVoteCount}</span>
+            <span className="font-semibold">{formatNumber(localVoteCount)}</span>
         </button>
     );
 }

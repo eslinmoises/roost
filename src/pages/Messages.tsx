@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ConversationList from '../components/messages/ConversationList';
@@ -9,6 +10,7 @@ import type { Profile } from '../types/database';
 import { supabase } from '../services/supabase';
 
 export default function Messages() {
+    useTranslation();
   const { userId } = useParams<{ userId?: string }>();
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [showNewMessageModal, setShowNewMessageModal] = useState(false);

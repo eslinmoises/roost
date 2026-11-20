@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,6 +13,7 @@ import { AnnouncementBanner } from '@/components/admin';
 import { Users, Radio } from 'lucide-react';
 
 export default function Home() {
+    useTranslation();
     const { profile } = useAuth();
     const { isLive, session: liveSession } = useLiveStatus();
     const [membersCount, setMembersCount] = useState(0);
@@ -43,24 +46,22 @@ export default function Home() {
             <div className={`hidden lg:block fixed ${APP_CONFIG.demo.enabled ? 'top-28 h-[calc(100vh-7rem)]' : 'top-16 h-[calc(100vh-4rem)]'} right-0 w-80 overflow-y-auto scrollbar-thin p-4 space-y-6 bg-white dark:bg-surface-900 border-l border-surface-200 dark:border-surface-800`}>
                 {/* About card */}
                 <div className="card p-6 shadow-none">
-                    <h2 className="font-semibold text-surface-900 dark:text-surface-100 mb-4">About</h2>
-                    <p className="text-surface-600 dark:text-surface-400 text-sm mb-4">
-                        Welcome to {APP_CONFIG.name}! {APP_CONFIG.description}
-                    </p>
+                    <h2 className="font-semibold text-surface-900 dark:text-surface-100 mb-4">{t("common:about")}</h2>
+                    <p className="text-surface-600 dark:text-surface-400 text-sm mb-4">{t("common:welcomeTo", { value1: APP_CONFIG.name, value2: APP_CONFIG.description })}</p>
                     <div className="flex items-center gap-6 text-sm">
                         <div className="flex items-center gap-2">
                             <Users className="w-4 h-4 text-surface-400 dark:text-surface-500" />
-                            <span className="text-surface-600 dark:text-surface-400">{membersCount} Members</span>
+                            <span className="text-surface-600 dark:text-surface-400">{t("common:members", { value1: membersCount })}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                            <span className="text-surface-600 dark:text-surface-400">{onlineCount} Online</span>
+                            <span className="text-surface-600 dark:text-surface-400">{t("common:online", { value1: onlineCount })}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Leaderboard card */}
-                <LeaderboardCard period={30} limit={10} title="Top Contributors" />
+                <LeaderboardCard period={30} limit={10} title={t("common:topContributors")} />
 
                 {/* Community Members Widget */}
                 <CommunityMembersWidget />
@@ -87,15 +88,14 @@ export default function Home() {
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                                         <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                                     </span>
-                                    <span className="text-sm font-bold uppercase tracking-wide">Live Now</span>
+                                    <span className="text-sm font-bold uppercase tracking-wide">{t("common:liveNow")}</span>
                                 </div>
                                 <p className="text-sm text-white/90 font-medium truncate mt-0.5">
                                     {liveSession.title}
                                 </p>
                             </div>
                             <span className="flex-shrink-0 px-3 py-1.5 bg-white text-red-600 text-sm font-semibold rounded-lg">
-                                Join
-                            </span>
+                                {t("common:join")}</span>
                         </div>
                     </Link>
                 )}
@@ -103,11 +103,9 @@ export default function Home() {
                 <div className="py-8 px-4 sm:px-6 lg:px-8 space-y-6">
                     {/* Welcome message */}
                     <div className="card p-6 shadow-none">
-                        <h1 className="text-md md:text-lg font-semibold text-surface-900 dark:text-surface-100">
-                            Welcome back, {profile?.display_name || 'there'}! 👋
-                        </h1>
+                        <h1 className="text-md md:text-lg font-semibold text-surface-900 dark:text-surface-100">{t("common:welcomeBack", { value1: profile?.display_name || t('common:friend') })}</h1>
                         <p className="text-surface-500 dark:text-surface-400 mt-1 text-xs   md:text-base">
-                            {APP_CONFIG.demo.enabled ? 'Explore the feed, meet the members, and find your next classroom.' : 'What would you like to share with the community today?'}
+                            {APP_CONFIG.demo.enabled ? t("common:exploreTheFeedMeetTheMembersAndFindYour") : t("common:whatWouldYouLikeToShareWithTheCommunity")}
                         </p>
                     </div>
 

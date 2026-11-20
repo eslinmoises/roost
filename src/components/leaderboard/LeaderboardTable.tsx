@@ -1,3 +1,6 @@
+import { activeLanguage } from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { Trophy } from 'lucide-react';
 import { getGlobalLeaderboard, getGroupLeaderboard, subscribeToLeaderboardChanges } from '../../services';
@@ -12,6 +15,7 @@ interface LeaderboardTableProps {
 }
 
 export default function LeaderboardTable({ groupId, period }: LeaderboardTableProps) {
+    useTranslation();
     const { user } = useAuth();
     const [leaderboard, setLeaderboard] = useState<LeaderboardRank[]>([]);
     const [loading, setLoading] = useState(true);
@@ -117,14 +121,11 @@ export default function LeaderboardTable({ groupId, period }: LeaderboardTablePr
                         <thead className="bg-gray-50 dark:bg-surface-800 border-b border-gray-200 dark:border-surface-700">
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-20">
-                                    Rank
-                                </th>
+                                    {t("leaderboard:rank2")}</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    User
-                                </th>
+                                    {t("leaderboard:user")}</th>
                                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
-                                    Points
-                                </th>
+                                    {t("leaderboard:points")}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 dark:divide-surface-700">
@@ -158,10 +159,9 @@ export default function LeaderboardTable({ groupId, period }: LeaderboardTablePr
         return (
             <div className="bg-white dark:bg-surface-900 rounded-lg border border-gray-200 dark:border-surface-700 p-12 text-center">
                 <Trophy size={64} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No Data Yet</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t("leaderboard:noDataYet2")}</h3>
                 <p className="text-gray-500 dark:text-gray-400">
-                    The leaderboard will populate once users start earning points!
-                </p>
+                    {t("leaderboard:theLeaderboardWillPopulateOnceUsersStartEarningPoints")}</p>
             </div>
         );
     }
@@ -173,14 +173,11 @@ export default function LeaderboardTable({ groupId, period }: LeaderboardTablePr
                     <thead className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-b border-gray-200 dark:border-surface-700">
                         <tr>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20">
-                                Rank
-                            </th>
+                                {t("leaderboard:rank2")}</th>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                User
-                            </th>
+                                {t("leaderboard:user")}</th>
                             <th className="px-6 py-4 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-32">
-                                Points
-                            </th>
+                                {t("leaderboard:points")}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-surface-800">
@@ -226,13 +223,12 @@ export default function LeaderboardTable({ groupId, period }: LeaderboardTablePr
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex items-center gap-2">
                                                     <p className="font-medium text-gray-900 dark:text-gray-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                                                        {entry.user?.display_name || 'Unknown'}
+                                                        {entry.user?.display_name || t("common:uiUnknown")}
                                                     </p>
                                                     {entry.user?.membership_type === 'premium' && <ProBadge size="xs" />}
                                                     {isCurrentUser && (
                                                         <span className="px-2 py-0.5 bg-purple-600 text-white text-xs font-medium rounded">
-                                                            You
-                                                        </span>
+                                                            {t("leaderboard:you")}</span>
                                                     )}
                                                 </div>
                                                 {entry.user?.username && (
@@ -253,9 +249,9 @@ export default function LeaderboardTable({ groupId, period }: LeaderboardTablePr
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex flex-col items-end">
                                             <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
-                                                {(entry.total_points || 0).toLocaleString()}
+                                                {(entry.total_points || 0).toLocaleString(activeLanguage())}
                                             </span>
-                                            <span className="text-xs text-gray-500 dark:text-gray-400">points</span>
+                                            <span className="text-xs text-gray-500 dark:text-gray-400">{t("leaderboard:points2")}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -271,10 +267,10 @@ export default function LeaderboardTable({ groupId, period }: LeaderboardTablePr
                     {loadingMore ? (
                         <div className="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400">
                             <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
-                            <span className="text-sm">Loading more...</span>
+                            <span className="text-sm">{t("leaderboard:loadingMore")}</span>
                         </div>
                     ) : (
-                        <span className="text-sm text-gray-400 dark:text-gray-500">Scroll for more</span>
+                        <span className="text-sm text-gray-400 dark:text-gray-500">{t("leaderboard:scrollForMore")}</span>
                     )}
                 </div>
             )}

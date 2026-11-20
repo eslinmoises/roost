@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { Search } from 'lucide-react';
 
 interface MemberFiltersProps {
@@ -17,6 +19,7 @@ export function MemberFilters({
     sortBy,
     onSortChange
 }: MemberFiltersProps) {
+    useTranslation();
     return (
         <div className="bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-xl p-4 mb-6 sticky top-[73px] z-10 shadow-sm dark:shadow-none">
             <div className="flex flex-col md:flex-row gap-4">
@@ -24,7 +27,7 @@ export function MemberFilters({
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400 dark:text-surface-500" />
                     <input
                         type="text"
-                        placeholder="Search members..."
+                        placeholder={t("profile:searchMembers")}
                         value={searchQuery}
                         onChange={(e) => onSearchChange(e.target.value)}
                         className="w-full pl-9 pr-4 py-2 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 text-surface-900 dark:text-surface-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50"
@@ -37,8 +40,8 @@ export function MemberFilters({
                         onChange={(e) => onStatusChange(e.target.value as 'all' | 'online')}
                         className="px-3 py-2 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 text-surface-900 dark:text-surface-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50"
                     >
-                        <option value="all">All Status</option>
-                        <option value="online">Online Now</option>
+                        <option value="all">{t("profile:allStatus")}</option>
+                        <option value="online">{t("profile:onlineNow")}</option>
                     </select>
 
                     <select
@@ -46,9 +49,9 @@ export function MemberFilters({
                         onChange={(e) => onSortChange(e.target.value as any)}
                         className="px-3 py-2 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 text-surface-900 dark:text-surface-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50"
                     >
-                        <option value="newest">Newest Members</option>
-                        <option value="last_active">Recently Active</option>
-                        <option value="alphabetical">Alphabetical</option>
+                        <option value="newest">{t("profile:newestMembers")}</option>
+                        <option value="last_active">{t("profile:recentlyActive")}</option>
+                        <option value="alphabetical">{t("profile:alphabetical")}</option>
                     </select>
                 </div>
             </div>

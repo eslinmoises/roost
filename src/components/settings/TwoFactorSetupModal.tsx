@@ -1,3 +1,6 @@
+import { localizeError } from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { X, Loader2, Check, AlertCircle, Shield, CheckCircle } from 'lucide-react';
 import { supabase } from '@/services/supabase';
@@ -11,6 +14,7 @@ interface TwoFactorSetupModalProps {
 type SetupStep = 'intro' | 'scan' | 'verify' | 'complete';
 
 export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoFactorSetupModalProps) {
+    useTranslation();
     const [step, setStep] = useState<SetupStep>('intro');
     const [secret, setSecret] = useState('');
     const [qrCode, setQrCode] = useState('');
@@ -47,7 +51,7 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
         try {
             const { data, error: enrollError } = await supabase.auth.mfa.enroll({
                 factorType: 'totp',
-                friendlyName: 'Roost authenticator',
+                friendlyName: t("settings:roostAuthenticator"),
             });
             if (enrollError) throw enrollError;
             setFactorId(data.id);
@@ -55,7 +59,7 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
             setQrCode(data.totp.qr_code);
             setStep('scan');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to setup 2FA');
+            setError(err instanceof Error ? localizeError(err.message) : t("settings:failedToSetup2FA"));
         } finally {
             setIsLoading(false);
         }
@@ -63,7 +67,7 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
 
     const verifyCode = async () => {
         if (verificationCode.length !== 6) {
-            setError('Please enter a 6-digit code');
+            setError(t("settings:pleaseEnterA6DigitCode"));
             return;
         }
 
@@ -71,7 +75,7 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
         setError(null);
 
         try {
-            if (!factorId) throw new Error('The enrollment session expired. Start again.');
+            if (!factorId) throw new Error(t("settings:theEnrollmentSessionExpiredStartAgain"));
             const { error: verifyError } = await supabase.auth.mfa.challengeAndVerify({
                 factorId,
                 code: verificationCode,
@@ -84,11 +88,11 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                 const statusResponse = await fetch(`${apiUrl}/api/auth/mfa/status`, {
                     headers: { Authorization: `Bearer ${session.access_token}` },
                 });
-                if (!statusResponse.ok) throw new Error('2FA was enrolled but the account status could not be synchronized.');
+                if (!statusResponse.ok) throw new Error(t("settings:2FAWasEnrolledButTheAccountStatusCouldNot"));
             }
             setStep('complete');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to verify code');
+            setError(err instanceof Error ? localizeError(err.message) : t("settings:failedToVerifyCode"));
         } finally {
             setIsLoading(false);
         }
@@ -123,14 +127,13 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                             <Shield className="w-5 h-5 text-green-600 dark:text-green-400" />
                         </div>
                         <h2 id="two-factor-setup-title" className="text-lg font-semibold text-surface-900 dark:text-surface-100">
-                            Setup Two-Factor Authentication
-                        </h2>
+                            {t("settings:setupTwoFactorAuthentication")}</h2>
                     </div>
                     {step !== 'complete' && (
                         <button
                             onClick={handleClose}
                             disabled={isLoading}
-                            aria-label="Close two-factor authentication setup"
+                            aria-label={t("settings:closeTwoFactorAuthenticationSetup")}
                             className="p-2 text-surface-500 hover:text-surface-700 dark:text-surface-400 dark:hover:text-surface-200 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
                         >
                             <X className="w-5 h-5" />
@@ -144,7 +147,7 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                     {error && (
                         <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg flex items-center gap-3">
                             <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                            <span>{error}</span>
+                            <span>{localizeError(error)}</span>
                         </div>
                     )}
 
@@ -156,27 +159,21 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                                     <Shield className="w-8 h-8 text-green-600 dark:text-green-400" />
                                 </div>
                                 <h3 className="text-lg font-medium text-surface-900 dark:text-surface-100 mb-2">
-                                    Add an Extra Layer of Security
-                                </h3>
+                                    {t("settings:addAnExtraLayerOfSecurity")}</h3>
                                 <p className="text-surface-500 dark:text-surface-400">
-                                    Two-factor authentication adds an additional layer of security to your account
-                                    by requiring a code from your authenticator app when you sign in.
-                                </p>
+                                    {t("settings:twoFactorAuthenticationAddsAnAdditionalLayerOfSecurity")}</p>
                             </div>
 
                             <div className="bg-surface-50 dark:bg-surface-800 rounded-lg p-4">
                                 <h4 className="font-medium text-surface-900 dark:text-surface-100 mb-2">
-                                    You'll need:
-                                </h4>
+                                    {t("settings:youLlNeed")}</h4>
                                 <ul className="space-y-2 text-sm text-surface-600 dark:text-surface-400">
                                     <li className="flex items-center gap-2">
                                         <Check className="w-4 h-4 text-green-500" />
-                                        An authenticator app (Google Authenticator, Authy, etc.)
-                                    </li>
+                                        {t("settings:anAuthenticatorAppGoogleAuthenticatorAuthyEtc")}</li>
                                     <li className="flex items-center gap-2">
                                         <Check className="w-4 h-4 text-green-500" />
-                                        Your phone nearby to scan a QR code
-                                    </li>
+                                        {t("settings:yourPhoneNearbyToScanAQRCode")}</li>
                                 </ul>
                             </div>
 
@@ -188,10 +185,10 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                                 {isLoading ? (
                                     <>
                                         <Loader2 className="w-5 h-5 animate-spin" />
-                                        <span>Setting up...</span>
+                                        <span>{t("settings:settingUp")}</span>
                                     </>
                                 ) : (
-                                    <span>Get Started</span>
+                                    <span>{t("settings:getStarted")}</span>
                                 )}
                             </button>
                         </div>
@@ -202,11 +199,9 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                         <div className="space-y-6">
                             <div className="text-center">
                                 <h3 className="text-lg font-medium text-surface-900 dark:text-surface-100 mb-2">
-                                    Scan QR Code
-                                </h3>
+                                    {t("settings:scanQRCode")}</h3>
                                 <p className="text-surface-500 dark:text-surface-400 text-sm">
-                                    Open your authenticator app and scan this QR code
-                                </p>
+                                    {t("settings:openYourAuthenticatorAppAndScanThisQRCode")}</p>
                             </div>
 
                             {/* QR Code */}
@@ -214,7 +209,7 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                                 <div className="p-4 bg-white rounded-lg border border-surface-200 dark:border-surface-700">
                                     <img
                                         src={qrCode}
-                                        alt="QR Code"
+                                        alt={t("settings:qRCode")}
                                         className="w-48 h-48"
                                     />
                                 </div>
@@ -223,8 +218,7 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                             {/* Manual entry option */}
                             <div className="bg-surface-50 dark:bg-surface-800 rounded-lg p-4">
                                 <p className="text-xs text-surface-500 dark:text-surface-400 mb-2">
-                                    Can't scan? Enter this code manually:
-                                </p>
+                                    {t("settings:canTScanEnterThisCodeManually")}</p>
                                 <code className="block px-3 py-2 bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded text-sm font-mono break-all">
                                     {secret}
                                 </code>
@@ -234,8 +228,7 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                                 onClick={() => setStep('verify')}
                                 className="w-full px-4 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
                             >
-                                Continue
-                            </button>
+                                {t("settings:continue")}</button>
                         </div>
                     )}
 
@@ -244,17 +237,15 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                         <div className="space-y-6">
                             <div className="text-center">
                                 <h3 className="text-lg font-medium text-surface-900 dark:text-surface-100 mb-2">
-                                    Enter Verification Code
-                                </h3>
+                                    {t("settings:enterVerificationCode")}</h3>
                                 <p className="text-surface-500 dark:text-surface-400 text-sm">
-                                    Enter the 6-digit code from your authenticator app
-                                </p>
+                                    {t("settings:enterThe6DigitCodeFromYourAuthenticatorApp")}</p>
                             </div>
 
                             <div>
                                 <input
                                     type="text"
-                                    aria-label="Six-digit authenticator code"
+                                    aria-label={t("settings:sixDigitAuthenticatorCode")}
                                     inputMode="numeric"
                                     autoComplete="one-time-code"
                                     value={verificationCode}
@@ -274,8 +265,7 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                                     onClick={() => setStep('scan')}
                                     className="flex-1 px-4 py-3 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 rounded-lg font-medium hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
                                 >
-                                    Back
-                                </button>
+                                    {t("settings:back")}</button>
                                 <button
                                     onClick={verifyCode}
                                     disabled={isLoading || verificationCode.length !== 6}
@@ -284,10 +274,10 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                                     {isLoading ? (
                                         <>
                                             <Loader2 className="w-5 h-5 animate-spin" />
-                                            <span>Verifying...</span>
+                                            <span>{t("settings:verifying")}</span>
                                         </>
                                     ) : (
-                                        <span>Verify</span>
+                                        <span>{t("settings:verify")}</span>
                                     )}
                                 </button>
                             </div>
@@ -302,11 +292,9 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                                     <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
                                 </div>
                                 <h3 className="text-lg font-medium text-surface-900 dark:text-surface-100 mb-2">
-                                    Two-Factor Authentication Enabled
-                                </h3>
+                                    {t("settings:twoFactorAuthenticationEnabled")}</h3>
                                 <p className="text-surface-500 dark:text-surface-400 text-sm">
-                                    Future sign-ins require a code from your authenticator app. Keep access to the app and contact an administrator if you lose your device.
-                                </p>
+                                    {t("settings:futureSignInsRequireACodeFromYourAuthenticator")}</p>
                             </div>
 
                             <button
@@ -314,7 +302,7 @@ export default function TwoFactorSetupModal({ isOpen, onClose, onSuccess }: TwoF
                                 className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
                             >
                                 <Check className="w-5 h-5" />
-                                <span>Done</span>
+                                <span>{t("settings:done")}</span>
                             </button>
                         </div>
                     )}

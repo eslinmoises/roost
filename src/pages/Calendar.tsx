@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { APP_CONFIG } from '@/config/app';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Plus, Filter } from 'lucide-react';
@@ -10,6 +12,7 @@ import type { EventWithDetails } from '../types';
 import type { RSVPStatus } from '../types/database';
 
 export default function Calendar() {
+    useTranslation();
     const { user } = useAuth();
     const [events, setEvents] = useState<EventWithDetails[]>([]);
     const [upcomingEvents, setUpcomingEvents] = useState<EventWithDetails[]>([]);
@@ -131,12 +134,12 @@ export default function Calendar() {
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Calendar</h1>
-                    <p className="text-gray-600 dark:text-gray-400 mt-1">Community events and activities</p>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("events:calendar")}</h1>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">{t("events:communityEventsAndActivities")}</p>
                 </div>
                 <button
                     disabled={APP_CONFIG.demo.enabled}
-                    title={APP_CONFIG.demo.enabled ? 'Events are read-only in this demo' : undefined}
+                    title={APP_CONFIG.demo.enabled ? t("events:eventsAreReadOnlyInThisDemo") : undefined}
                     onClick={() => {
                         setSelectedSlot(null);
                         setIsCreateOpen(true);
@@ -144,7 +147,7 @@ export default function Calendar() {
                     className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                 >
                     <Plus size={20} />
-                    <span>Create Event</span>
+                    <span>{t("events:createEvent")}</span>
                 </button>
             </div>
 
@@ -170,16 +173,16 @@ export default function Calendar() {
                     <div className="bg-white dark:bg-surface-900 rounded-lg shadow-sm dark:shadow-none dark:border dark:border-surface-700 p-4">
                         <div className="flex items-center gap-2 mb-3">
                             <Filter size={18} className="text-gray-600 dark:text-gray-400" />
-                            <h2 className="font-semibold text-gray-900 dark:text-gray-100">Filters</h2>
+                            <h2 className="font-semibold text-gray-900 dark:text-gray-100">{t("events:filters")}</h2>
                         </div>
                         <div>
-                            <label htmlFor="calendar-group" className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Group</label>
+                            <label htmlFor="calendar-group" className="block text-sm text-gray-600 dark:text-gray-400 mb-1">{t("events:group")}</label>
                             <select id="calendar-group"
                                 value={selectedGroup || ''}
                                 onChange={(e) => setSelectedGroup(e.target.value || undefined)}
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500"
                             >
-                                <option value="">All Groups</option>
+                                <option value="">{t("events:allGroups")}</option>
                                 {userGroups.map((group) => (
                                     <option key={group.id} value={group.id}>
                                         {group.name}
@@ -191,11 +194,10 @@ export default function Calendar() {
 
                     {/* Upcoming Events */}
                     <div className="bg-white dark:bg-surface-900 rounded-lg shadow-sm dark:shadow-none dark:border dark:border-surface-700 p-4">
-                        <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">Upcoming Events</h2>
+                        <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">{t("events:upcomingEvents")}</h2>
                         {upcomingEvents.length === 0 ? (
                             <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-4">
-                                No upcoming events
-                            </p>
+                                {t("events:noUpcomingEvents")}</p>
                         ) : (
                             <div className="space-y-3">
                                 {upcomingEvents.map((event) => (

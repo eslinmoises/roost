@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useEffect, useState } from 'react';
 import { getSignedDownloadUrl } from '@/services/s3';
 
@@ -26,7 +27,7 @@ export function useAssetUrl(source?: string | null) {
             blobUrl = resolved;
             setUrl(resolved);
         }).catch((reason) => {
-            if (active) setError(reason instanceof Error ? reason.message : 'File access denied');
+            if (active) setError(reason instanceof Error ? reason.message : t("common:fileAccessDenied"));
         });
         return () => {
             active = false;

@@ -2,9 +2,17 @@ import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 const { from, leaderboard } = vi.hoisted(() => ({ from: vi.fn(), leaderboard: vi.fn() }));
 vi.mock('./supabase', () => ({ supabase: { from } }));
 vi.mock('./leaderboard', () => ({ getGlobalLeaderboard: leaderboard }));
-import { getUserGrowth, getActivityStats, getTopContributors } from './admin';
+import { BAN_DURATIONS, getUserGrowth, getActivityStats, getTopContributors } from './admin';
+import i18n from '@/i18n';
 
 describe('admin dashboard data', () => {
+  it('localizes ban duration labels while preserving the API duration values', async () => {
+    await i18n.changeLanguage('es');
+    expect(BAN_DURATIONS.map(duration => duration.value)).toEqual(['1 hour', '1 day', '7 days', '30 days', null]);
+    expect(BAN_DURATIONS[0].label).toBe('1 hora');
+    await i18n.changeLanguage('en');
+    expect(BAN_DURATIONS[0].label).toBe('1 Hour');
+  });
   beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date('2026-11-15T17:00:00Z')); vi.clearAllMocks(); });
   afterEach(() => vi.useRealTimers());
   const query = (data: unknown[], error: Error | null = null) => {

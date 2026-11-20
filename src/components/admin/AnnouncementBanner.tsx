@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from '@/i18n';
 import { useState, useEffect } from 'react';
 import { X, AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { getActiveAnnouncements, dismissAnnouncement, getDismissedAnnouncementIds } from '../../services';
@@ -30,6 +32,7 @@ const typeIconColors: Record<AnnouncementType, string> = {
 };
 
 export default function AnnouncementBanner({ groupId }: AnnouncementBannerProps) {
+    useTranslation();
     const { user } = useAuth();
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
@@ -99,7 +102,7 @@ export default function AnnouncementBanner({ groupId }: AnnouncementBannerProps)
                             <button
                                 onClick={() => handleDismiss(announcement.id)}
                                 className={`p-1 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors ${typeTextColors[announcement.type]}`}
-                                title="Dismiss"
+                                title={t("admin:dismiss")}
                             >
                                 <X className="w-4 h-4" />
                             </button>
