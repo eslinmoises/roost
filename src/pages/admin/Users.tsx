@@ -329,7 +329,7 @@ export default function AdminUsers() {
                 {/* Pagination */}
                 {totalPages > 1 && (
                     <div className="px-6 py-4 border-t border-gray-100 dark:border-surface-700 flex items-center justify-between">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t("admin:showingToOfUsers", { value1: (page - 1) * pageSize + 1, value2: Math.min(page * pageSize, total), value3: total })}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{t("admin:showingToOfUsers", { value1: (page - 1) * pageSize + 1, value2: Math.min(page * pageSize, total), count: total })}</p>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setPage((p) => Math.max(1, p - 1))}

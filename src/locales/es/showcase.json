@@ -8,7 +8,6 @@
   "image": "Imagen {{value1}}",
   "255Characters": "{{value1}}/255 caracteres",
   "150CharactersMin10": "{{value1}}/150 caracteres (mín. 10)",
-  "charactersMin50": "{{value1}} caracteres (mín. 50)",
   "screenshot": "Captura de pantalla {{value1}}",
   "featured": "Destacado",
   "newest": "Más recientes",
@@ -106,5 +105,7 @@
   "submitForReview": "Enviar a revisión",
   "ratingReviews_one": "{{rating}} ({{count}} reseña)",
   "ratingReviews_other": "{{rating}} ({{count}} reseñas)",
-  "sentence2": "<part0>Iniciar sesión</part0>{{value0}}para dejar una reseña."
+  "sentence2": "<part0>Iniciar sesión</part0>{{value0}}para dejar una reseña.",
+  "charactersMin50_one": "{{count}} carácter (mín. 50)",
+  "charactersMin50_other": "{{count}} caracteres (mín. 50)"
 }

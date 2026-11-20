@@ -61,5 +61,7 @@
   "calendarAllDay": "Todo el día",
   "calendarNoEvents": "No hay eventos en este período.",
   "calendarShowMore": "+{{count}} más",
-  "maybeCount": ", {{count}} quizás"
+  "maybeCount": ", {{count}} quizás",
+  "attendingCount_one": "{{count}} asistirá{{maybe}}",
+  "attendingCount_other": "{{count}} asistirán{{maybe}}"
 }

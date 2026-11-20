@@ -4,7 +4,6 @@
   "hAgo": "Hace {{value1}} h",
   "dAgo": "Hace {{value1}} d",
   "rank": "Posición #{{value1}}",
-  "outOfUsers": "de {{value1}} usuarios",
   "topContributors": "Principales colaboradores",
   "noDataYet": "Aún no hay datos",
   "pts": "pts",
@@ -53,5 +52,13 @@
   "attendAnEvent": "Asistir a un evento",
   "rSVPAndJoinCommunityEvents": "Confirma tu asistencia y participa en eventos de la comunidad",
   "completeYourProfile": "Completar tu perfil",
-  "oneTimeBonusForACompleteProfile": "Bonificación única por completar tu perfil"
+  "oneTimeBonusForACompleteProfile": "Bonificación única por completar tu perfil",
+  "storedPost": "Creó una nueva publicación",
+  "storedComment": "Creó un nuevo comentario",
+  "storedReactionGiven": "Dio una reacción",
+  "storedReactionReceived": "Recibió una reacción",
+  "storedEvent": "Confirmó su asistencia a un evento",
+  "storedShowcase": "Proyecto aprobado en la vitrina: {{title}}",
+  "outOfUsers_one": "de {{count}} usuario",
+  "outOfUsers_other": "de {{count}} usuarios"
 }

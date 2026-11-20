@@ -5,7 +5,6 @@
   "uploaded_other": "{{count}} archivos subidos",
   "available_one": "{{count}} grabación disponible",
   "available_other": "{{count}} grabaciones disponibles",
-  "showingOfRecordings": "Mostrando {{value1}}-{{value2}} de {{value3}} grabaciones",
   "filesToUpload": "Archivos por subir ({{value1}})",
   "upload_one": "Subir {{count}} archivo",
   "upload_other": "Subir {{count}} archivos",
@@ -167,5 +166,7 @@
   "pleaseType": "Escribe",
   "toConfirm": "para confirmar.",
   "sentence13": "Esta acción no se puede deshacer. Se eliminará permanentemente el aula<part0> {{value0}} </part0>y todo su contenido.",
-  "sentence14": "Escribe <part0>{{value0}}</part0> para confirmar."
+  "sentence14": "Escribe <part0>{{value0}}</part0> para confirmar.",
+  "showingOfRecordings_one": "Mostrando {{value1}}-{{value2}} de {{count}} grabación",
+  "showingOfRecordings_other": "Mostrando {{value1}}-{{value2}} de {{count}} grabaciones"
 }

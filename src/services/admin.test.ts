@@ -2,7 +2,7 @@ import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 const { from, leaderboard } = vi.hoisted(() => ({ from: vi.fn(), leaderboard: vi.fn() }));
 vi.mock('./supabase', () => ({ supabase: { from } }));
 vi.mock('./leaderboard', () => ({ getGlobalLeaderboard: leaderboard }));
-import { BAN_DURATIONS, getUserGrowth, getActivityStats, getTopContributors } from './admin';
+import { banUser, BAN_DURATIONS, getUserGrowth, getActivityStats, getTopContributors } from './admin';
 import i18n from '@/i18n';
 
 describe('admin dashboard data', () => {
@@ -12,6 +12,23 @@ describe('admin dashboard data', () => {
     expect(BAN_DURATIONS[0].label).toBe('1 hora');
     await i18n.changeLanguage('en');
     expect(BAN_DURATIONS[0].label).toBe('1 Hour');
+  });
+  describe.each(['es', 'en'])('ban persistence in %s', language => {
+    it.each([
+      ['1 hour', '2026-11-15T18:00:00.000Z'],
+      ['1 day', '2026-11-16T17:00:00.000Z'],
+      ['7 days', '2026-11-22T17:00:00.000Z'],
+      ['30 days', '2026-12-15T17:00:00.000Z'],
+    ])('stores the full interval for %s', async (interval, expiration) => {
+      await i18n.changeLanguage(language);
+      let saved: { ban_expires_at: string } | undefined;
+      from.mockReturnValue({ update: (payload: { ban_expires_at: string }) => {
+        saved = payload;
+        return { eq: () => Promise.resolve({ error: null }) };
+      } });
+      await banUser('member', 'admin', 'Test reason', interval);
+      expect(saved?.ban_expires_at).toBe(expiration);
+    });
   });
   beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date('2026-11-15T17:00:00Z')); vi.clearAllMocks(); });
   afterEach(() => vi.useRealTimers());

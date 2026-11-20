@@ -150,5 +150,9 @@
   "emojiCategory_activities": "Activities",
   "emojiCategory_objects": "Objects",
   "emojiCategory_symbols": "Symbols",
-  "emojiCategory_flags": "Flags"
+  "emojiCategory_flags": "Flags",
+  "memberTotal_one": "{{count}} Member",
+  "memberTotal_other": "{{count}} Members",
+  "you": "You",
+  "searchPlaceholder": "Search..."
 }

@@ -129,7 +129,7 @@ export default function LiveRoomChat({ sessionId }: LiveRoomChatProps) {
       content,
       created_at: new Date().toISOString(),
       profiles: {
-        display_name: profile?.display_name || 'You',
+        display_name: profile?.display_name || t('common:you'),
         avatar_url: profile?.avatar_url || null,
       },
     };

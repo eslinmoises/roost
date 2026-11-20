@@ -260,7 +260,7 @@ export default function Activations() {
 
                                             <div className="flex items-center justify-between text-sm mb-4">
                                                 <span className="text-surface-500 dark:text-surface-400">{t("activations:monthlyLimit")}</span>
-                                                <span className="font-medium text-surface-900 dark:text-surface-100">{t("activations:remaining", { value1: product.remaining_activations, value2: product.monthly_limit })}</span>
+                                                <span className="font-medium text-surface-900 dark:text-surface-100">{t("activations:remaining", { count: product.remaining_activations, value2: product.monthly_limit })}</span>
                                             </div>
 
                                             {/* Progress bar */}

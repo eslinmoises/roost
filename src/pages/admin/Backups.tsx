@@ -61,7 +61,7 @@ export default function AdminBackups() {
             } else {
                 setBackupResult({
                     type: 'error',
-                    message: result.error || t("admin:backupFailed"),
+                    message: localizeError(result.error) || t("admin:backupFailed"),
                 });
             }
         } catch (error) {
@@ -93,9 +93,9 @@ export default function AdminBackups() {
         const diffHours = Math.floor(diffMs / 3600000);
         const diffDays = Math.floor(diffMs / 86400000);
 
-        if (diffMins < 60) return t("admin:minutesAgo", { value1: diffMins });
-        if (diffHours < 24) return t("admin:hoursAgo", { value1: diffHours });
-        return t("admin:daysAgo", { value1: diffDays });
+        if (diffMins < 60) return t("admin:minutesAgo", { count: diffMins });
+        if (diffHours < 24) return t("admin:hoursAgo", { count: diffHours });
+        return t("admin:daysAgo", { count: diffDays });
     };
 
     const handleDownload = async (filename: string) => {

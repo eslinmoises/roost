@@ -19,9 +19,9 @@ interface CategoryFilterProps {
 }
 
 const SORT_LABELS: Record<SortOption, string> = {
-    newest: 'Newest',
-    popular: 'Popular',
-    trending: 'Trending',
+    get newest() { return t('posts:sortNewest'); },
+    get popular() { return t('posts:sortPopular'); },
+    get trending() { return t('posts:sortTrending'); },
 };
 
 export default function CategoryFilter({

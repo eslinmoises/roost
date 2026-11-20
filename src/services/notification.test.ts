@@ -6,7 +6,9 @@ import {
   deleteNotification,
   getUnreadNotificationCount,
   getNotificationIconInfo,
+  createMentionNotifications,
 } from './notification';
+import i18n from '@/i18n';
 import { supabase } from './supabase';
 
 vi.mock('./supabase', () => ({
@@ -16,6 +18,15 @@ vi.mock('./supabase', () => ({
 }));
 
 describe('Notification Service', () => {
+  it('keeps mention persistence canonical when the sender uses Spanish', async () => {
+    await i18n.changeLanguage('es');
+    let saved: unknown;
+    vi.mocked(supabase.from).mockImplementation((table: string) => (table === 'profiles'
+      ? { select: () => ({ in: () => Promise.resolve({ data: [{ id: 'recipient' }] }) }) }
+      : { insert: (rows: unknown) => { saved = rows; return Promise.resolve({ error: null }); } }) as any);
+    await createMentionNotifications(['recipient'], 'actor', 'Ana', 'post');
+    expect(saved).toEqual([expect.objectContaining({ title: 'New Mention', message: 'Ana mentioned you in a comment' })]);
+  });
   beforeEach(() => {
     vi.clearAllMocks();
   });

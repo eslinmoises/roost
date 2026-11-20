@@ -44,5 +44,7 @@
   "noModulesYet": "No modules yet",
   "createModulesToOrganizeYourCourseContent": "Create modules to organize your course content.",
   "courseModulesWillAppearHereWhenPublishedByInstructors": "Course modules will appear here when published by instructors.",
-  "createYourFirstModule": "Create Your First Module"
+  "createYourFirstModule": "Create Your First Module",
+  "lessonProgress_one": "· {{value1}}/{{count}} lessons",
+  "lessonProgress_other": "· {{value1}}/{{count}} lessons"
 }

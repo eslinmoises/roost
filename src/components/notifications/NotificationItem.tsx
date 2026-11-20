@@ -1,5 +1,6 @@
 import { formatDistanceToNow } from '@/lib/locale';
 import { useTranslation } from 'react-i18next';
+import { notificationCopy } from '@/i18n/persisted';
 
 import { MessageSquare, Heart, Mail, UserPlus, Users, AtSign, UserCheck, Bell, Reply } from 'lucide-react';
 import type { Notification } from '../../types/database';
@@ -27,6 +28,7 @@ export default function NotificationItem({ notification, onClick }: Notification
     useTranslation();
   const { icon: iconName, color } = getNotificationIconInfo(notification.type);
   const Icon = iconMap[iconName as keyof typeof iconMap] || Bell;
+  const copy = notificationCopy(notification.type, notification.title, notification.message);
 
   return (
     <button
@@ -42,11 +44,11 @@ export default function NotificationItem({ notification, onClick }: Notification
       {/* Content */}
       <div className="flex-1 min-w-0">
         <p className={`text-sm ${notification.is_read ? 'text-surface-700 dark:text-surface-300' : 'text-surface-900 dark:text-surface-100 font-medium'}`}>
-          {notification.title}
+          {copy.title}
         </p>
         {notification.message && (
           <p className="text-xs text-surface-500 dark:text-surface-400 mt-0.5">
-            {notification.message}
+            {copy.message}
           </p>
         )}
         <p className="text-xs text-surface-400 dark:text-surface-500 mt-1">

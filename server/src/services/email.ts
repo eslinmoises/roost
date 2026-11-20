@@ -1,4 +1,5 @@
 import { emailText, emailLocale } from '../locales/index.js';
+import { notificationCopy } from '../locales/notifications.js';
 import nodemailer, { type Transporter } from 'nodemailer';
 
 // HTML escape function to prevent XSS in email templates
@@ -198,7 +199,8 @@ class EmailService {
     message?: string;
     link?: string;
   }): Promise<boolean> {
-    const { to, userName, notificationType, title, message, link } = params;
+    const { to, userName, notificationType, title: storedTitle, message: storedMessage, link } = params;
+    const { title, message } = notificationCopy(notificationType, storedTitle, storedMessage);
     const safeName = escapeHtml(userName || emailText('nameFallback'));
     const safeTitle = escapeHtml(title);
     const safeMessage = message ? escapeHtml(message) : '';

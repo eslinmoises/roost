@@ -338,7 +338,7 @@ function CommentItem({
                         <CommentForm
                             onSubmit={handleEditSubmit}
                             initialValue={comment.content}
-                            submitLabel="Save"
+                            submitLabel={t('common:uiSave')}
                             onCancel={() => setIsEditing(false)}
                             autoFocus
                             isReply

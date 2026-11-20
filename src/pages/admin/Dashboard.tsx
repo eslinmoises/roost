@@ -176,12 +176,12 @@ export default function AdminDashboard() {
                                     <div
                                         className="h-6 bg-primary-500 rounded"
                                         style={{ width: `${Math.min(day.posts * 10, 100)}%` }}
-                                        title={t("admin:posts", { value1: day.posts })}
+                                        title={t("admin:posts", { count: day.posts })}
                                     />
                                     <div
                                         className="h-6 bg-green-500 rounded"
                                         style={{ width: `${Math.min(day.comments * 5, 100)}%` }}
-                                        title={t("admin:comments", { value1: day.comments })}
+                                        title={t("admin:comments", { count: day.comments })}
                                     />
                                 </div>
                             </div>
@@ -243,7 +243,7 @@ export default function AdminDashboard() {
                                 key={day.date}
                                 className="flex-1 bg-primary-500 rounded-t hover:bg-primary-600 transition-colors cursor-pointer"
                                 style={{ height: `${Math.max(height, 4)}%` }}
-                                title={t("admin:newMembers", { value1: new Date(day.date).toLocaleDateString(activeLanguage()), value2: day.count })}
+                                title={t("admin:newMembers", { value1: new Date(day.date).toLocaleDateString(activeLanguage()), count: day.count })}
                             />
                         );
                     })}

@@ -186,7 +186,7 @@ export default function ChatView({ conversation, onBack }: ChatViewProps) {
       sender: {
         id: user.id,
         username: user.email?.split('@')[0] || '',
-        display_name: user.user_metadata?.display_name || 'You',
+        display_name: user.user_metadata?.display_name || t('common:you'),
         avatar_url: user.user_metadata?.avatar_url,
         is_online: true,
         membership_type: user.user_metadata?.membership_type || null

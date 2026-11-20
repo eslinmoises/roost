@@ -10,5 +10,19 @@
   "youLlBeNotifiedAboutCommentsReactionsAndMessages": "You'll be notified about comments, reactions, and messages",
   "loadingMore": "Loading more...",
   "scrollForMore": "Scroll for more",
-  "newMention": "New Mention"
+  "newMention": "New Mention",
+  "systemComment": "{{actor}} commented on your post",
+  "systemReply": "{{actor}} replied to your comment",
+  "systemReactionPost": "{{actor}} reacted to your post",
+  "systemReactionComment": "{{actor}} reacted to your comment",
+  "systemReactionShowcase": "{{actor}} reacted to your showcase",
+  "systemMessage": "New message from {{actor}}",
+  "systemMention": "{{actor}} mentioned you",
+  "systemFollower": "{{actor}} started following you",
+  "subscriptionCancelled": "Subscription Cancelled",
+  "subscriptionExpired": "Subscription Expired",
+  "paymentFailed": "Payment Failed",
+  "subscriptionCancelledBody": "Your subscription has been cancelled. You can resubscribe at any time to regain premium access.",
+  "subscriptionExpiredBody": "Your subscription has expired. Please renew to regain premium access.",
+  "paymentFailedBody": "Your subscription payment failed. Please update your payment method to keep your premium access."
 }

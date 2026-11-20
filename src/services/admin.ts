@@ -142,16 +142,16 @@ export async function banUser(
     if (durationInterval) {
         const now = new Date();
         switch (durationInterval) {
-            case t("errors:1Hour2"):
+            case '1 hour':
                 now.setHours(now.getHours() + 1);
                 break;
-            case t("errors:1Day"):
+            case '1 day':
                 now.setDate(now.getDate() + 1);
                 break;
-            case t("errors:7Days2"):
+            case '7 days':
                 now.setDate(now.getDate() + 7);
                 break;
-            case t("errors:30Days2"):
+            case '30 days':
                 now.setDate(now.getDate() + 30);
                 break;
         }

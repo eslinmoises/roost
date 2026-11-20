@@ -95,5 +95,8 @@
   "showReplies_one": "Show {{count}} reply",
   "showReplies_other": "Show {{count}} replies",
   "showNewPosts_one": "Show {{count}} new post",
-  "showNewPosts_other": "Show {{count}} new posts"
+  "showNewPosts_other": "Show {{count}} new posts",
+  "sortNewest": "Newest",
+  "sortPopular": "Popular",
+  "sortTrending": "Trending"
 }

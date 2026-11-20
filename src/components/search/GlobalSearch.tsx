@@ -23,7 +23,7 @@ interface GlobalSearchProps {
 
 export default function GlobalSearch({
     className = '',
-    placeholder = 'Search...',
+    placeholder = t('common:searchPlaceholder'),
     onClose,
     autoFocus = false,
 }: GlobalSearchProps) {

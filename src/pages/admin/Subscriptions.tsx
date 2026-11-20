@@ -2,6 +2,7 @@ import { Trans } from 'react-i18next';
 import { formatNumber } from '@/lib/locale';
 import { localizeError } from '@/i18n/errors';
 import { activeLanguage } from '@/i18n';
+import { cleanupMessage as localizeCleanupMessage } from '@/i18n/persisted';
 import { useTranslation } from 'react-i18next';
 import { t } from '@/i18n';
 import { useState, useEffect, useCallback } from 'react';
@@ -122,7 +123,7 @@ export default function AdminSubscriptions() {
         setCleanupMessage(null);
         try {
             const result = await stripeAdminService.runCleanup();
-            setCleanupMessage(result.message);
+            setCleanupMessage(localizeCleanupMessage(result.message));
             await fetchStats();
         } catch (err) {
             setError(err instanceof Error ? localizeError(err.message) : t("admin:cleanupFailed"));
@@ -218,7 +219,7 @@ export default function AdminSubscriptions() {
                             </div>
                             <div>
                                 <p className="text-2xl font-bold text-surface-900 dark:text-surface-100">{formatNumber(stats.webhooks.total)}</p>
-                                <p className="text-xs text-surface-500 dark:text-surface-400">{t("admin:webhooksFailed", { value1: stats.webhooks.failed })}</p>
+                                <p className="text-xs text-surface-500 dark:text-surface-400">{t("admin:webhooksFailed", { count: stats.webhooks.failed })}</p>
                             </div>
                         </div>
                     </div>

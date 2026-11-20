@@ -51,7 +51,7 @@ export default function Home() {
                     <div className="flex items-center gap-6 text-sm">
                         <div className="flex items-center gap-2">
                             <Users className="w-4 h-4 text-surface-400 dark:text-surface-500" />
-                            <span className="text-surface-600 dark:text-surface-400">{t("common:members", { value1: membersCount })}</span>
+                            <span className="text-surface-600 dark:text-surface-400">{t('common:memberTotal', { count: membersCount })}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />

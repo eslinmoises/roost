@@ -41,5 +41,21 @@
   "status_completed": "Completada",
   "status_rejected": "Rechazada",
   "SubscriptionCancelledText": "Hola, {{safeName}}:\n\nTu suscripción a {{safeProductName}} fue cancelada. Tu acceso continúa hasta el {{formattedDate}} (período de gracia de 7 días).\n\nSi cambias de opinión, puedes reactivar tu suscripción cuando quieras desde la configuración de tu cuenta.\n\nSaludos,\nEl equipo de {{fromName}}",
-  "SubscriptionReactivatedText": "Hola, {{safeName}}:\n\n¡Buenas noticias! Tu suscripción a {{safeProductName}} se ha reactivado.\n\nYa tienes acceso completo a todas las funciones de la comunidad otra vez.\n{{frontendUrl}}\n\nSaludos,\nEl equipo de {{fromName}}"
+  "SubscriptionReactivatedText": "Hola, {{safeName}}:\n\n¡Buenas noticias! Tu suscripción a {{safeProductName}} se ha reactivado.\n\nYa tienes acceso completo a todas las funciones de la comunidad otra vez.\n{{frontendUrl}}\n\nSaludos,\nEl equipo de {{fromName}}",
+  "notice_systemComment": "{{actor}} comentó en tu publicación",
+  "notice_systemReply": "{{actor}} respondió a tu comentario",
+  "notice_systemReactionPost": "{{actor}} reaccionó a tu publicación",
+  "notice_systemReactionComment": "{{actor}} reaccionó a tu comentario",
+  "notice_systemReactionShowcase": "{{actor}} reaccionó a tu proyecto de la vitrina",
+  "notice_systemMessage": "Nuevo mensaje de {{actor}}",
+  "notice_systemMention": "{{actor}} te mencionó",
+  "notice_systemFollower": "{{actor}} empezó a seguirte",
+  "notice_subscriptionCancelled": "Suscripción cancelada",
+  "notice_subscriptionExpired": "Suscripción vencida",
+  "notice_paymentFailed": "Pago fallido",
+  "notice_subscriptionCancelledBody": "Tu suscripción fue cancelada. Puedes volver a suscribirte cuando quieras para recuperar el acceso premium.",
+  "notice_subscriptionExpiredBody": "Tu suscripción venció. Renuévala para recuperar el acceso premium.",
+  "notice_paymentFailedBody": "El pago de tu suscripción falló. Actualiza tu método de pago para conservar el acceso premium.",
+  "notice_newMention": "Nueva mención",
+  "notice_mentionedYouInAComment": "{{value1}} te mencionó en un comentario"
 }

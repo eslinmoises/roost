@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
@@ -15,7 +14,6 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const STORAGE_KEY = 'theme-preference';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    useTranslation();
     const [theme, setThemeState] = useState<Theme>(() => {
         const stored = localStorage.getItem(STORAGE_KEY);
         return (stored as Theme) || 'system';

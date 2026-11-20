@@ -5,7 +5,6 @@
   "uploaded_other": "{{count}} files uploaded",
   "available_one": "{{count}} recording available",
   "available_other": "{{count}} recordings available",
-  "showingOfRecordings": "Showing {{value1}}-{{value2}} of {{value3}} recordings",
   "filesToUpload": "Files to upload ({{value1}})",
   "upload_one": "Upload {{count}} File",
   "upload_other": "Upload {{count}} Files",
@@ -167,5 +166,7 @@
   "pleaseType": "Please type",
   "toConfirm": "to confirm.",
   "sentence13": "This action cannot be undone. This will permanently delete the<part0> {{value0}} </part0>classroom and all of its content.",
-  "sentence14": "Please type <part0>{{value0}}</part0> to confirm."
+  "sentence14": "Please type <part0>{{value0}}</part0> to confirm.",
+  "showingOfRecordings_one": "Showing {{value1}}-{{value2}} of {{count}} recordings",
+  "showingOfRecordings_other": "Showing {{value1}}-{{value2}} of {{count}} recordings"
 }

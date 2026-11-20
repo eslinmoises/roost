@@ -10,5 +10,19 @@
   "youLlBeNotifiedAboutCommentsReactionsAndMessages": "Recibirás notificaciones sobre comentarios, reacciones y mensajes",
   "loadingMore": "Cargando más...",
   "scrollForMore": "Desplázate para ver más",
-  "newMention": "Nueva mención"
+  "newMention": "Nueva mención",
+  "systemComment": "{{actor}} comentó en tu publicación",
+  "systemReply": "{{actor}} respondió a tu comentario",
+  "systemReactionPost": "{{actor}} reaccionó a tu publicación",
+  "systemReactionComment": "{{actor}} reaccionó a tu comentario",
+  "systemReactionShowcase": "{{actor}} reaccionó a tu proyecto de la vitrina",
+  "systemMessage": "Nuevo mensaje de {{actor}}",
+  "systemMention": "{{actor}} te mencionó",
+  "systemFollower": "{{actor}} empezó a seguirte",
+  "subscriptionCancelled": "Suscripción cancelada",
+  "subscriptionExpired": "Suscripción vencida",
+  "paymentFailed": "Pago fallido",
+  "subscriptionCancelledBody": "Tu suscripción fue cancelada. Puedes volver a suscribirte cuando quieras para recuperar el acceso premium.",
+  "subscriptionExpiredBody": "Tu suscripción venció. Renuévala para recuperar el acceso premium.",
+  "paymentFailedBody": "El pago de tu suscripción falló. Actualiza tu método de pago para conservar el acceso premium."
 }

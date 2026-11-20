@@ -52,7 +52,7 @@ export default function ModuleCard({ module, onClick }: ModuleCardProps) {
                     <p className="text-xs text-surface-500 dark:text-surface-400">
                         {formatNumber(module.progress_percentage)}%
                         {module.recording_count > 0 && (
-                            <span className="ml-1">{t("classroom:lessons", { value1: module.completed_count, value2: module.recording_count })}</span>
+                            <span className="ml-1">{t('classroom:lessonProgress', { value1: module.completed_count, count: module.recording_count })}</span>
                         )}
                     </p>
                 </div>

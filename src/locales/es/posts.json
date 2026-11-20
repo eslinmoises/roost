@@ -95,5 +95,8 @@
   "showReplies_one": "Mostrar {{count}} respuesta",
   "showReplies_other": "Mostrar {{count}} respuestas",
   "showNewPosts_one": "Mostrar {{count}} publicación nueva",
-  "showNewPosts_other": "Mostrar {{count}} publicaciones nuevas"
+  "showNewPosts_other": "Mostrar {{count}} publicaciones nuevas",
+  "sortNewest": "Más recientes",
+  "sortPopular": "Populares",
+  "sortTrending": "Tendencias"
 }

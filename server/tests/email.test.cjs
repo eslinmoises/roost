@@ -50,3 +50,16 @@ test('English email subjects and text remain available', async () => {
   await emailService.sendNotificationEmail({ to: 'test@example.com', userName: 'Ana', notificationType: 'new_comment', title: 'A post' });
   assert.equal(last.subject, 'New Comment: A post');
 });
+test('stock database notifications are translated at email presentation time', async () => {
+  process.env.EMAIL_LOCALE = 'es';
+  await emailService.sendNotificationEmail({ to: 'test@example.com', userName: 'Ana', notificationType: 'new_message', title: 'New message from Ana', message: 'Keep this excerpt in English' });
+  assert.equal(last.subject, 'Nuevo mensaje de Ana');
+  assert.match(last.html, /Nuevo mensaje de Ana/);
+  assert.match(last.text, /Keep this excerpt in English/);
+  await emailService.sendNotificationEmail({ to: 'test@example.com', userName: 'Ana', notificationType: 'new_message', title: 'Subscription Expired', message: 'Your subscription has expired. Please renew to regain premium access.' });
+  assert.equal(last.subject, 'Suscripción vencida');
+  assert.match(last.text, /Renuévala para recuperar/);
+  process.env.EMAIL_LOCALE = 'en';
+  await emailService.sendNotificationEmail({ to: 'test@example.com', userName: 'Ana', notificationType: 'new_message', title: 'New message from Ana' });
+  assert.equal(last.subject, 'New message from Ana');
+});

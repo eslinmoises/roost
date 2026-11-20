@@ -1,5 +1,4 @@
 {
-  "remaining": "{{value1}} / {{value2}} restantes",
   "requested": "Solicitado el {{value1}}",
   "downloadInstallTheOnYourWordPressSite": "Descarga e instala el {{value1}} en tu sitio de WordPress",
   "activationRemainingThisMonth_one": "{{count}} activación restante este mes",
@@ -45,5 +44,7 @@
   "yourLoginDetailsAreStoredSecurelyAndOnlyUsed": "Tus datos de acceso se guardan de forma segura y nuestro equipo solo los usa para activar el producto en tu sitio web.",
   "cancel": "Cancelar",
   "submitting": "Enviando...",
-  "submitRequest": "Enviar solicitud"
+  "submitRequest": "Enviar solicitud",
+  "remaining_one": "{{count}} / {{value2}} restante",
+  "remaining_other": "{{count}} / {{value2}} restantes"
 }

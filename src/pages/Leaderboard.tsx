@@ -118,7 +118,7 @@ export default function Leaderboard() {
                                     <UserRankBadge rank={userRank.rank} size="lg" />
                                     <div>
                                         <p className="text-3xl font-bold">#{formatNumber(userRank.rank)}</p>
-                                        <p className="text-purple-100">{t("leaderboard:outOfUsers", { value1: userRank.totalUsers.toLocaleString(activeLanguage()) })}</p>
+                                        <p className="text-purple-100">{t("leaderboard:outOfUsers", { count: userRank.totalUsers })}</p>
                                     </div>
                                 </div>
                             </div>

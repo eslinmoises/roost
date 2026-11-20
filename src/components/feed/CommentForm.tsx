@@ -26,7 +26,7 @@ export default function CommentForm({
     placeholder = t("posts:writeAComment"),
     autoFocus = false,
     initialValue = '',
-    submitLabel = 'Post',
+    submitLabel = t('common:uiPost'),
     onCancel,
     isReply = false,
 }: CommentFormProps) {

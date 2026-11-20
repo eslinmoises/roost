@@ -46,7 +46,7 @@ interface GuideSection {
 // Feature card component
 function FeatureCard({ icon: Icon, title, description }: { icon: typeof Home; title: string; description: string }) {
     useTranslation();
-    
+
     return (
         <div className="bg-white dark:bg-surface-800 rounded-xl p-6 border border-surface-200 dark:border-surface-700 hover:border-primary-300 dark:hover:border-primary-700 transition-colors">
             <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center mb-4">
@@ -331,7 +331,7 @@ export default function Guide() {
             {
                 get title() { return t("guide:managingNotifications"); },
                 get description() { return t("guide:markNotificationsAsReadIndividuallyOrMarkAllAs"); },
-                tips: [t("guide:swipeOrClickToMarkAsRead"), t("guide:useMarkAllReadToClearTheBadge"), 'Adjust preferences in Settings > Notifications'],
+                tips: [t("guide:swipeOrClickToMarkAsRead"), t("guide:useMarkAllReadToClearTheBadge"), t('guide:adjustNotificationPreferences')],
                 screenshot: { src: '/guide-screenshots/settings.png', alt: t("guide:settingsPageForNotificationPreferences") },
             },
         ],

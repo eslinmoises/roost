@@ -95,7 +95,7 @@ export default function SubscriptionRequired() {
         const end = new Date(endsAt);
         const diff = end.getTime() - now.getTime();
 
-        if (diff <= 0) return 'Expired';
+        if (diff <= 0) return t('billing:expired');
 
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));

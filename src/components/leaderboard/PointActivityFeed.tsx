@@ -1,4 +1,5 @@
 import { formatNumber } from '@/lib/locale';
+import { pointActivityDescription } from '@/i18n/persisted';
 import { localizeError } from '@/i18n/errors';
 import { activeLanguage } from '@/i18n';
 import { useTranslation } from 'react-i18next';
@@ -165,7 +166,7 @@ export default function PointActivityFeed({ userId, limit = ITEMS_PER_PAGE }: Po
                         <div className="flex-1 min-w-0">
                             <div className="flex items-baseline gap-2">
                                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                                    {activity.description || config.label}
+                                    {pointActivityDescription(activity.action_type, activity.description, config.label)}
                                 </p>
                                 <span className={`text-sm font-semibold ${activity.points > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                                     {activity.points > 0 ? '+' : ''}{formatNumber(activity.points)}

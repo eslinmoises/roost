@@ -129,5 +129,6 @@
   "stillHaveQuestions": "Still have questions?",
   "sendUsAMessage": "Send us a message",
   "andWeLlBeHappyToHelp": "and we'll be happy to help!",
-  "sentence15": "Still have questions?{{value0}}<part0>Send us a message</part0>{{value1}}and we'll be happy to help!"
+  "sentence15": "Still have questions?{{value0}}<part0>Send us a message</part0>{{value1}}and we'll be happy to help!",
+  "adjustNotificationPreferences": "Adjust preferences in Settings > Notifications"
 }

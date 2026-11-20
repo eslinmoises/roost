@@ -1,4 +1,4 @@
-import { t } from '@/i18n';
+import i18n from '@/i18n';
 import { supabase } from './supabase';
 import type { Notification } from '../types/database';
 
@@ -249,13 +249,14 @@ export async function createMentionNotifications(
     if (!users || users.length === 0) return;
 
     // Create notifications for each mentioned user (skip self-mentions)
+    const canonical = i18n.getFixedT('en', 'notifications');
     const notifications = users
       .filter(u => u.id !== actorId)
       .map(u => ({
         user_id: u.id,
         type: 'mention' as const,
-        title: t("notifications:newMention"),
-        message: t("notifications:mentionedYouInAComment", { value1: actorName }),
+        title: canonical('newMention'),
+        message: canonical('mentionedYouInAComment', { value1: actorName }),
         link: `/post/${postId}`,
         is_read: false,
       }));

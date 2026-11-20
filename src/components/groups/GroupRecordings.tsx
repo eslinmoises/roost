@@ -178,7 +178,7 @@ export default function GroupRecordings({ groupId, userRole }: GroupRecordingsPr
                     {/* Pagination Controls */}
                     {totalPages > 1 && (
                         <div className="flex items-center justify-between pt-4">
-                            <p className="text-sm text-surface-500 dark:text-surface-400">{t("groups:showingOfRecordings", { value1: startIndex + 1, value2: Math.min(endIndex, sortedRecordings.length), value3: sortedRecordings.length })}</p>
+                            <p className="text-sm text-surface-500 dark:text-surface-400">{t("groups:showingOfRecordings", { value1: startIndex + 1, value2: Math.min(endIndex, sortedRecordings.length), count: sortedRecordings.length })}</p>
                             <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}

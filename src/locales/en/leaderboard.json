@@ -4,7 +4,6 @@
   "hAgo": "{{value1}}h ago",
   "dAgo": "{{value1}}d ago",
   "rank": "Rank #{{value1}}",
-  "outOfUsers": "out of {{value1}} users",
   "topContributors": "Top Contributors",
   "noDataYet": "No data yet",
   "pts": "pts",
@@ -53,5 +52,13 @@
   "attendAnEvent": "Attend an Event",
   "rSVPAndJoinCommunityEvents": "RSVP and join community events",
   "completeYourProfile": "Complete Your Profile",
-  "oneTimeBonusForACompleteProfile": "One-time bonus for a complete profile"
+  "oneTimeBonusForACompleteProfile": "One-time bonus for a complete profile",
+  "storedPost": "Created a new post",
+  "storedComment": "Created a new comment",
+  "storedReactionGiven": "Gave a reaction",
+  "storedReactionReceived": "Received a reaction",
+  "storedEvent": "RSVP'd to an event",
+  "storedShowcase": "Showcase approved: {{title}}",
+  "outOfUsers_one": "out of {{count}} users",
+  "outOfUsers_other": "out of {{count}} users"
 }

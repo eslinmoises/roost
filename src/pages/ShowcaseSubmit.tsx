@@ -501,7 +501,7 @@ export default function ShowcaseSubmit() {
                             onChange={setDescription}
                             placeholder={t("showcase:describeYourProjectInDetail")}
                         />
-                        <p className="text-xs text-surface-500 mt-1">{t("showcase:charactersMin50", { value1: description.replace(/<[^>]*>/g, '').length })}</p>
+                        <p className="text-xs text-surface-500 mt-1">{t("showcase:charactersMin50", { count: description.replace(/<[^>]*>/g, '').length })}</p>
                     </div>
 
                     <div>

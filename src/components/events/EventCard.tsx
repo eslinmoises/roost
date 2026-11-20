@@ -98,7 +98,7 @@ export default function EventCard({ event, onRSVP, onClick, showGroup = true }: 
                 {event.attendeeCount && (
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                         <Users size={16} className="text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                        <span>{t("events:going", { value1: event.attendeeCount.going, value2: event.attendeeCount.maybe > 0 ? t('events:maybeCount', { count: event.attendeeCount.maybe }) : '' })}</span>
+                        <span>{t('events:attendingCount', { count: event.attendeeCount.going, maybe: event.attendeeCount.maybe > 0 ? t('events:maybeCount', { count: event.attendeeCount.maybe }) : '' })}</span>
                     </div>
                 )}
 
